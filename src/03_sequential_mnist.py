@@ -48,8 +48,8 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 
 def input_fn(split):
-    train_split = 'train[:TRAIN_SAMPLES]'
-    valid_split = 'train[TRAIN_SAMPLES:]'
+    train_split = f'train[:{TRAIN_SAMPLES}]'
+    valid_split = f'train[{TRAIN_SAMPLES}:]'
     if split == 'train':
         dataset = mnist_builder.as_dataset(as_supervised=True, split=train_split)
         print("Total amount of training samples: " + len(dataset))
