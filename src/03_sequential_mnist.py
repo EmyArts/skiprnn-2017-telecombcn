@@ -25,7 +25,6 @@ create_generic_flags()
 
 # Task-specific flags
 tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
-
 FLAGS = tf.app.flags.FLAGS
 
 # Constants
@@ -35,7 +34,7 @@ VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 600
 
 # Load data
-mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path)
+mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path, sl)
 mnist_builder.download_and_prepare()
 info = mnist_builder.info
 # datasets = mnist_builder.as_dataset()
@@ -54,9 +53,9 @@ def input_fn(split):
     if split == 'train':
         dataset = mnist_builder.as_dataset(as_supervised=True, split='train')
     elif split == 'val':
-        dataset = mnist_builder.as_dataset(as_supervised=True, split='val')
+        dataset = mnist_builder.as_dataset(as_supervised=True, split='test')
     elif split == 'test':
-        dataset = mnist_builder.as_dataset(as_supervised=True, split=tfds.Split.TEST)
+        dataset = mnist_builder.as_dataset(as_supervised=True, split='test')
     else:
         raise ValueError()
 
