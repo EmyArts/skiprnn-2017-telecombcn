@@ -31,7 +31,7 @@ FLAGS = tf.app.flags.FLAGS
 OUTPUT_SIZE = 10
 SEQUENCE_LENGTH = 784
 VALIDATION_SAMPLES = 5000
-NUM_EPOCHS = 600
+NUM_EPOCHS = 10
 
 # Load data
 mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path)
@@ -48,12 +48,12 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 
 def input_fn(split):
-    #splits = ("train[:90]", "train[:10]")
-    #train_split, valid_split = tfds.Split.TRAIN.subsplit([TRAIN_SAMPLES, VALIDATION_SAMPLES])
+    train_split = 'train[:TRAIN_SAMPLES]'
+    valid_split = 'train[TRAIN_SAMPLES:]'
     if split == 'train':
-        dataset = mnist_builder.as_dataset(as_supervised=True, split='train')
+        dataset = mnist_builder.as_dataset(as_supervised=True, split=train_split)
     elif split == 'val':
-        dataset = mnist_builder.as_dataset(as_supervised=True, split='test')
+        dataset = mnist_builder.as_dataset(as_supervised=True, split=valid_split)
     elif split == 'test':
         dataset = mnist_builder.as_dataset(as_supervised=True, split='test')
     else:
