@@ -34,7 +34,7 @@ VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 600
 
 # Load data
-mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path, sl)
+mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path)
 mnist_builder.download_and_prepare()
 info = mnist_builder.info
 # datasets = mnist_builder.as_dataset()
