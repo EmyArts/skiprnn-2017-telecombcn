@@ -38,6 +38,7 @@ NUM_EPOCHS = 600
 mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path)
 mnist_builder.download_and_prepare()
 info = mnist_builder.info
+# datasets = mnist_builder.as_dataset()
 
 TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples - VALIDATION_SAMPLES
 TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples
@@ -48,11 +49,12 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 
 def input_fn(split):
-    train_split, valid_split = tfds.Split.TRAIN.subsplit([TRAIN_SAMPLES, VALIDATION_SAMPLES])
+    #splits = ("train[:90]", "train[:10]")
+    #train_split, valid_split = tfds.Split.TRAIN.subsplit([TRAIN_SAMPLES, VALIDATION_SAMPLES])
     if split == 'train':
-        dataset = mnist_builder.as_dataset(as_supervised=True, split=train_split)
+        dataset = mnist_builder.as_dataset(as_supervised=True, split='train')
     elif split == 'val':
-        dataset = mnist_builder.as_dataset(as_supervised=True, split=valid_split)
+        dataset = mnist_builder.as_dataset(as_supervised=True, split='val')
     elif split == 'test':
         dataset = mnist_builder.as_dataset(as_supervised=True, split=tfds.Split.TEST)
     else:
