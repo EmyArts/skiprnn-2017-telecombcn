@@ -31,7 +31,7 @@ FLAGS = tf.app.flags.FLAGS
 OUTPUT_SIZE = 10
 SEQUENCE_LENGTH = 784
 VALIDATION_SAMPLES = 5000
-NUM_EPOCHS = 3
+NUM_EPOCHS = 50
 
 # Load data
 mnist_builder = tfds.builder('mnist', data_dir=FLAGS.data_path)
