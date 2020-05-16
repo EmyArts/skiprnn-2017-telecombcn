@@ -27,7 +27,7 @@ def create_generic_flags():
     tf.app.flags.DEFINE_string('logdir', '../logs', "Directory where TensorBoard logs will be stored.")
 
     # Flags for the Skip RNN cells
-    tf.app.flags.DEFINE_float('cost_per_sample', 0.01, "Cost per used sample. Set to 0 to disable this option.")
+    tf.app.flags.DEFINE_float('cost_per_sample', 0.0001, "Cost per used sample. Set to 0 to disable this option.")
 
 
 def compute_gradients(loss, learning_rate, gradient_clipping=-1):
