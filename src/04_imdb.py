@@ -50,7 +50,7 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 def input_fn(split):
     test_split = f'train[:{TEST_SAMPLES}]'
-    valid_split = f'test[{TRAIN_SAMPLES}:]'
+    valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
         dataset = imdb_builder.as_dataset(as_supervised=True, split='train')
         #print("Total amount of training samples: " + str(len(list(dataset))))
