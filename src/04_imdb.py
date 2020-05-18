@@ -72,6 +72,7 @@ def input_fn(split):
     text, labels = iterator.get_next()
     iterator_init_op = iterator.initializer
 
+    print("\n\n Images: " + str(text[0]))
     inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     return inputs
 
