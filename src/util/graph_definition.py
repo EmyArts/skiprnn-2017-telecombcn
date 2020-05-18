@@ -69,7 +69,7 @@ def create_model(model, num_cells, batch_size, learn_initial_state=True):
             else:
                 initial_state = []
                 for idx, cell in enumerate(cell_list):
-                    with tf.variable_scope('layer_%d' % (idx + 1)):
+                    with tf.compat.v1.variable_scope('layer_%d' % (idx + 1)):
                         initial_state.append(cell.trainable_initial_state(batch_size))
                 initial_state = tuple(initial_state)
         else:

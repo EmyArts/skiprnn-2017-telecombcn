@@ -67,7 +67,7 @@ class SkipLSTMCell(tf.nn.rnn_cell.RNNCell):
         return SkipLSTMOutputTuple(self._num_units, 1)
 
     def __call__(self, inputs, state, scope=None):
-        with tf.variable_scope(scope or type(self).__name__):
+        with tf.compat.v1.variable_scope(scope or type(self).__name__):
             c_prev, h_prev, update_prob_prev, cum_update_prob_prev = state
 
             # Parameters of gates are concatenated into one multiply for efficiency.
@@ -86,7 +86,7 @@ class SkipLSTMCell(tf.nn.rnn_cell.RNNCell):
             new_h_tilde = self._activation(new_c_tilde) * tf.sigmoid(o)
 
             # Compute value for the update prob
-            with tf.variable_scope('state_update_prob'):
+            with tf.compat.v1.variable_scope('state_update_prob'):
                 new_update_prob_tilde = rnn_ops.linear(new_c_tilde, 1, True, bias_start=self._update_bias)
                 new_update_prob_tilde = tf.sigmoid(new_update_prob_tilde)
 
@@ -111,14 +111,14 @@ class SkipLSTMCell(tf.nn.rnn_cell.RNNCell):
         :param batch_size: number of samples per batch
         :return: SkipLSTMStateTuple
         """
-        with tf.variable_scope('initial_c'):
+        with tf.compat.v1.variable_scope('initial_c'):
             initial_c = rnn_ops.create_initial_state(batch_size, self._num_units)
-        with tf.variable_scope('initial_h'):
+        with tf.compat.v1.variable_scope('initial_h'):
             initial_h = rnn_ops.create_initial_state(batch_size, self._num_units)
-        with tf.variable_scope('initial_update_prob'):
+        with tf.compat.v1.variable_scope('initial_update_prob'):
             initial_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                initializer=tf.ones_initializer())
-        with tf.variable_scope('initial_cum_update_prob'):
+        with tf.compat.v1.variable_scope('initial_cum_update_prob'):
             initial_cum_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                    initializer=tf.zeros_initializer())
         return SkipLSTMStateTuple(initial_c, initial_h, initial_update_prob, initial_cum_update_prob)
@@ -157,14 +157,14 @@ class MultiSkipLSTMCell(tf.nn.rnn_cell.RNNCell):
         return SkipLSTMOutputTuple(self._num_units[-1], 1)
 
     def __call__(self, inputs, state, scope=None):
-        with tf.variable_scope(scope or type(self).__name__):
+        with tf.compat.v1.variable_scope(scope or type(self).__name__):
             update_prob_prev, cum_update_prob_prev = state[-1].update_prob, state[-1].cum_update_prob
             cell_input = inputs
             state_candidates = []
 
             # Compute update candidates for all layers
             for idx in range(self._num_layers):
-                with tf.variable_scope('layer_%d' % (idx + 1)):
+                with tf.compat.v1.variable_scope('layer_%d' % (idx + 1)):
                     c_prev, h_prev = state[idx].c, state[idx].h
 
                     # Parameters of gates are concatenated into one multiply for efficiency.
@@ -186,7 +186,7 @@ class MultiSkipLSTMCell(tf.nn.rnn_cell.RNNCell):
                     cell_input = new_h_tilde
 
             # Compute value for the update prob
-            with tf.variable_scope('state_update_prob'):
+            with tf.compat.v1.variable_scope('state_update_prob'):
                 new_update_prob_tilde = rnn_ops.linear(state_candidates[-1].c, 1, True, bias_start=self._update_bias)
                 new_update_prob_tilde = tf.sigmoid(new_update_prob_tilde)
 
@@ -218,21 +218,21 @@ class MultiSkipLSTMCell(tf.nn.rnn_cell.RNNCell):
         """
         initial_states = []
         for idx in range(self._num_layers - 1):
-            with tf.variable_scope('layer_%d' % (idx + 1)):
-                with tf.variable_scope('initial_c'):
+            with tf.compat.v1.variable_scope('layer_%d' % (idx + 1)):
+                with tf.compat.v1.variable_scope('initial_c'):
                     initial_c = rnn_ops.create_initial_state(batch_size, self._num_units[idx])
-                with tf.variable_scope('initial_h'):
+                with tf.compat.v1.variable_scope('initial_h'):
                     initial_h = rnn_ops.create_initial_state(batch_size, self._num_units[idx])
                 initial_states.append(LSTMStateTuple(initial_c, initial_h))
-        with tf.variable_scope('layer_%d' % self._num_layers):
-            with tf.variable_scope('initial_c'):
+        with tf.compat.v1.variable_scope('layer_%d' % self._num_layers):
+            with tf.compat.v1.variable_scope('initial_c'):
                 initial_c = rnn_ops.create_initial_state(batch_size, self._num_units[-1])
-            with tf.variable_scope('initial_h'):
+            with tf.compat.v1.variable_scope('initial_h'):
                 initial_h = rnn_ops.create_initial_state(batch_size, self._num_units[-1])
-            with tf.variable_scope('initial_update_prob'):
+            with tf.compat.v1.variable_scope('initial_update_prob'):
                 initial_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                    initializer=tf.ones_initializer())
-            with tf.variable_scope('initial_cum_update_prob'):
+            with tf.compat.v1.variable_scope('initial_cum_update_prob'):
                 initial_cum_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                        initializer=tf.zeros_initializer())
             initial_states.append(SkipLSTMStateTuple(initial_c, initial_h,
@@ -267,11 +267,11 @@ class SkipGRUCell(tf.nn.rnn_cell.RNNCell):
         return SkipGRUOutputTuple(self._num_units, 1)
 
     def __call__(self, inputs, state, scope=None):
-        with tf.variable_scope(scope or type(self).__name__):
+        with tf.compat.v1.variable_scope(scope or type(self).__name__):
             h_prev, update_prob_prev, cum_update_prob_prev = state
 
             # Parameters of gates are concatenated into one multiply for efficiency.
-            with tf.variable_scope("gates"):
+            with tf.compat.v1.variable_scope("gates"):
                 concat = rnn_ops.linear([inputs, h_prev], 2 * self._num_units, bias=True, bias_start=1.0)
 
             # r = reset_gate, u = update_gate
@@ -285,12 +285,12 @@ class SkipGRUCell(tf.nn.rnn_cell.RNNCell):
             r = tf.sigmoid(r)
             u = tf.sigmoid(u)
 
-            with tf.variable_scope("candidate"):
+            with tf.compat.v1.variable_scope("candidate"):
                 new_c_tilde = self._activation(rnn_ops.linear([inputs, r * h_prev], self._num_units, True))
             new_h_tilde = u * h_prev + (1 - u) * new_c_tilde
 
             # Compute value for the update prob
-            with tf.variable_scope('state_update_prob'):
+            with tf.compat.v1.variable_scope('state_update_prob'):
                 new_update_prob_tilde = rnn_ops.linear(new_h_tilde, 1, True, bias_start=self._update_bias)
                 new_update_prob_tilde = tf.sigmoid(new_update_prob_tilde)
 
@@ -314,12 +314,12 @@ class SkipGRUCell(tf.nn.rnn_cell.RNNCell):
         :param batch_size: number of samples per batch
         :return: SkipGRUStateTuple
         """
-        with tf.variable_scope('initial_h'):
+        with tf.compat.v1.variable_scope('initial_h'):
             initial_h = rnn_ops.create_initial_state(batch_size, self._num_units)
-        with tf.variable_scope('initial_update_prob'):
+        with tf.compat.v1.variable_scope('initial_update_prob'):
             initial_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                initializer=tf.ones_initializer())
-        with tf.variable_scope('initial_cum_update_prob'):
+        with tf.compat.v1.variable_scope('initial_cum_update_prob'):
             initial_cum_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                    initializer=tf.zeros_initializer())
         return SkipGRUStateTuple(initial_h, initial_update_prob, initial_cum_update_prob)
@@ -355,21 +355,21 @@ class MultiSkipGRUCell(tf.nn.rnn_cell.RNNCell):
         return SkipGRUOutputTuple(self._num_units[-1], 1)
 
     def __call__(self, inputs, state, scope=None):
-        with tf.variable_scope(scope or type(self).__name__):
+        with tf.compat.v1.variable_scope(scope or type(self).__name__):
             update_prob_prev, cum_update_prob_prev = state[-1].update_prob, state[-1].cum_update_prob
             cell_input = inputs
             state_candidates = []
 
             # Compute update candidates for all layers
             for idx in range(self._num_layers):
-                with tf.variable_scope('layer_%d' % (idx + 1)):
+                with tf.compat.v1.variable_scope('layer_%d' % (idx + 1)):
                     if isinstance(state[idx], SkipGRUStateTuple):
                         h_prev = state[idx].h
                     else:
                         h_prev = state[idx]
 
                     # Parameters of gates are concatenated into one multiply for efficiency.
-                    with tf.variable_scope("gates"):
+                    with tf.compat.v1.variable_scope("gates"):
                         concat = rnn_ops.linear([cell_input, h_prev], 2 * self._num_units[idx], bias=True, bias_start=1.0,)
 
                     # r = reset_gate, u = update_gate
@@ -383,7 +383,7 @@ class MultiSkipGRUCell(tf.nn.rnn_cell.RNNCell):
                     r = tf.sigmoid(r)
                     u = tf.sigmoid(u)
 
-                    with tf.variable_scope("candidate"):
+                    with tf.compat.v1.variable_scope("candidate"):
                         new_c_tilde = self._activation(rnn_ops.linear([inputs, r * h_prev], self._num_units[idx], True))
                     new_h_tilde = u * h_prev + (1 - u) * new_c_tilde
 
@@ -391,7 +391,7 @@ class MultiSkipGRUCell(tf.nn.rnn_cell.RNNCell):
                     cell_input = new_h_tilde
 
             # Compute value for the update prob
-            with tf.variable_scope('state_update_prob'):
+            with tf.compat.v1.variable_scope('state_update_prob'):
                 new_update_prob_tilde = rnn_ops.linear(state_candidates[-1], 1, True, bias_start=self._update_bias)
                 new_update_prob_tilde = tf.sigmoid(new_update_prob_tilde)
 
@@ -421,17 +421,17 @@ class MultiSkipGRUCell(tf.nn.rnn_cell.RNNCell):
         """
         initial_states = []
         for idx in range(self._num_layers - 1):
-            with tf.variable_scope('layer_%d' % (idx + 1)):
-                with tf.variable_scope('initial_h'):
+            with tf.compat.v1.variable_scope('layer_%d' % (idx + 1)):
+                with tf.compat.v1.variable_scope('initial_h'):
                     initial_h = rnn_ops.create_initial_state(batch_size, self._num_units[idx])
                 initial_states.append(initial_h)
-        with tf.variable_scope('layer_%d' % self._num_layers):
-            with tf.variable_scope('initial_h'):
+        with tf.compat.v1.variable_scope('layer_%d' % self._num_layers):
+            with tf.compat.v1.variable_scope('initial_h'):
                 initial_h = rnn_ops.create_initial_state(batch_size, self._num_units[-1])
-            with tf.variable_scope('initial_update_prob'):
+            with tf.compat.v1.variable_scope('initial_update_prob'):
                 initial_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                    initializer=tf.ones_initializer())
-            with tf.variable_scope('initial_cum_update_prob'):
+            with tf.compat.v1.variable_scope('initial_cum_update_prob'):
                 initial_cum_update_prob = rnn_ops.create_initial_state(batch_size, 1, trainable=False,
                                                                        initializer=tf.zeros_initializer())
             initial_states.append(SkipGRUStateTuple(initial_h, initial_update_prob, initial_cum_update_prob))

@@ -63,8 +63,8 @@ def linear(args, output_size, bias, weights_init=None, bias_start=0.0):
     dtype = [a.dtype for a in args][0]
 
     # Now the computation.
-    scope = tf.get_variable_scope()
-    with tf.variable_scope(scope) as outer_scope:
+    scope = tf.get_compat.v1.variable_scope()
+    with tf.compat.v1.variable_scope(scope) as outer_scope:
         weights = get_variable("Weights", [total_arg_size, output_size], initializer=weights_init)
         if len(args) == 1:
             res = tf.matmul(args[0], weights)
@@ -72,7 +72,7 @@ def linear(args, output_size, bias, weights_init=None, bias_start=0.0):
             res = tf.matmul(tf.concat(args, 1), weights)
         if not bias:
             return res
-        with tf.variable_scope(outer_scope) as inner_scope:
+        with tf.compat.v1.variable_scope(outer_scope) as inner_scope:
             inner_scope.set_partitioner(None)
             biases = get_variable('Biases', [output_size], initializer=tf.constant_initializer(bias_start, dtype=dtype))
         return tf.nn.bias_add(res, biases)
@@ -100,9 +100,9 @@ def layer_norm(x, axes=1, initial_bias_value=0.0, epsilon=1e-3, name="var"):
     if not isinstance(axes, list):
         axes = [axes]
 
-    scope = tf.get_variable_scope()
-    with tf.variable_scope(scope):
-        with tf.variable_scope(name):
+    scope = tf.get_compat.v1.variable_scope()
+    with tf.compat.v1.variable_scope(scope):
+        with tf.compat.v1.variable_scope(name):
             mean = tf.reduce_mean(x, axes, keep_dims=True)
             variance = tf.sqrt(tf.reduce_mean(tf.square(x - mean), axes, keep_dims=True))
 

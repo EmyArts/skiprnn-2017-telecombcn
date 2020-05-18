@@ -85,7 +85,7 @@ def model_fn(mode, inputs, reuse=False):
 
     is_training = (mode == 'train')
 
-    with tf.variable_scope('model', reuse=reuse):
+    with tf.compat.v1.variable_scope('model', reuse=reuse):
         cell, initial_state = create_model(model=FLAGS.model,
                                            num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                            batch_size=FLAGS.batch_size)
