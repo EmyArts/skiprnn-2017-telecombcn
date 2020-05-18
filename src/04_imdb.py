@@ -27,7 +27,6 @@ create_generic_flags()
 # Task-specific flags
 tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
 FLAGS = tf.app.flags.FLAGS
-embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
 
 # Constants
 OUTPUT_SIZE = 2
@@ -65,12 +64,6 @@ def input_fn(split):
     else:
         raise ValueError()
 
-    def preprocess(x, y):
-        print(x)
-        x = embed(x)
-        return x, y
-
-    dataset = dataset.map(preprocess)
     dataset = dataset.repeat()
     dataset = dataset.batch(FLAGS.batch_size)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
@@ -84,7 +77,8 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    samples = tf.reshape(inputs['text'], (-1, SEQUENCE_LENGTH, 1))
+    embed = hub.Model("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
+    samples = embed(inputs['text'])
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
