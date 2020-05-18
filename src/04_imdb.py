@@ -16,6 +16,7 @@ import datetime
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
 import tensorflow_datasets as tfds
+import nltk
 
 from util.misc import *
 from util.graph_definition import *
@@ -64,7 +65,7 @@ def input_fn(split):
         raise ValueError()
 
     def preprocess(x, y):
-        x = tf.cast(x, tf.float32) / 255.0
+        x = nltk.word_tokenize(x)
         return x, y
 
     dataset = dataset.map(preprocess)
