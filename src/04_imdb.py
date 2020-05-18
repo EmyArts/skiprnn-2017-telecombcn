@@ -16,8 +16,7 @@ import datetime
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
 import tensorflow_datasets as tfds
-import nltk
-nltk.download("punkt")
+import tensorflow_hub as hub
 
 from util.misc import *
 from util.graph_definition import *
@@ -28,6 +27,7 @@ create_generic_flags()
 # Task-specific flags
 tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
 FLAGS = tf.app.flags.FLAGS
+embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
 
 # Constants
 OUTPUT_SIZE = 2
@@ -67,7 +67,7 @@ def input_fn(split):
 
     def preprocess(x, y):
         print(x)
-        x = nltk.word_tokenize(x)
+        x = embed(x)
         return x, y
 
     dataset = dataset.map(preprocess)
