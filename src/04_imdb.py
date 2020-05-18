@@ -64,7 +64,7 @@ def input_fn(split):
         raise ValueError()
 
     def preprocess(x, y):
-        #x = tf.cast(x, tf.float32) / 255.0
+        x = tf.cast(x, tf.float32) # / 255.0
         return x, y
 
     dataset = dataset.map(preprocess)
