@@ -30,7 +30,7 @@ FLAGS = tf.app.flags.FLAGS
 
 # Constants
 OUTPUT_SIZE = 2
-SEQUENCE_LENGTH = 784
+SEQUENCE_LENGTH = 128
 VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
@@ -77,7 +77,7 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    embed = hub.Model("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
+    embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
     samples = embed(inputs['text'])
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
