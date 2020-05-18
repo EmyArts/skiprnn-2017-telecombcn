@@ -35,7 +35,7 @@ VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
 # Load data
-imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
+imdb_builder = tfds.builder('imdb_reviews/subwords8k', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 # datasets = mnist_builder.as_dataset()
@@ -53,19 +53,20 @@ def input_fn(split):
     test_split = f'train[:{TEST_SAMPLES}]'
     valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
-        dataset = imdb_builder.as_dataset(as_supervised=True, split='train')
+        dataset, info = imdb_builder.as_dataset(as_supervised=True, split='train', with_info=True)
         #print("Total amount of training samples: " + str(len(list(dataset))))
     elif split == 'val':
-        dataset = imdb_builder.as_dataset(as_supervised=True, split=valid_split)
+        dataset, info = imdb_builder.as_dataset(as_supervised=True, split=valid_split, with_info=True)
         #print("Total amount of validation samples: " + str(len(list(dataset))))
     elif split == 'test':
-        dataset = imdb_builder.as_dataset(as_supervised=True, split=test_split)
+        dataset, info = imdb_builder.as_dataset(as_supervised=True, split=test_split, with_info=True)
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
 
-    dataset = dataset.repeat()
-    dataset = dataset.batch(FLAGS.batch_size)
+    encoder = info.features['text'].encoder
+    # dataset = dataset.repeat()
+    dataset = dataset.shuffle(1000).padded_batch(FLAGS.batch_size, padded_shapes=([None],[]))
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
@@ -78,9 +79,9 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    embeddings = tf.get_variable('embedding_matrix', [2, FLAGS.rnn_cells])
+    embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
+    embeddings = tf.get_variable('embed', [2, FLAGS.rnn_cells])
     tf.nn.embedding_lookup(embeddings, inputs["text"])
-    #embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
     samples = tf.reshape(tf.nn.embedding_lookup(embeddings, inputs["text"]), (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
