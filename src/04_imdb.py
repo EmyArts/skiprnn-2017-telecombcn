@@ -66,6 +66,7 @@ def input_fn(split):
         raise ValueError()
 
     def preprocess(x, y):
+        print(x)
         x = nltk.word_tokenize(x)
         return x, y
 
