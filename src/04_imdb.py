@@ -78,8 +78,10 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
-    samples = tf.reshape(embed(inputs['text']), (-1, SEQUENCE_LENGTH, 1))
+    embeddings = tf.get_variable('embedding_matrix', [2, FLAGS.rnn_cells])
+    tf.nn.embedding_lookup(embeddings, inputs["text"])
+    #embed = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
+    samples = tf.reshape(tf.nn.embedding_lookup(embeddings, inputs["text"]), (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
