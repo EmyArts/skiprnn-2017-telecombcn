@@ -34,7 +34,7 @@ VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
 # Load data
-imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
+imdb_builder = tfds.builder('imdb_reviews/subword8k', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 # datasets = mnist_builder.as_dataset()
@@ -73,15 +73,15 @@ def input_fn(split):
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
-    images, labels = iterator.get_next()
+    text, labels = iterator.get_next()
     iterator_init_op = iterator.initializer
 
-    inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     return inputs
 
 
 def model_fn(mode, inputs, reuse=False):
-    samples = tf.reshape(inputs['images'], (-1, SEQUENCE_LENGTH, 1))
+    samples = tf.reshape(inputs['text'], (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
