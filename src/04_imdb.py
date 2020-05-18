@@ -17,6 +17,7 @@ import tensorflow as tf
 import tensorflow.contrib.layers as layers
 import tensorflow_datasets as tfds
 import nltk
+nltk.download("punkt")
 
 from util.misc import *
 from util.graph_definition import *
