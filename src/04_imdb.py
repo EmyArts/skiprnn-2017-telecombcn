@@ -66,7 +66,7 @@ def input_fn(split):
 
     # encoder = info.features['text'].encoder
     # dataset = dataset.repeat()
-    dataset = dataset.shuffle(1000).padded_batch(FLAGS.batch_size, padded_shapes=(64, ))
+    dataset = dataset.shuffle(1000).padded_batch(FLAGS.batch_size, padded_shapes=([None],[]))
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
