@@ -35,7 +35,7 @@ VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
 # Load data
-imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
+imdb_builder = tfds.builder('imdb_reviews/subwords8k', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 # datasets = mnist_builder.as_dataset()
