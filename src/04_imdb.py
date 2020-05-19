@@ -53,13 +53,13 @@ def input_fn(split):
     test_split = f'test[:{TEST_SAMPLES}]'
     valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
-        dataset, info = imdb_builder.as_dataset(as_supervised=True, split='train')
+        dataset = imdb_builder.as_dataset(as_supervised=True, split='train')
         #print("Total amount of training samples: " + str(len(list(dataset))))
     elif split == 'val':
-        dataset, info = imdb_builder.as_dataset(as_supervised=True, split=valid_split)
+        dataset = imdb_builder.as_dataset(as_supervised=True, split=valid_split)
         #print("Total amount of validation samples: " + str(len(list(dataset))))
     elif split == 'test':
-        dataset, info = imdb_builder.as_dataset(as_supervised=True, split=test_split)
+        dataset = imdb_builder.as_dataset(as_supervised=True, split=test_split)
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
