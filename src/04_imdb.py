@@ -50,7 +50,7 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 
 def input_fn(split):
-    test_split = f'train[:{TEST_SAMPLES}]'
+    test_split = f'test[:{TEST_SAMPLES}]'
     valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
         dataset, info = imdb_builder.as_dataset(as_supervised=True, split='train')
@@ -64,7 +64,7 @@ def input_fn(split):
     else:
         raise ValueError()
 
-    encoder = info.features['text'].encoder
+    # encoder = info.features['text'].encoder
     # dataset = dataset.repeat()
     dataset = dataset.shuffle(1000).padded_batch(FLAGS.batch_size, padded_shapes=([None],[]))
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
