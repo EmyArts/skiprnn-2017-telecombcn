@@ -35,7 +35,7 @@ VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
 # Load data
-imdb_builder = tfds.builder('imdb_reviews/subwords8k', data_dir=FLAGS.data_path)
+imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 # datasets = mnist_builder.as_dataset()
@@ -47,7 +47,6 @@ TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples - VALIDATION_SAMPLES
 ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
 VAL_ITERS = int(VALIDATION_SAMPLES / FLAGS.batch_size)
 TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
-
 
 def input_fn(split):
     test_split = f'test[:{TEST_SAMPLES}]'
@@ -64,6 +63,7 @@ def input_fn(split):
     else:
         raise ValueError()
 
+    print(dataset)
     # encoder = info.features['text'].encoder
     # dataset = dataset.repeat()
     dataset = dataset.shuffle(1000).padded_batch(FLAGS.batch_size, padded_shapes=([None],[]))
@@ -79,8 +79,6 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    embedding_matrix = hub.load("https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1")
-    print(embedding_matrix)
     embeddings = tf.get_variable('embedding_matrix', [2, FLAGS.rnn_cells])
     samples = tf.reshape(tf.nn.embedding_lookup(embeddings, inputs["text"]), (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
