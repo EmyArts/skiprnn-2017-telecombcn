@@ -24,7 +24,8 @@ class Embedding:
 		encoder = {}
 		decoder = {}
 		train_data, test_data, info = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=True, as_supervised=True)
-		for word in train_data
+		for word, _ in train_data:
+
 
 
 
