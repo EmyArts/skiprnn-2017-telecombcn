@@ -44,8 +44,8 @@ class Embedding:
 					probs[word] += 1
 
 		probs = {k: v / total_words for k, v in probs.items()}
-		probs[self.PAD_WORD] = 1 - np.finfo(float).epsilon
-		probs[self.UNK_WORD] = np.finfo(float).epsilon
+		probs[self.PAD_WORD] = 1 - np.finfo(float).eps
+		probs[self.UNK_WORD] = np.finfo(float).eps
 
 		pickle.dump(encoder, (self.encoder_file, 'wb'), protocol= 0)
 		pickle.dump(decoder, (self.decoder_file, 'wb'), protocol= 0)
