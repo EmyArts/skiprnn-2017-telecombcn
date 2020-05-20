@@ -20,6 +20,7 @@ import tensorflow_hub as hub
 
 from util.misc import *
 from util.graph_definition import *
+from Embedder import Embedder
 
 # Task-independent flags
 create_generic_flags()
@@ -30,7 +31,7 @@ FLAGS = tf.app.flags.FLAGS
 
 # Constants
 OUTPUT_SIZE = 2
-SEQUENCE_LENGTH = 64
+SEQUENCE_LENGTH = 3000
 VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
@@ -63,24 +64,16 @@ def input_fn(split):
     else:
         raise ValueError()
 
-    print(dataset)
-    # encoder = info.features['text'].encoder
-    # dataset = dataset.repeat()
-    dataset = dataset.shuffle(1000).padded_batch(FLAGS.batch_size, padded_shapes=([],[]))
-    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
-
     iterator = dataset.make_initializable_iterator()
-    text, labels = iterator.get_next()
     iterator_init_op = iterator.initializer
-
-    print("\n\n Images: " + str(text[0]))
-    inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    text, probs, labels = Embedder.get_embeddings(dataset)
+    inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
     return inputs
 
 
 def model_fn(mode, inputs, reuse=False):
     embeddings = tf.get_variable('embedding_matrix', [2, FLAGS.rnn_cells])
-    samples = tf.reshape(tf.nn.embedding_lookup(embeddings, inputs["text"]), (-1, SEQUENCE_LENGTH, 1))
+    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')

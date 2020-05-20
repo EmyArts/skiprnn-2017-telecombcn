@@ -74,8 +74,8 @@ def input_fn(split):
     iterator = dataset.make_initializable_iterator()
     images, labels = iterator.get_next()
     iterator_init_op = iterator.initializer
-
     inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    print(inputs)
     return inputs
 
 
