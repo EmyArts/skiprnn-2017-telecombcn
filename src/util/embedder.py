@@ -15,8 +15,8 @@ class Embedding:
 		self.probs_file = 'probs.pkl'
 
 
-		self.UNK_WORD = 'unk'
-		self.PAD_WORD = 'pad_word'
+		self.unk_word = 'unk'
+		self.pad_word = 'pad_word'
 
 		if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
 			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
@@ -26,9 +26,9 @@ class Embedding:
 			self.encoder, self.decoder, self.probs = self.train_embedding()
 
 	def train_embedding(self):
-		encoder = {self.PAD_WORD: 0, self.UNK_WORD: 1}
-		decoder = {0: self.PAD_WORD , 1: self.UNK_WORD}
-		probs = {self.PAD_WORD: 1, self.UNK_WORD: 1}
+		encoder = {self.pad_word: 0, self.unk_word: 1}
+		decoder = {0: self.pad_word , 1: self.unk_word}
+		probs = {self.pad_word: 1, self.unk_word: 1}
 		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True, data_dir=DATA_DIR)
 		total_words = 2 # pad and unknown
 		idx = 2
@@ -44,8 +44,8 @@ class Embedding:
 					probs[word] += 1
 
 		probs = {k: v / total_words for k, v in probs.items()}
-		probs[self.PAD_WORD] = 1 - np.finfo(float).eps
-		probs[self.UNK_WORD] = np.finfo(float).eps
+		probs[self.pad_word] = 1 - np.finfo(float).eps
+		probs[self.unk_word] = np.finfo(float).eps
 
 		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol= 0)
 		pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol= 0)
@@ -64,7 +64,7 @@ class Embedding:
 				tokens.append(self.pad_word)
 			for t in tokens:
 				if not t in self.encoder.keys:
-					t = self.UNK_WORD
+					t = self.unk_word
 				inp.append(self.encoder[t])
 				p.append(self.probs[t])
 			inputs.append(inp)
