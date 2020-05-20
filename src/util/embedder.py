@@ -55,7 +55,7 @@ class Embedding:
 	def get_embeddings(self, data):
 		inputs = []
 		probs = []
-		label = []
+		l = []
 		for text, label in tfds.as_numpy(data):
 			inp = []
 			p = []
@@ -69,7 +69,7 @@ class Embedding:
 				p.append(self.probs[t])
 			inputs.append(inp)
 			probs.append(p)
-			label.append(label)
+			l.append(label)
 		return inputs, probs, label
 
 
