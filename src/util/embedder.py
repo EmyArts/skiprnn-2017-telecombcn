@@ -4,7 +4,7 @@ import nltk
 import numpy as np
 from os import path
 nltk.download("punkt")
-DATA_DIR = '../data'
+DATA_DIR = '.../data'
 
 class Embedding:
 	def __init__(self):
