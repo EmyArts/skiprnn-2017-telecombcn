@@ -20,7 +20,7 @@ import tensorflow_hub as hub
 
 from util.misc import *
 from util.graph_definition import *
-from Embedder import Embedder
+from util.embedder import Embedder
 
 # Task-independent flags
 create_generic_flags()
