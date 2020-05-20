@@ -1,17 +1,12 @@
 import pickle
-import tensorflow as tf
 import tensorflow_datasets as tfds
 import nltk
 import numpy as np
-import os.path
 from os import path
-
-# tf.enable_eager_execution
 nltk.download("punkt")
 
 
 class Embedding:
-	# Data is given as ...
 	def __init__(self):
 
 		self.max_sent_len = 3000 # Value emperically found, longest length was 2809

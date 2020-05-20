@@ -20,7 +20,7 @@ import tensorflow_hub as hub
 
 from util.misc import *
 from util.graph_definition import *
-from util.embedder import Embedder
+from util.embedder import Embedding
 
 # Task-independent flags
 create_generic_flags()
@@ -39,7 +39,7 @@ NUM_EPOCHS = 50
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
-embedder = Embedder()
+embedder = Embedding()
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
