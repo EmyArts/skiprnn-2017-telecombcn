@@ -11,7 +11,7 @@ class Embedding:
 
 		self.max_sent_len = 3000 # Value emperically found, longest length was 2809
 		self.decoder_file = 'decode.pkl'
-		self.encoder_file = 'decode.pkl'
+		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
 
 
@@ -27,7 +27,7 @@ class Embedding:
 
 	def train_embedding(self):
 		encoder = {self.pad_word: 0, self.unk_word: 1}
-		decoder = {0: self.pad_word , 1: self.unk_word}
+		decoder = {0: self.pad_word, 1: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
 		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True, data_dir=DATA_DIR)
 		total_words = 2 # pad and unknown
@@ -42,14 +42,14 @@ class Embedding:
 					probs[word] = 1
 				else:
 					probs[word] += 1
-
+		print(f"The vocabulary size is {total_words}")
 		probs = {k: v / total_words for k, v in probs.items()}
 		probs[self.pad_word] = 1 - np.finfo(float).eps
 		probs[self.unk_word] = np.finfo(float).eps
 
-		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol= 0)
-		pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol= 0)
-		pickle.dump(probs, open(self.probs_file, 'wb'), protocol= 0)
+		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
+		pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
+		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 		return encoder, decoder, probs
 
 	def get_embeddings(self, data):
