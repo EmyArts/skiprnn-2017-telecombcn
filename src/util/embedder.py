@@ -47,9 +47,9 @@ class Embedding:
 		probs[self.PAD_WORD] = 1 - np.finfo(float).eps
 		probs[self.UNK_WORD] = np.finfo(float).eps
 
-		pickle.dump(encoder, (self.encoder_file, 'wb'), protocol= 0)
-		pickle.dump(decoder, (self.decoder_file, 'wb'), protocol= 0)
-		pickle.dump(probs, (self.probs_file, 'wb'), protocol= 0)
+		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol= 0)
+		pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol= 0)
+		pickle.dump(probs, open(self.probs_file, 'wb'), protocol= 0)
 		return encoder, decoder, probs
 
 	def get_embeddings(self, data):
