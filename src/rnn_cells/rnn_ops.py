@@ -63,7 +63,7 @@ def linear(args, output_size, bias, weights_init=None, bias_start=0.0):
     dtype = [a.dtype for a in args][0]
 
     # Now the computation.
-    scope = tf.variable_scope()
+    scope = tf.get_variable_scope()
     with tf.variable_scope(scope) as outer_scope:
         weights = get_variable("Weights", [total_arg_size, output_size], initializer=weights_init)
         if len(args) == 1:
@@ -100,7 +100,7 @@ def layer_norm(x, axes=1, initial_bias_value=0.0, epsilon=1e-3, name="var"):
     if not isinstance(axes, list):
         axes = [axes]
 
-    scope = tf.variable_scope()
+    scope = tf.get_variable_scope()
     with tf.variable_scope(scope):
         with tf.variable_scope(name):
             mean = tf.reduce_mean(x, axes, keep_dims=True)
