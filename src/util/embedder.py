@@ -7,6 +7,24 @@ nltk.download("punkt")
 
 
 class Embedding:
+	def __init__(self):
+
+		self.max_sent_len = 3000 # Value emperically found, longest length was 2809
+		self.decoder_file = 'decode.pkl'
+		self.encoder_file = 'decode.pkl'
+		self.probs_file = 'probs.pkl'
+
+
+		self.UNK_WORD = 'unk'
+		self.PAD_WORD = 'pad_word'
+
+		if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
+			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
+			self.decoder = pickle.load(open(self.decoder_file, 'rb'))
+			self.probs = pickle.load(open(self.probs_file, 'rb'))
+		else:
+			self.encoder, self.decoder, self.probs = self.train_embedding()
+
 	def train_embedding(self):
 		encoder = {self.PAD_WORD: 0, self.UNK_WORD: 1}
 		decoder = {0: self.PAD_WORD , 1: self.UNK_WORD}
@@ -33,24 +51,6 @@ class Embedding:
 		pickle.dump(decoder, (self.decoder_file, 'wb'), protocol= 0)
 		pickle.dump(probs, (self.probs_file, 'wb'), protocol= 0)
 		return encoder, decoder, probs
-
-	def __init__(self):
-
-		self.max_sent_len = 3000 # Value emperically found, longest length was 2809
-		self.decoder_file = 'decode.pkl'
-		self.encoder_file = 'decode.pkl'
-		self.probs_file = 'probs.pkl'
-
-
-		self.UNK_WORD = 'unk'
-		self.PAD_WORD = 'pad_word'
-
-		if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
-			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
-			self.decoder = pickle.load(open(self.decoder_file, 'rb'))
-			self.probs = pickle.load(open(self.probs_file, 'rb'))
-		else:
-			self.encoder, self.decoder, self.probs = train_embedding()
 
 	def get_embeddings(self, data):
 		inputs = []
