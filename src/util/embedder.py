@@ -14,7 +14,6 @@ class Embedding:
 		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
 
-
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
 
@@ -26,12 +25,12 @@ class Embedding:
 			self.encoder, self.decoder, self.probs = self.train_embedding()
 
 	def train_embedding(self):
-		encoder = {self.pad_word: 0, self.unk_word: 1}
-		decoder = {0: self.pad_word, 1: self.unk_word}
+		encoder = {self.pad_word: 0.0, self.unk_word: 1.0}
+		decoder = {0.0: self.pad_word, 1.0: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
 		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True, data_dir=DATA_DIR)
 		total_words = 2 # pad and unknown
-		idx = 2
+		idx = 2.0
 		for text, label in tfds.as_numpy(train_data):
 			# the example is a tuple (text, label)
 			for word in nltk.tokenize.word_tokenize(str(text))[1:-1]:
