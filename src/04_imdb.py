@@ -16,7 +16,6 @@ import datetime
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
 import tensorflow_datasets as tfds
-import tensorflow_hub as hub
 
 from util.misc import *
 from util.graph_definition import *
@@ -73,13 +72,12 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    embeddings = tf.get_variable('embedding_matrix', [2, FLAGS.rnn_cells])
     samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
 
-    with tf.compat.v1.variable_scope('model', reuse=reuse):
+    with tf.variable_scope('model', reuse=reuse):
         cell, initial_state = create_model(model=FLAGS.model,
                                            num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                            batch_size=FLAGS.batch_size)
