@@ -4,7 +4,7 @@ import nltk
 import numpy as np
 from os import path
 nltk.download("punkt")
-
+DATA_DIR = '../data'
 
 class Embedding:
 	def __init__(self):
@@ -29,7 +29,7 @@ class Embedding:
 		encoder = {self.PAD_WORD: 0, self.UNK_WORD: 1}
 		decoder = {0: self.PAD_WORD , 1: self.UNK_WORD}
 		probs = {self.PAD_WORD: 1, self.UNK_WORD: 1}
-		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True)
+		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True, data_dir=DATA_DIR)
 		total_words = 2 # pad and unknown
 		idx = 2
 		for text, label in tfds.as_numpy(train_data):
@@ -44,8 +44,8 @@ class Embedding:
 					probs[word] += 1
 
 		probs = {k: v / total_words for k, v in probs.items()}
-		probs[self.PAD_WORD] = 1 - np.finf(float).epsilon
-		probs[self.UNK_WORD] = np.finf(float).epsilon
+		probs[self.PAD_WORD] = 1 - np.finfo(float).epsilon
+		probs[self.UNK_WORD] = np.finfo(float).epsilon
 
 		pickle.dump(encoder, (self.encoder_file, 'wb'), protocol= 0)
 		pickle.dump(decoder, (self.decoder_file, 'wb'), protocol= 0)
