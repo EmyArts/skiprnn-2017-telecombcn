@@ -29,7 +29,7 @@ class Embedding:
 		encoder = {self.PAD_WORD: 0, self.UNK_WORD: 1}
 		decoder = {0: self.PAD_WORD , 1: self.UNK_WORD}
 		probs = {self.PAD_WORD: 1, self.UNK_WORD: 1}
-		train_data, test_data, info = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=True, as_supervised=True)
+		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True)
 		total_words = 2 # pad and unknown
 		idx = 2
 		for text, label in tfds.as_numpy(train_data):
