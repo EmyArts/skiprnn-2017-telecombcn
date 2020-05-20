@@ -39,6 +39,7 @@ class Embedding:
 					encoder[word] = idx
 					decoder[idx] = word
 					probs[word] = 1
+					idx += 1
 				else:
 					probs[word] += 1
 		print(f"The vocabulary size is {total_words}")
