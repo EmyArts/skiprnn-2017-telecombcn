@@ -39,6 +39,7 @@ NUM_EPOCHS = 50
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
+embedder = Embedder()
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
@@ -66,7 +67,7 @@ def input_fn(split):
 
     iterator = dataset.make_initializable_iterator()
     iterator_init_op = iterator.initializer
-    text, probs, labels = Embedder.get_embeddings(dataset)
+    text, probs, labels = embedder.get_embeddings(dataset)
     inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
     return inputs
 
