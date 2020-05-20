@@ -43,7 +43,7 @@ class Embedding:
 				else:
 					probs[word] += 1
 
-		probs = {k: v / total_words for k, v in probs.iteritems()}
+		probs = {k: v / total_words for k, v in probs.items()}
 		probs[self.PAD_WORD] = 1 - np.finf(float).epsilon
 		probs[self.UNK_WORD] = np.finf(float).epsilon
 
