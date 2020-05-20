@@ -58,18 +58,24 @@ class Embedding:
 		return encoder, decoder, probs
 
 	def get_embeddings(self, data):
-		inp = []
+		inputs = []
+		probs = []
 		label = []
 		for text, label in tfds.as_numpy(data):
+			inp = []
+			p = []
 			tokens = nltk.tokenize.word_tokenize(str(text))[2:-1]
 			while len(tokens) < self.max_sent_len:
 				tokens.append(self.pad_word)
 			for t in tokens:
-				try:
-					inp.append(self.encoder[t])
-				except Exception:
-					print(f"Unknown word {t} was found")
-					inp.append(self.encoder[self.UNK_WORD])
+				if not t in self.encoder.keys:
+					t = self.UNK_WORD
+				inp.append(self.encoder[t])
+				p.append(self.probs[t])
+			inputs.append(inp)
+			probs.append(p)
+			label.append(label)
+		return inputs, probs, label
 
 
 
