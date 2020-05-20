@@ -63,7 +63,7 @@ class Embedding:
 			while len(tokens) < self.max_sent_len:
 				tokens.append(self.pad_word)
 			for t in tokens:
-				if not t in self.encoder.keys:
+				if not t in self.encoder.keys():
 					t = self.unk_word
 				inp.append(self.encoder[t])
 				p.append(self.probs[t])
