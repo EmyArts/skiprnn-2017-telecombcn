@@ -18,7 +18,7 @@ class Embedding:
 		self.UNK_WORD = 'unk'
 		self.PAD_WORD = 'pad_word'
 
-		if path.exists(self.encode_file) and path.exists(self.decode_file) and path.exists(self.probs_file):
+		if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
 			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
 			self.decoder = pickle.load(open(self.decoder_file, 'rb'))
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
