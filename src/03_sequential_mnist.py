@@ -73,7 +73,7 @@ def input_fn(split):
 
     iterator = dataset.make_initializable_iterator()
     images, labels = iterator.get_next()
-    print(f"\n\nImages shape is {tf.shape(images).numpy()}")
+    print(f"\n\nImages shape is {images.shape}")
     iterator_init_op = iterator.initializer
     inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
     print(inputs)
@@ -82,7 +82,7 @@ def input_fn(split):
 
 def model_fn(mode, inputs, reuse=False):
     samples = tf.reshape(inputs['images'], (-1, SEQUENCE_LENGTH, 1))
-    print(f"\n\nSample shape is {tf.shape(samples).numpy()}")
+    print(f"\n\nSample shape is {samples.shape}")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
