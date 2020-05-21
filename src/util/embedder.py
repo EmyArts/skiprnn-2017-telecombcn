@@ -52,32 +52,38 @@ class Embedding:
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 		return encoder, decoder, probs
 
-	def get_embeddings(self, data):
+	def get_embeddings(self, data, batch_size):
+		return_inputs = []
+		return_ps = []
+		return_l = []
+		b = 0
 		inputs = []
-		probs = []
+		ps = []
 		l = []
-		for batch in tfds.as_numpy(data):
-			inp_batch = []
-			probs_batch =[]
-			l_batch = []
-			for text, label in batch:
-				inp = []
-				p = []
-				tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
-				while len(tokens) < self.max_sent_len:
-					tokens.append(self.pad_word)
-				for t in tokens:
-					if not t in self.encoder.keys():
-						t = self.unk_word
-					inp.append(self.encoder[t])
-					p.append(self.probs[t])
-				inp_batch.append(inp)
-				probs_batch.append(p)
-				l_batch.append(label)
-			inputs.append(inp_batch)
-			probs.append(probs_batch)
-			l.append(l_batch)
-		return inputs, probs, l
+		for text, label in tfds.as_numpy(data):
+			if b == batch_size:
+				return_inputs.append(inputs)
+				return_ps.append(ps)
+				return_l.append(l)
+				b = 0
+				inputs = []
+				ps = []
+				l = []
+			inp = []
+			p = []
+			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
+			while len(tokens) < self.max_sent_len:
+				tokens.append(self.pad_word)
+			for t in tokens:
+				if not t in self.encoder.keys():
+					t = self.unk_word
+				inp.append(self.encoder[t])
+				p.append(self.probs[t])
+			inputs.append(inp)
+			ps.append(p)
+			l.append(label)
+		return return_inputs, return_ps, return_l
+
 
 
 

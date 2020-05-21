@@ -73,7 +73,7 @@ def input_fn(split):
 
     iterator = dataset.make_initializable_iterator()
     iterator_init_op = iterator.initializer
-    text, probs, labels = embedder.get_embeddings(dataset)
+    text, probs, labels = embedder.get_embeddings(dataset, FLAGS.batch_size)
     inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
     return inputs
 
