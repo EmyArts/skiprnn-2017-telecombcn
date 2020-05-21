@@ -102,7 +102,7 @@ def model_fn(mode, inputs, reuse=False):
     cross_entropy = tf.reduce_mean(cross_entropy_per_sample)
 
     # Compute accuracy
-    accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
+    accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float64))
 
     # Compute loss for each updated state
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
