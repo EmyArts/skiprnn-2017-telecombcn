@@ -56,11 +56,11 @@ class Embedding:
 		inputs = []
 		probs = []
 		l = []
-		for batch in data:
+		for batch in tfds.as_numpy(data):
 			inp_batch = []
 			probs_batch =[]
 			l_batch = []
-			for text, label in tfds.as_numpy(batch):
+			for text, label in batch:
 				inp = []
 				p = []
 				tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
