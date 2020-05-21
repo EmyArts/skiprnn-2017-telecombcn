@@ -75,11 +75,12 @@ def input_fn(split):
     iterator_init_op = iterator.initializer
     text, probs, labels = embedder.get_embeddings(dataset, FLAGS.batch_size)
     inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    print(f"\n\n Input shape is {text.shape}, probs shape is {probs.shape}, labels shape is {labels.shape}")
     return inputs
 
 
 def model_fn(mode, inputs, reuse=False):
-    #samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
+    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
