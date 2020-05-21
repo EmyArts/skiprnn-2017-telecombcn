@@ -69,6 +69,7 @@ class Embedding:
 				inputs = []
 				ps = []
 				l = []
+			b += 1
 			inp = []
 			p = []
 			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
