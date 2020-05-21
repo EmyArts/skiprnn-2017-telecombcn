@@ -13,6 +13,7 @@ class Embedding:
 		self.decoder_file = 'decode.pkl'
 		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
+		self.vocab_size = 3000*25000
 
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
@@ -43,6 +44,7 @@ class Embedding:
 				else:
 					probs[word] += 1
 		print(f"The vocabulary size is {total_words}")
+		self.vocab_size = total_words
 		probs = {k: v / total_words for k, v in probs.items()}
 		probs[self.pad_word] = 1 - np.finfo(float).eps
 		probs[self.unk_word] = np.finfo(float).eps
@@ -53,23 +55,10 @@ class Embedding:
 		return encoder, decoder, probs
 
 	def get_embeddings(self, data, batch_size):
-		return_inputs = []
-		return_ps = []
-		return_l = []
-		b = 0
 		inputs = []
 		ps = []
 		l = []
 		for text, label in tfds.as_numpy(data):
-			if b == batch_size:
-				return_inputs.append(inputs)
-				return_ps.append(ps)
-				return_l.append(l)
-				b = 0
-				inputs = []
-				ps = []
-				l = []
-			b += 1
 			inp = []
 			p = []
 			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
@@ -83,7 +72,8 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		return return_inputs, return_ps, return_l
+		batch_shape = (batch_size, int(len(inputs)/batch_size), self.vocab_size)
+		return np.array(inputs).reshape(batch_shape), np.array(ps).reshape(batch_shape), np.array(l).reshape(batch_shape)
 
 
 
