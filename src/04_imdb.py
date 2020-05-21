@@ -49,6 +49,7 @@ ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
 VAL_ITERS = int(VALIDATION_SAMPLES / FLAGS.batch_size)
 TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
+
 def input_fn(split):
     test_split = f'test[:{TEST_SAMPLES}]'
     valid_split = f'test[{TEST_SAMPLES}:]'
@@ -63,6 +64,10 @@ def input_fn(split):
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
+
+    dataset = dataset.repeat()
+    dataset = dataset.batch(FLAGS.batch_size)
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
     iterator_init_op = iterator.initializer

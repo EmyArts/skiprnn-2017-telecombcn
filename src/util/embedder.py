@@ -56,21 +56,28 @@ class Embedding:
 		inputs = []
 		probs = []
 		l = []
-		for text, label in tfds.as_numpy(data):
-			inp = []
-			p = []
-			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
-			while len(tokens) < self.max_sent_len:
-				tokens.append(self.pad_word)
-			for t in tokens:
-				if not t in self.encoder.keys():
-					t = self.unk_word
-				inp.append(self.encoder[t])
-				p.append(self.probs[t])
-			inputs.append(inp)
-			probs.append(p)
-			l.append(label)
-		return inputs, probs, label
+		for batch in data:
+			inp_batch = []
+			probs_batch =[]
+			l_batch = []
+			for text, label in tfds.as_numpy(batch):
+				inp = []
+				p = []
+				tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
+				while len(tokens) < self.max_sent_len:
+					tokens.append(self.pad_word)
+				for t in tokens:
+					if not t in self.encoder.keys():
+						t = self.unk_word
+					inp.append(self.encoder[t])
+					p.append(self.probs[t])
+				inp_batch.append(inp)
+				probs_batch.append(p)
+				l_batch.append(label)
+			inputs.append(inp_batch)
+			probs.append(probs_batch)
+			l.append(l_batch)
+		return inputs, probs, l
 
 
 
