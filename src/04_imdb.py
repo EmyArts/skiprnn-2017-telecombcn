@@ -69,6 +69,8 @@ def input_fn(split):
     dataset = dataset.batch(FLAGS.batch_size)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
+    print(dataset)
+
     iterator = dataset.make_initializable_iterator()
     iterator_init_op = iterator.initializer
     text, probs, labels = embedder.get_embeddings(dataset)
