@@ -84,7 +84,7 @@ def model_fn(mode, inputs, reuse=False):
     samples = tf.reshape(inputs['images'], (-1, SEQUENCE_LENGTH, 1))
     print(f"\n\nSample shape is {samples.shape}")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
-    print(f"\n\nLabels shape is {labels.shape}")
+    print(f"\n\nLabels shape is {ground_truth.shape}")
 
     is_training = (mode == 'train')
 
