@@ -64,12 +64,12 @@ def input_fn(split):
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
-
-    dataset = dataset.repeat()
-    dataset = dataset.batch(FLAGS.batch_size)
-    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
-
-    print(dataset)
+    #
+    # dataset = dataset.repeat()
+    # dataset = dataset.batch(FLAGS.batch_size)
+    # dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    #
+    # print(dataset)
 
     iterator = dataset.make_initializable_iterator()
     iterator_init_op = iterator.initializer
