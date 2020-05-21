@@ -29,7 +29,7 @@ tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data wi
 FLAGS = tf.app.flags.FLAGS
 
 # Constants
-OUTPUT_SIZE = 2
+OUTPUT_SIZE = 1
 SEQUENCE_LENGTH = 3000
 VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
