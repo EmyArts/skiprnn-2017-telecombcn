@@ -72,8 +72,8 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		batch_shape = (batch_size, int(len(inputs)/batch_size), self.max_sent_len)
-		return np.array(inputs).reshape(batch_shape), np.array(ps).reshape(batch_shape), np.array(l).reshape((batch_size, int(len(inputs)/batch_size)))
+		batch_shape = (int(len(inputs)/batch_size), batch_size, self.max_sent_len)
+		return np.array(inputs).reshape(batch_shape), np.array(ps).reshape(batch_shape), np.array(l).reshape((int(len(inputs)/batch_size), batch_size))
 
 
 
