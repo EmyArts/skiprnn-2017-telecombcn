@@ -1,5 +1,6 @@
 import pickle
 import tensorflow_datasets as tfds
+import tensorflow as tf
 import nltk
 import numpy as np
 from os import path
@@ -54,7 +55,7 @@ class Embedding:
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 		return encoder, decoder, probs
 
-	def get_embeddings(self, data, batch_size):
+	def get_embeddings(self, data):
 		inputs = []
 		ps = []
 		l = []
@@ -72,8 +73,7 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		batch_shape = (int(len(inputs)/batch_size), batch_size, self.max_sent_len)
-		return np.array(inputs).reshape(batch_shape), np.array(ps).reshape(batch_shape), np.array(l).reshape((int(len(inputs)/batch_size), batch_size))
+		return tf.data.Dataset.from_tensor_slices(inputs, ps, l)
 
 
 
