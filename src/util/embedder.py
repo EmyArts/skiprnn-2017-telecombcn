@@ -48,7 +48,7 @@ class Embedding:
 					idx += 1
 				else:
 					probs[word] += 1
-		print(f"The vocabulary size is {total_words}")
+		print(f"The vocabulary size is {tot al_words}")
 		self.vocab_size = total_words
 		probs = {k: v / total_words for k, v in probs.items()}
 		probs[self.pad_word] = 1 - np.finfo(np.float32).eps
@@ -66,8 +66,8 @@ class Embedding:
 		ps = []
 		l = []
 		for text, label in tfds.as_numpy(data):
-			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
-			p = np.full(self.max_sent_len, self.probs[self.pad_word])
+			inp = np.full((self.max_sent_len), self.encoder[self.pad_word])
+			p = np.full((self.max_sent_len), self.probs[self.pad_word])
 			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
 			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
