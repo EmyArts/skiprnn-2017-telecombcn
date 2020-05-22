@@ -48,7 +48,7 @@ class Embedding:
 					idx += 1
 				else:
 					probs[word] += 1
-		print(f"The vocabulary size is {tot al_words}")
+		print(f"The vocabulary size is {total_words}")
 		self.vocab_size = total_words
 		probs = {k: v / total_words for k, v in probs.items()}
 		probs[self.pad_word] = 1 - np.finfo(np.float32).eps
