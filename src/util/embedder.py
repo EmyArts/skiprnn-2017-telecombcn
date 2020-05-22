@@ -65,7 +65,7 @@ class Embedding:
 		inputs = []
 		ps = []
 		l = []
-		for text, label in tfds.as_numpy(data):
+		for text, label in tfds.as_numpy(data)[:10]:
 			inp = np.full((self.max_sent_len), self.encoder[self.pad_word])
 			p = np.full((self.max_sent_len), self.probs[self.pad_word])
 			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
