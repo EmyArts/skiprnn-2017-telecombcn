@@ -81,7 +81,6 @@ def input_fn(split):
     text, probs, labels = iterator.get_next()
     iterator_init_op = iterator.initializer
     inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
-    tf.data.Dataset(inputs)
     print(f"\n\n Input shape is {text.shape}, probs shape is {probs.shape}, labels shape is {labels.shape}")
     return inputs
 
