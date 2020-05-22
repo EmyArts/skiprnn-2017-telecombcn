@@ -118,3 +118,14 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
         return tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
     else:
         return tf.zeros(loss.get_shape())
+
+def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, surprisal_influence):
+    """
+    Compute penalization term on the average surprisal of the unread samples.
+    """
+    if using_skip_rnn(model):
+        return tf.reduce_mean(surprisal_influence * tf.math.divide(tf.math.multiply(updated_states,
+                                                                                    -tf.math.log(sample_probabilities)),
+                                                                   tf.reduce_sum(updated_states, 1)), 0)
+    else:
+        return tf.zeros(loss.get_shape())

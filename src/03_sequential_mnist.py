@@ -63,7 +63,7 @@ def input_fn(split):
         raise ValueError()
 
     def preprocess(x, y):
-        x = tf.cast(x, tf.float64) / 255.0
+        x = tf.cast(x, tf.float32) / 255.0
         return x, y
 
     dataset = dataset.map(preprocess)
@@ -93,7 +93,7 @@ def model_fn(mode, inputs, reuse=False):
                                            num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                            batch_size=FLAGS.batch_size)
 
-        rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float64, initial_state=initial_state)
+        rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
         # Split the outputs of the RNN into the actual outputs and the state update gate
         rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
