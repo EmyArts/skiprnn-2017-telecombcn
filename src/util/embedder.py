@@ -11,7 +11,7 @@ class Embedding:
 	def __init__(self):
 
 		self.max_sent_len = 3000 # Value emperically found, longest length was 2809
-		self.decoder_file = 'decode.pkl'
+		#self.decoder_file = 'decode.pkl'
 		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
 		self.vocab_size = 3000*25000
@@ -19,16 +19,20 @@ class Embedding:
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
 
-		if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
+		if path.exists(self.encoder_file) and path.exists(self.probs_file):
+		#if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
+			print("Using pkl files for embedding")
 			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
-			self.decoder = pickle.load(open(self.decoder_file, 'rb'))
+			#self.decoder = pickle.load(open(self.decoder_file, 'rb'))
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 		else:
-			self.encoder, self.decoder, self.probs = self.train_embedding()
+			#self.encoder, self.decoder, self.probs = self.train_embedding()
+			self.encoder, self.probs = self.train_embedding()
 
 	def train_embedding(self):
+		print("Training embedding")
 		encoder = {self.pad_word: 0.0, self.unk_word: 1.0}
-		decoder = {0.0: self.pad_word, 1.0: self.unk_word}
+		#decoder = {0.0: self.pad_word, 1.0: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
 		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True, data_dir=DATA_DIR)
 		total_words = 2 # pad and unknown
@@ -39,7 +43,7 @@ class Embedding:
 				total_words += 1
 				if not word in encoder.keys():
 					encoder[word] = idx
-					decoder[idx] = word
+					#decoder[idx] = word
 					probs[word] = 1
 					idx += 1
 				else:
@@ -51,9 +55,10 @@ class Embedding:
 		probs[self.unk_word] = np.finfo(float).eps
 
 		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
-		pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
+		#pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
-		return encoder, decoder, probs
+		#return encoder, decoder, probs
+		return encoder, probs
 
 	def get_embeddings(self, data):
 		print("Creating embeddings.")
