@@ -56,6 +56,7 @@ class Embedding:
 		return encoder, decoder, probs
 
 	def get_embeddings(self, data):
+		print("Creating embeddings.")
 		inputs = []
 		ps = []
 		l = []
