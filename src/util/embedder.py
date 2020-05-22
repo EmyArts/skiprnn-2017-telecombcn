@@ -73,7 +73,7 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		return tf.data.Dataset.from_tensor_slices(inputs, ps, l)
+		return tf.data.Dataset.from_tensor_slices((inputs, ps, l))
 
 
 
