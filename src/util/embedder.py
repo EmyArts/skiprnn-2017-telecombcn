@@ -51,8 +51,8 @@ class Embedding:
 		print(f"The vocabulary size is {total_words}")
 		self.vocab_size = total_words
 		probs = {k: v / total_words for k, v in probs.items()}
-		probs[self.pad_word] = 1 - np.finfo(float).eps
-		probs[self.unk_word] = np.finfo(float).eps
+		probs[self.pad_word] = 1 - np.finfo(np.float32).eps
+		probs[self.unk_word] = np.finfo(np.float32).eps
 
 		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
 		#pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
@@ -77,7 +77,7 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		print(inputs[:10], ps[:10], l[:10])
+		#print(inputs[:10], ps[:10], l[:10])
 		return tf.data.Dataset.from_tensor_slices((inputs, ps, l))
 
 
