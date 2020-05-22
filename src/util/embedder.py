@@ -21,7 +21,7 @@ class Embedding:
 
 		if path.exists(self.encoder_file) and path.exists(self.probs_file):
 		#if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
-			print("Using pkl files for embedding")
+			print("\nUsing pkl files for embedding\n")
 			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
 			#self.decoder = pickle.load(open(self.decoder_file, 'rb'))
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
@@ -30,7 +30,7 @@ class Embedding:
 			self.encoder, self.probs = self.train_embedding()
 
 	def train_embedding(self):
-		print("Training embedding")
+		print("\nTraining embedding\n")
 		encoder = {self.pad_word: 0.0, self.unk_word: 1.0}
 		#decoder = {0.0: self.pad_word, 1.0: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
