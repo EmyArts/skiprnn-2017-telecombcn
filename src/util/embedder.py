@@ -62,20 +62,18 @@ class Embedding:
 
 	def get_embeddings(self, data):
 		print("Creating embeddings.")
-		inputs = []
-		ps = []
+		inputs = np.full(data.as_numpy.shape, self.encoder[self.pad_word])
+		ps = np.full(data.as_numpy.shape, self.probs[self.pad_word])
 		l = []
 		for text, label in tfds.as_numpy(data):
-			inp = []
-			p = []
+			inp = np.empty(self.max_sent_len)
+			p = np.empty(self.max_sent_len)
 			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
-			while len(tokens) < self.max_sent_len:
-				tokens.append(self.pad_word)
-			for t in tokens:
+			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
 					t = self.unk_word
-				inp.append(self.encoder[t])
-				p.append(self.probs[t])
+				inp[i] = self.encoder[t]
+				p[i] = self.probs[t]
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
