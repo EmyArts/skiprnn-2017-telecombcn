@@ -82,14 +82,14 @@ INPUT_SIZE = 10
 COST_PER_SAMPLE = 1e-05
 
 # Placeholder for the input tensor with shape (batch, time, input_dims)
-x = tf.placeholder(tf.float64, [None, None, INPUT_SIZE])
+x = tf.placeholder(tf.float32, [None, None, INPUT_SIZE])
 
 # Create SkipLSTM and trainable initial state
 cell = SkipLSTMCell(NUM_CELLS)
 initial_state = cell.trainable_initial_state(BATCH_SIZE)
 
 # Dynamic RNN unfolding
-rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, x, dtype=tf.float64, initial_state=initial_state)
+rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, x, dtype=tf.float32, initial_state=initial_state)
 
 # Split the output into the actual RNN output and the state update gate
 rnn_outputs, updated_states = rnn_outputs.h, rnn_outputs.state_gate

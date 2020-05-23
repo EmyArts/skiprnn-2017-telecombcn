@@ -100,14 +100,14 @@ def generate_batch(batch_size, sampling_period, signal_duration, start_period, e
 
 
 def train():
-    samples = tf.compat.v1.placeholder(tf.float64, [None, None, INPUT_SIZE])  # (batch, time, in)
+    samples = tf.compat.v1.placeholder(tf.float32, [None, None, INPUT_SIZE])  # (batch, time, in)
     ground_truth = tf.compat.v1.placeholder(tf.int64, [None])  # (batch, out)
 
     cell, initial_state = create_model(model=FLAGS.model,
                                        num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                        batch_size=FLAGS.batch_size)
 
-    rnn_outputs, rnn_states = tf.compat.v1.nn.dynamic_rnn(cell, samples, dtype=tf.float64, initial_state=initial_state)
+    rnn_outputs, rnn_states = tf.compat.v1.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
     # Split the outputs of the RNN into the actual outputs and the state update gate
     rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
@@ -119,7 +119,7 @@ def train():
     cross_entropy = tf.reduce_mean(input_tensor=cross_entropy_per_sample)
 
     # Compute accuracy
-    accuracy = tf.reduce_mean(input_tensor=tf.cast(tf.equal(tf.argmax(input=out, axis=1), ground_truth), tf.float64))
+    accuracy = tf.reduce_mean(input_tensor=tf.cast(tf.equal(tf.argmax(input=out, axis=1), ground_truth), tf.float32))
 
     # Compute loss for each updated state
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)

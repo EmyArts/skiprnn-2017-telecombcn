@@ -98,14 +98,14 @@ def generate_batch(seq_length, batch_size, min_val, max_val):
 
 
 def train():
-    samples = tf.placeholder(tf.float64, [None, None, INPUT_SIZE])  # (batch, time, in)
-    ground_truth = tf.placeholder(tf.float64, [None, OUTPUT_SIZE])  # (batch, out)
+    samples = tf.placeholder(tf.float32, [None, None, INPUT_SIZE])  # (batch, time, in)
+    ground_truth = tf.placeholder(tf.float32, [None, OUTPUT_SIZE])  # (batch, out)
 
     cell, initial_state = create_model(model=FLAGS.model,
                                        num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                        batch_size=FLAGS.batch_size)
 
-    rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float64, initial_state=initial_state)
+    rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
     # Split the outputs of the RNN into the actual outputs and the state update gate
     rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)

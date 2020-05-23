@@ -89,7 +89,7 @@ def model_fn(mode, inputs, reuse=False):
                                            num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                            batch_size=FLAGS.batch_size)
 
-        rnn_outputs, rnn_states = tf.compat.v1.nn.dynamic_rnn(cell, samples, dtype=tf.float64, initial_state=initial_state)
+        rnn_outputs, rnn_states = tf.compat.v1.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
         # Split the outputs of the RNN into the actual outputs and the state update gate
         rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
@@ -102,7 +102,7 @@ def model_fn(mode, inputs, reuse=False):
     cross_entropy = tf.reduce_mean(input_tensor=cross_entropy_per_sample)
 
     # Compute accuracy
-    accuracy = tf.reduce_mean(input_tensor=tf.cast(tf.equal(predictions, ground_truth), tf.float64))
+    accuracy = tf.reduce_mean(input_tensor=tf.cast(tf.equal(predictions, ground_truth), tf.float32))
 
     # Compute loss for each updated state
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
