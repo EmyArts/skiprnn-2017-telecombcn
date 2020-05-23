@@ -6,14 +6,14 @@ import tensorflow as tf
 from tensorflow.python.util import nest
 
 
-def get_variable(name, shape, initializer=None, dtype=tf.float32, device=None):
+def get_variable(name, shape, initializer=None, dtype=tf.float64, device=None):
     """
     Helper to create a Variable stored on CPU memory.
     Args:
       name: name of the variable
       shape: list of ints
       initializer: initializer for Variable
-      dtype: data type, defaults to tf.float32
+      dtype: data type, defaults to tf.float64
       device: device to which the variable will be pinned
     Returns:
       Variable Tensor
@@ -80,7 +80,7 @@ def linear(args, output_size, bias, weights_init=None, bias_start=0.0):
 
 def create_initial_state(batch_size, state_size, trainable=True, initializer=tf.random_normal_initializer()):
     with tf.device('/cpu:0'):
-        s = tf.get_variable('initial_state', shape=[1, state_size], dtype=tf.float32, trainable=trainable,
+        s = tf.get_variable('initial_state', shape=[1, state_size], dtype=tf.float64, trainable=trainable,
                             initializer=initializer)
         state = tf.tile(s, tf.stack([batch_size] + [1]))
     return state

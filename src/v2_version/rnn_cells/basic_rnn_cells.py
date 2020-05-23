@@ -72,7 +72,7 @@ class BasicLSTMCell(tf.compat.v1.nn.rnn_cell.RNNCell):
         """
         def _create_initial_state(batch_size, state_size, trainable=True, initializer=tf.compat.v1.random_normal_initializer()):
             with tf.device('/cpu:0'):
-                s = tf.compat.v1.get_variable('initial_state', shape=[1, state_size], dtype=tf.float32, trainable=trainable,
+                s = tf.compat.v1.get_variable('initial_state', shape=[1, state_size], dtype=tf.float64, trainable=trainable,
                                     initializer=initializer)
                 state = tf.tile(s, tf.stack([batch_size] + [1]))
             return state
