@@ -65,8 +65,10 @@ def input_fn(split):
     else:
         raise ValueError()
 
-
-    dataset = embedder.get_embeddings(dataset)
+    try:
+        dataset = embedder.get_embeddings(dataset)
+    except:
+        print("An exception occured during the get embeddings.")
 
     dataset = dataset.repeat()
     dataset = dataset.batch(FLAGS.batch_size)
