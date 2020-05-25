@@ -127,6 +127,7 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     if using_skip_rnn(model):
         neg_updated_states = tf.subtract(tf.constant(1.0), updated_states)
         surprisal = tf.multiply(neg_updated_states, -(tf.log(sample_probabilities)))
-        return tf.reduce_mean(surprisal_influence * tf.divide(surprisal, tf.reduce_sum(neg_updated_states, 1)), 0)
+        average_surprisal = tf.divide(surprisal, tf.reduce_sum(neg_updated_states, 1))
+        return tf.reduce_mean(surprisal_influence * average_surprisal, 0)
     else:
         return tf.zeros(loss.get_shape())
