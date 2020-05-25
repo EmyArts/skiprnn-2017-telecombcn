@@ -123,6 +123,7 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     """
     Compute penalization term on the average surprisal of the unread samples.
     """
+    print(updated_states)
     if using_skip_rnn(model):
         neg_updated_states = tf.subtract(tf.constant(1.0), updated_states)
         return tf.reduce_mean(surprisal_influence * tf.divide(tf.multiply(neg_updated_states,
