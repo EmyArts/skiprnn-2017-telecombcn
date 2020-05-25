@@ -101,6 +101,8 @@ def model_fn(mode, inputs, reuse=False):
         # Split the outputs of the RNN into the actual outputs and the state update gate
         rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
 
+        print(f"\nUpdated states are {updated_states}.\n")
+
         logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=OUTPUT_SIZE)
         predictions = tf.argmax(logits, 1)
 
