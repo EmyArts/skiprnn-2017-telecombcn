@@ -85,6 +85,7 @@ def input_fn(split):
 def model_fn(mode, inputs, reuse=False):
     samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
     probs = inputs["probs"]
+    print(f"\nUpdated states are {probs}.\n")
     #probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     #samples = inputs["text"]
     #print(f"\n\nSample shape is {tf.shape(samples).numpy()}")
