@@ -120,7 +120,7 @@ def model_fn(mode, inputs, reuse=False):
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
     print(f"Budget loss: {budget_loss}")
 
-    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
+    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.001)
     print(f"Surprisal loss: {surprisal_loss}")
 
     # Combine all losses
