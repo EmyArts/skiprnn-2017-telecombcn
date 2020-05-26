@@ -4,13 +4,14 @@ import tensorflow as tf
 import nltk
 import numpy as np
 from os import path
+from gensim.utils import simple_tokenize
 nltk.download("punkt")
 DATA_DIR = '.../data'
 
 class Embedding:
 	def __init__(self):
 
-		self.max_sent_len = 3000 # Value emperically found, longest length was 2809
+		self.max_sent_len = 2520 # Value emperically found, longest length was 2514
 		#self.decoder_file = 'decode.pkl'
 		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
@@ -39,7 +40,7 @@ class Embedding:
 		idx = 2.0
 		for text, label in tfds.as_numpy(train_data):
 			# the example is a tuple (text, label)
-			for word in nltk.tokenize.word_tokenize(str(text))[1:-1]:
+			for word in simple_tokenize(str(text)):
 				total_words += 1
 				if not word in encoder.keys():
 					encoder[word] = idx
@@ -68,7 +69,7 @@ class Embedding:
 		for text, label in tfds.as_numpy(data):
 			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
 			p = np.full(self.max_sent_len, self.probs[self.pad_word])
-			tokens = nltk.tokenize.word_tokenize(str(text))[1:-1]
+			tokens = simple_tokenize(str(text))
 			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
 					t = self.unk_word
