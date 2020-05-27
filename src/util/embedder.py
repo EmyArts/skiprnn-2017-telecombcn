@@ -18,6 +18,7 @@ class Embedding:
 		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
 		self.vocab_size = 3000*25000
+		self.vec_len = 2
 
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
@@ -38,7 +39,7 @@ class Embedding:
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
-		encoder = {self.pad_word: 0.0, self.unk_word: 1.0}
+		encoder = {self.pad_word: [0.0, 0.0], self.unk_word: [1.0, 1.0]}
 		#decoder = {0.0: self.pad_word, 1.0: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
 		data = tfds.load('imdb_reviews/plain_text', split='unsupervised', data_dir=DATA_DIR)
@@ -53,7 +54,7 @@ class Embedding:
 			for idx, word in enumerate(tokens):
 				total_words += 1
 				if not word in encoder.keys():
-					encoder[word] = idx
+					encoder[word] = [idx, idx]
 					#decoder[idx] = word
 					probs[word] = 1
 					idx += 1

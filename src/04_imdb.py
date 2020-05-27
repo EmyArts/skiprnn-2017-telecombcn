@@ -40,6 +40,7 @@ imdb_builder.download_and_prepare()
 info = imdb_builder.info
 embedder = Embedding()
 SEQUENCE_LENGTH = embedder.max_sent_len
+EMBEDDING_LENGTH = embedder.vec_len
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
@@ -84,7 +85,7 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
+    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, EMBEDDING_LENGTH))
     #probs = inputs["probs"]
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     #samples = inputs["text"]
