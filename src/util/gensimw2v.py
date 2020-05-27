@@ -1,40 +1,36 @@
-import pickle
-import tensorflow_datasets as tfds
-import tensorflow as tf
-import nltk
+from gensim.test.utils import common_texts
 from gensim.models import Word2Vec
-from gensim.utils import simple_tokenize
-import numpy as np
 from os import path
+import pickle
+import tensorflow
+import tensorflow_datasets as tfds
 import multiprocessing
 nltk.download("punkt")
 DATA_DIR = '.../data'
 
-class Embedding:
-	def __init__(self):
+class Gensim_Embedding:
 
-		self.max_sent_len = 2520 # Value emperically found, longest length was 2514
-		#self.decoder_file = 'decode.pkl'
-		self.encoder_file = 'encode.pkl'
+	def __init__(self):
+		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
+		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
+		# self.decoder_file = 'decode.pkl'
+		# self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
-		self.vocab_size = 3000*25000
+		self.vocab_size = 3000 * 25000
 
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
 
 		if path.exists(self.encoder_file) and path.exists(self.probs_file):
-		#if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
+			# if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
 			print("\nUsing pkl files for embedding\n")
-			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
-			#self.decoder = pickle.load(open(self.decoder_file, 'rb'))
+			self.encoder = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
+			# self.encoder = pickle.load(open(self.encoder_file, 'rb'))
+			# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 		else:
-			#self.encoder, self.decoder, self.probs = self.train_embedding()
+			# self.encoder, self.decoder, self.probs = self.train_embedding()
 			self.encoder, self.probs = self.train_embedding()
-
-	# def train_word2vec(self):
-
-
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
@@ -47,7 +43,7 @@ class Embedding:
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
-			tokens = list(simple_tokenize(str(text)))[3:]
+			tokens = list(simple_tokenize(str(text)))
 			# if len(tokens) > max_len:
 			# 	 print(len(tokens))
 			for idx, word in enumerate(tokens):
@@ -91,10 +87,5 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.float32), np.array(ps, dtype=np.float32), np.array(l)))
-
-
-
-
-
-
+		return tf.data.Dataset.from_tensor_slices(
+			(np.array(inputs, dtype=np.float32), np.array(ps, dtype=np.float32), np.array(l)))
