@@ -39,6 +39,7 @@ imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 embedder = Embedding()
+SEQUENCE_LENGTH = embedder.max_sent_len
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
