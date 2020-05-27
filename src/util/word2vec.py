@@ -267,7 +267,11 @@ data = tfds.load('imdb_reviews', split='unsupervised')
 
 # Note the .lower() as upper and lowercase does not matter in our implementation
 # [['natural', 'language', 'processing', 'and', 'machine', 'learning', 'is', 'fun', 'and', 'exciting']]
-corpus = simple_tokenize(str(tfds.as_numpy(data)))
+corpus = []
+
+for i, t in enumerate(tfds.as_numpy(data)):
+  for token in simple_tokenize(str(t)):
+    corpus.append(token)
 
 # Initialise object
 w2v = word2vec()

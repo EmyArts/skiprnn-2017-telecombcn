@@ -47,7 +47,7 @@ class Embedding:
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
-			tokens = simple_tokenize(str(text))
+			tokens = list(simple_tokenize(str(text)))
 			# if len(tokens) > max_len:
 			# 	 print(len(tokens))
 			for idx, word in enumerate(tokens):
@@ -82,7 +82,7 @@ class Embedding:
 		for text, label in tfds.as_numpy(data):
 			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
 			p = np.full(self.max_sent_len, self.probs[self.pad_word])
-			tokens = simple_tokenize(str(text))
+			tokens = list(simple_tokenize(str(text)))
 			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
 					t = self.unk_word
