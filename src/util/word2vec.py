@@ -6,6 +6,7 @@ Email: derek@derekchia.com
 """
 
 import numpy as np
+import tensorflow_datasets as tfds
 from collections import defaultdict
 from gensim.utils import simple_tokenize
 
@@ -262,11 +263,11 @@ settings = {
 	'learning_rate': 0.01  # learning rate
 }
 
-text = "natural language processing and machine learning is fun and exciting"
+data = tfds.load('imdb_reviews', split='unsupervised')
 
 # Note the .lower() as upper and lowercase does not matter in our implementation
 # [['natural', 'language', 'processing', 'and', 'machine', 'learning', 'is', 'fun', 'and', 'exciting']]
-corpus = [[word.lower() for word in text.split()]]
+corpus = simple_tokenize(str(tfds.as_numpy(data)))
 
 # Initialise object
 w2v = word2vec()

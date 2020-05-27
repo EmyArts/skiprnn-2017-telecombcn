@@ -41,11 +41,11 @@ class Embedding:
 		encoder = {self.pad_word: 0.0, self.unk_word: 1.0}
 		#decoder = {0.0: self.pad_word, 1.0: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
-		train_data, test_data = tfds.load('imdb_reviews/plain_text', split=(tfds.Split.TRAIN, tfds.Split.TEST), with_info=False, as_supervised=True, data_dir=DATA_DIR)
+		data = tfds.load('imdb_reviews/plain_text', split='unsupervised', data_dir=DATA_DIR)
 		total_words = 2 # pad and unknown
 		idx = 2.0
 		max_len = 0
-		for text, label in tfds.as_numpy(train_data):
+		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
 			tokens = simple_tokenize(str(text))
 			# if len(tokens) > max_len:
