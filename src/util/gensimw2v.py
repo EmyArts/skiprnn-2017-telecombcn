@@ -59,7 +59,6 @@ class Gensim_Embedding:
 					#encoder[word] = idx
 					#decoder[idx] = word
 					probs[word] = 1
-					idx += 1
 				else:
 					probs[word] += 1
 			if idx > max_len:
@@ -89,10 +88,13 @@ class Gensim_Embedding:
 			for i, t in enumerate(tokens):
 				try:
 					inp[i] = self.encoder[t]
-					p[i] = np.full(self.vec_len, self.probs[t])
 				except Exception as e:
-					print(e)
+					print("W2V lookup " + str(e))
 					pass
+				try:
+					p[i] = self.probs[t]
+				except Exception as e:
+					print("Probabilities " + str(e))
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
