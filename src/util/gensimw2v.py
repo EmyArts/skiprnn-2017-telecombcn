@@ -87,8 +87,6 @@ class Gensim_Embedding:
 			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
 			tokens = list(simple_tokenize(str(text)))
 			for i, t in enumerate(tokens):
-				if not t in self.encoder.keys():
-					t = self.unk_word
 				inp[i] = self.encoder[t]
 				p[i] = np.full(self.vec_len, self.probs[t])
 			inputs.append(inp)
