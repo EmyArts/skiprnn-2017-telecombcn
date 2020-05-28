@@ -1,4 +1,5 @@
 from gensim.test.utils import common_texts
+from gensim.utils import simple_tokenize
 from gensim.models import Word2Vec
 from os import path
 import numpy as np
