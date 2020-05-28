@@ -1,6 +1,7 @@
 from gensim.test.utils import common_texts
 from gensim.utils import simple_tokenize
-from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
+from gensim.scripts.glove2word2vec import glove2word2vec
 from os import path
 import numpy as np
 import pickle
@@ -10,6 +11,8 @@ import tensorflow_datasets as tfds
 import multiprocessing
 nltk.download("punkt")
 DATA_DIR = '.../data'
+glove_input_file = 'glove.6B.100d.txt'
+word2vec_output_file = 'glove.6B.100d.txt.word2vec'
 
 class Gensim_Embedding:
 
@@ -17,6 +20,8 @@ class Gensim_Embedding:
 		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
 		self.vec_len = 100
+		self.glove_input_file = 'glove.6B.txt'
+		self.encoder_file = 'glove.6B.txt.word2vec'
 		# self.decoder_file = 'decode.pkl'
 		# self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
@@ -25,18 +30,17 @@ class Gensim_Embedding:
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
 
-		self.encoder = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
-		if path.exists(self.probs_file):
-		#if path.exists(self.encoder_file) and path.exists(self.probs_file):
+		if path.exists(self.encoder_file) and path.exists(self.probs_file):
 			# if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
 			print("\nUsing pkl files for embedding\n")
 			# self.encoder = pickle.load(open(self.encoder_file, 'rb'))
 			# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
+			glove2word2vec(self.glove_input_file, self.encoder_file)
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 		else:
 			# self.encoder, self.decoder, self.probs = self.train_embedding()
-
 			self.probs = self.train_embedding()
+		self.encoder = KeyedVectors.load_word2vec_format(self.encoder_file, binary=False)
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
