@@ -35,10 +35,10 @@ class Gensim_Embedding:
 			print("\nUsing pkl files for embedding\n")
 			# self.encoder = pickle.load(open(self.encoder_file, 'rb'))
 			# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
-			glove2word2vec(self.glove_input_file, self.encoder_file)
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 		else:
 			# self.encoder, self.decoder, self.probs = self.train_embedding()
+			glove2word2vec(self.glove_input_file, self.encoder_file)
 			self.probs = self.train_embedding()
 		self.encoder = KeyedVectors.load_word2vec_format(self.encoder_file, binary=False)
 
