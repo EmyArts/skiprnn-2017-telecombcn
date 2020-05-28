@@ -2,7 +2,7 @@ from gensim.test.utils import common_texts
 from gensim.utils import simple_tokenize
 from gensim.models import KeyedVectors
 from gensim.scripts.glove2word2vec import glove2word2vec
-from os import path
+from os import path, getcwd
 import numpy as np
 import pickle
 import nltk
@@ -38,7 +38,7 @@ class Gensim_Embedding:
 			# self.encoder, self.decoder, self.probs = self.train_embedding()
 			glove2word2vec(self.glove_input_file, self.encoder_file)
 			self.probs = self.train_embedding()
-		self.encoder = KeyedVectors.load_word2vec_format(self.encoder_file, binary=False)
+		self.encoder = KeyedVectors.load_word2vec_format((os.getcwd() + self.encoder_file), binary=False)
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
