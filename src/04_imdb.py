@@ -40,7 +40,7 @@ imdb_builder.download_and_prepare()
 info = imdb_builder.info
 embedder = Embedding()
 SEQUENCE_LENGTH = embedder.max_sent_len
-EMBEDDING_LENGTH = embedder.vec_len
+# EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
@@ -85,7 +85,7 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, EMBEDDING_LENGTH))
+    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
     #probs = inputs["probs"]
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     #samples = inputs["text"]
@@ -120,13 +120,13 @@ def model_fn(mode, inputs, reuse=False):
 
     # Compute loss for each updated state
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
-    print(f"Budget loss: {budget_loss}")
+    print(f"Budget loss: {tf.as_numpy(budget_loss)}")
 
-    #surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
-    #print(f"Surprisal loss: {surprisal_loss}")
+    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
+    print(f"Surprisal loss: {tf.as_numpy(surprisal_loss)}")
 
     # Combine all losses
-    loss = cross_entropy + budget_loss# + surprisal_loss
+    loss = cross_entropy + budget_loss + surprisal_loss
     loss = tf.reshape(loss, [])
 
     if is_training:
