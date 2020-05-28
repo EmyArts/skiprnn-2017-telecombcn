@@ -17,8 +17,8 @@ class Gensim_Embedding:
 	def __init__(self):
 		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
-		self.vec_len = 100
-		self.glove_input_file = 'glove.6B.100d.txt'
+		self.vec_len = 50
+		self.glove_input_file = 'glove.6B.50d.txt'
 		self.encoder_file = 'glove.word2vec'
 		# self.decoder_file = 'decode.pkl'
 		# self.encoder_file = 'encode.pkl'
@@ -92,7 +92,6 @@ class Gensim_Embedding:
 					p[i] = np.full(self.vec_len, self.probs[t])
 				except Exception:
 					# print(f"Unknown word encountered {t}")
-					pass
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
