@@ -20,7 +20,7 @@ import tensorflow_datasets as tfds
 from util.misc import *
 from util.graph_definition import *
 from util.embedder import Embedding
-
+from util.gensimw2v import Gensim_Embedding
 # Task-independent flags
 create_generic_flags()
 
@@ -38,7 +38,10 @@ NUM_EPOCHS = 50
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
-embedder = Embedding()
+if FLAGS.embedding == 'simple':
+    embedder = Embedding()
+else:
+    embedder = Gensim_Embedding()
 SEQUENCE_LENGTH = embedder.max_sent_len * embedder.vec_len
 # EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()
