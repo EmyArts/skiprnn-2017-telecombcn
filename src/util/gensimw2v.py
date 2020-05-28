@@ -24,20 +24,21 @@ class Gensim_Embedding:
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
 
-		# if path.exists(self.encoder_file) and path.exists(self.probs_file):
-		# 	# if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
-		# 	print("\nUsing pkl files for embedding\n")
-		# 	self.encoder = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
-		# 	# self.encoder = pickle.load(open(self.encoder_file, 'rb'))
-		# 	# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
-		# 	self.probs = pickle.load(open(self.probs_file, 'rb'))
-		# else:
+		self.encoder = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
+		if path.exists(self.probs_file):
+		#if path.exists(self.encoder_file) and path.exists(self.probs_file):
+			# if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
+			print("\nUsing pkl files for embedding\n")
+			# self.encoder = pickle.load(open(self.encoder_file, 'rb'))
+			# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
+			self.probs = pickle.load(open(self.probs_file, 'rb'))
+		else:
 			# self.encoder, self.decoder, self.probs = self.train_embedding()
-		self.encoder, self.probs = self.train_embedding()
+
+			self.probs = self.train_embedding()
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
-		encoder = {self.pad_word: 0.0, self.unk_word: 1.0}
 		#decoder = {0.0: self.pad_word, 1.0: self.unk_word}
 		probs = {self.pad_word: 1, self.unk_word: 1}
 		data = tfds.load('imdb_reviews/plain_text', split='unsupervised', data_dir=DATA_DIR)
@@ -72,7 +73,7 @@ class Gensim_Embedding:
 		#pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 		#return encoder, decoder, probs
-		return encoder, probs
+		return probs
 
 	def get_embeddings(self, data):
 		print("Creating embeddings.")
