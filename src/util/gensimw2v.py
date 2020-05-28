@@ -1,5 +1,5 @@
 from gensim.test.utils import common_texts
-from gensim.utils import simple_tokenize
+from gensim.utils import tokenize
 from gensim.models import KeyedVectors
 from gensim.scripts.glove2word2vec import glove2word2vec
 from os import path, getcwd
@@ -18,7 +18,7 @@ class Gensim_Embedding:
 		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
 		self.vec_len = 100
-		self.glove_input_file = 'glove.840B.300d.txt'
+		self.glove_input_file = 'glove.6B.100d.txt'
 		self.encoder_file = 'glove.word2vec'
 		# self.decoder_file = 'decode.pkl'
 		# self.encoder_file = 'encode.pkl'
@@ -50,7 +50,7 @@ class Gensim_Embedding:
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
-			tokens = list(simple_tokenize(str(text)))[3:]
+			tokens = list(tokenize(str(text)), lowecase=True)[3:]
 			# if len(tokens) > max_len:
 			# 	 print(len(tokens))
 			for idx, word in enumerate(tokens):
@@ -85,10 +85,13 @@ class Gensim_Embedding:
 		for text, label in tfds.as_numpy(data):
 			inp = np.zeros((self.max_sent_len, self.vec_len))
 			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
-			tokens = list(simple_tokenize(str(text)))
+			tokens = list(tokenize(str(text), lowercase=True))
 			for i, t in enumerate(tokens):
-				inp[i] = self.encoder[t]
-				p[i] = np.full(self.vec_len, self.probs[t])
+				try:
+					inp[i] = self.encoder[t]
+					p[i] = np.full(self.vec_len, self.probs[t])
+				except Exception:
+					print(f"Unknown word encountered {t}")
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
