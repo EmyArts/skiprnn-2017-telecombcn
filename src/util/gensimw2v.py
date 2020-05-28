@@ -38,7 +38,7 @@ class Gensim_Embedding:
 			# self.encoder, self.decoder, self.probs = self.train_embedding()
 			glove2word2vec(self.glove_input_file, self.encoder_file)
 			self.probs = self.train_embedding()
-		self.encoder = KeyedVectors.load_word2vec_format((os.getcwd() + self.encoder_file), binary=False)
+		self.encoder = KeyedVectors.load_word2vec_format((getcwd() + self.encoder_file), binary=False)
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
