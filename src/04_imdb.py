@@ -42,6 +42,7 @@ if FLAGS.embedding == 'simple':
     embedder = Embedding()
 else:
     embedder = Gensim_Embedding()
+
 SEQUENCE_LENGTH = embedder.max_sent_len * embedder.vec_len
 # EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()

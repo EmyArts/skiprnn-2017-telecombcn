@@ -3,6 +3,7 @@ from gensim.models import Word2Vec
 from os import path
 import numpy as np
 import pickle
+import nltk
 import tensorflow
 import tensorflow_datasets as tfds
 import multiprocessing
