@@ -91,7 +91,7 @@ class Gensim_Embedding:
 					inp[i] = self.encoder[t]
 					p[i] = np.full(self.vec_len, self.probs[t])
 				except Exception:
-					print(f"Unknown word encountered {t}")
+					# print(f"Unknown word encountered {t}")
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
