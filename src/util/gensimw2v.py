@@ -50,7 +50,7 @@ class Gensim_Embedding:
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
-			tokens = list(tokenize(str(text)), lowecase=True)[3:]
+			tokens = list(tokenize(str(text), lowecase=True))[3:]
 			# if len(tokens) > max_len:
 			# 	 print(len(tokens))
 			for idx, word in enumerate(tokens):
@@ -85,7 +85,7 @@ class Gensim_Embedding:
 		for text, label in tfds.as_numpy(data):
 			inp = np.zeros((self.max_sent_len, self.vec_len))
 			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
-			tokens = list(tokenize(str(text), lowercase=True))
+			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
 				try:
 					inp[i] = self.encoder[t]
