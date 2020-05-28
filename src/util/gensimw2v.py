@@ -11,8 +11,6 @@ import tensorflow_datasets as tfds
 import multiprocessing
 nltk.download("punkt")
 DATA_DIR = '.../data'
-glove_input_file = 'glove.6B.100d.txt'
-word2vec_output_file = 'glove.6B.100d.txt.word2vec'
 
 class Gensim_Embedding:
 
@@ -20,7 +18,7 @@ class Gensim_Embedding:
 		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
 		self.vec_len = 100
-		self.glove_input_file = 'glove.6B.txt'
+		self.glove_input_file = 'glove.6B.100d.txt'
 		self.encoder_file = 'glove.6B.txt.word2vec'
 		# self.decoder_file = 'decode.pkl'
 		# self.encoder_file = 'encode.pkl'
