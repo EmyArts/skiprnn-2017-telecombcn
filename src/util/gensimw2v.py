@@ -83,7 +83,7 @@ class Gensim_Embedding:
 		ps = []
 		l = []
 		for text, label in tfds.as_numpy(data):
-			inp = np.full((self.max_sent_len, self.vec_len), self.encoder[self.pad_word])
+			inp = np.zeros((self.max_sent_len, self.vec_len))
 			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
 			tokens = list(simple_tokenize(str(text)))
 			for i, t in enumerate(tokens):
