@@ -39,7 +39,7 @@ imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 embedder = Embedding()
-SEQUENCE_LENGTH = embedder.max_sent_len
+SEQUENCE_LENGTH = embedder.max_sent_len * embedder.vector_len
 # EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()
 
@@ -120,10 +120,10 @@ def model_fn(mode, inputs, reuse=False):
 
     # Compute loss for each updated state
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
-    print(f"Budget loss: {tf.as_numpy(budget_loss)}")
+    print(f"Budget loss: {tf.make_ndarray(budget_loss)}")
 
     surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
-    print(f"Surprisal loss: {tf.as_numpy(surprisal_loss)}")
+    print(f"Surprisal loss: {tf.make_ndarray(surprisal_loss)}")
 
     # Combine all losses
     loss = cross_entropy + budget_loss + surprisal_loss

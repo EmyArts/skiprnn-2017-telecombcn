@@ -14,6 +14,7 @@ class Embedding:
 	def __init__(self):
 
 		self.max_sent_len = 2520 # Value emperically found, longest length was 2514
+		self.vector_len = 1
 		#self.decoder_file = 'decode.pkl'
 		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'

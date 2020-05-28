@@ -1,6 +1,7 @@
 from gensim.test.utils import common_texts
 from gensim.models import Word2Vec
 from os import path
+import numpy as np
 import pickle
 import tensorflow
 import tensorflow_datasets as tfds
@@ -13,6 +14,7 @@ class Gensim_Embedding:
 	def __init__(self):
 		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
+		self.vector_len = 100
 		# self.decoder_file = 'decode.pkl'
 		# self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
