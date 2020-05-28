@@ -90,7 +90,8 @@ class Gensim_Embedding:
 				try:
 					inp[i] = self.encoder[t]
 					p[i] = np.full(self.vec_len, self.probs[t])
-				except Exception:
+				except Exception as e:
+					print(e)
 					pass
 			inputs.append(inp)
 			ps.append(p)
