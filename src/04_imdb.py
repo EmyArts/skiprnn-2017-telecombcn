@@ -120,10 +120,10 @@ def model_fn(mode, inputs, reuse=False):
 
     # Compute loss for each updated state
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
-    print(f"Budget loss: {tf.make_ndarray(budget_loss)}")
+    #print(f"Budget loss: {tf.make_ndarray(budget_loss)}")
 
     surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
-    print(f"Surprisal loss: {tf.make_ndarray(surprisal_loss)}")
+    #print(f"Surprisal loss: {tf.make_ndarray(surprisal_loss)}")
 
     # Combine all losses
     loss = cross_entropy + budget_loss + surprisal_loss
