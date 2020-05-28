@@ -48,19 +48,18 @@ class Gensim_Embedding:
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
-			tokens = list(simple_tokenize(str(text)))
+			tokens = list(simple_tokenize(str(text)))[3:]
 			# if len(tokens) > max_len:
 			# 	 print(len(tokens))
 			for idx, word in enumerate(tokens):
 				total_words += 1
-				probs[word] += 1
-				# if not word in encoder.keys():
-				# 	encoder[word] = idx
-				# 	#decoder[idx] = word
-				# 	probs[word] = 1
-				# 	idx += 1
-				# else:
-				# 	probs[word] += 1
+				if not word in probs.keys():
+					#encoder[word] = idx
+					#decoder[idx] = word
+					probs[word] = 1
+					idx += 1
+				else:
+					probs[word] += 1
 			if idx > max_len:
 				max_len = idx
 		print(f"The vocabulary size is {total_words}")
@@ -89,9 +88,8 @@ class Gensim_Embedding:
 				if not t in self.encoder.keys():
 					t = self.unk_word
 				inp[i] = self.encoder[t]
-				p[i] = np.full(self.vec_len,self.probs[t])
+				p[i] = np.full(self.vec_len, self.probs[t])
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		return tf.data.Dataset.from_tensor_slices(
-			(np.array(inputs, dtype=np.float32), np.array(ps, dtype=np.float32), np.array(l)))
+		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.float32), np.array(ps, dtype=np.float32), np.array(l)))

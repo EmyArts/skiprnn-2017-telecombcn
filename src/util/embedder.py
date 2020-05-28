@@ -83,7 +83,7 @@ class Embedding:
 		for text, label in tfds.as_numpy(data):
 			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
 			p = np.full(self.max_sent_len, self.probs[self.pad_word])
-			tokens = list(simple_tokenize(str(text)))
+			tokens = list(simple_tokenize(str(text)))[3:]
 			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
 					t = self.unk_word
