@@ -39,7 +39,7 @@ imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 embedder = Embedding()
-SEQUENCE_LENGTH = embedder.max_sent_len * embedder.vector_len
+SEQUENCE_LENGTH = embedder.max_sent_len * embedder.vec_len
 # EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()
 

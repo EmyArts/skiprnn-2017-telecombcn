@@ -14,7 +14,7 @@ class Gensim_Embedding:
 	def __init__(self):
 		# self.model = Word2Vec(common_texts, size=100, window=5, min_count=1, workers=4)
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
-		self.vector_len = 100
+		self.vec_len = 100
 		# self.decoder_file = 'decode.pkl'
 		# self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
@@ -50,13 +50,14 @@ class Gensim_Embedding:
 			# 	 print(len(tokens))
 			for idx, word in enumerate(tokens):
 				total_words += 1
-				if not word in encoder.keys():
-					encoder[word] = idx
-					#decoder[idx] = word
-					probs[word] = 1
-					idx += 1
-				else:
-					probs[word] += 1
+				probs[word] += 1
+				# if not word in encoder.keys():
+				# 	encoder[word] = idx
+				# 	#decoder[idx] = word
+				# 	probs[word] = 1
+				# 	idx += 1
+				# else:
+				# 	probs[word] += 1
 			if idx > max_len:
 				max_len = idx
 		print(f"The vocabulary size is {total_words}")
@@ -66,7 +67,7 @@ class Gensim_Embedding:
 		probs[self.pad_word] = 1 - np.finfo(np.float32).eps
 		probs[self.unk_word] = np.finfo(np.float32).eps
 
-		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
+		#pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
 		#pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 		#return encoder, decoder, probs
@@ -78,14 +79,14 @@ class Gensim_Embedding:
 		ps = []
 		l = []
 		for text, label in tfds.as_numpy(data):
-			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
-			p = np.full(self.max_sent_len, self.probs[self.pad_word])
+			inp = np.full((self.max_sent_len, self.vec_len), self.encoder[self.pad_word])
+			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
 			tokens = list(simple_tokenize(str(text)))
 			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
 					t = self.unk_word
 				inp[i] = self.encoder[t]
-				p[i] = self.probs[t]
+				p[i] = np.full(self.vec_len,self.probs[t])
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
