@@ -1,12 +1,10 @@
-from gensim.test.utils import common_texts
 from gensim.utils import tokenize
 from gensim.models import KeyedVectors
 from gensim.scripts.glove2word2vec import glove2word2vec
-from os import path, getcwd
+from os import path
 import numpy as np
 import pickle
 import nltk
-import tensorflow
 import tensorflow_datasets as tfds
 import tensorflow as tf
 import multiprocessing
@@ -32,7 +30,7 @@ class Gensim_Embedding:
 		if path.exists(self.encoder_file) and path.exists(self.probs_file):
 			# if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
 			print("\nUsing pkl files for embedding\n")
-			# self.encoder = pickle.load(open(self.encoder_file, 'rb'))
+			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
 			# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 		else:
@@ -73,7 +71,7 @@ class Gensim_Embedding:
 		probs[self.pad_word] = 1 - np.finfo(np.float32).eps
 		#probs[self.unk_word] = np.finfo(np.float32).eps
 
-		#pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
+		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
 		#pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 		#return encoder, decoder, probs
