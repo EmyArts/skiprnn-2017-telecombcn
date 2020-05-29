@@ -89,9 +89,7 @@ class Gensim_Embedding:
 			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
 				if not t in self.encoder.keys():
-					t = self.unk_word
-				inp[i] = self.encoder[t]
-				p[i] = self.probs[t]
+					p[i] = self.probs[self.unk_word]
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
