@@ -71,14 +71,18 @@ def input_fn(split):
     else:
         raise ValueError()
 
+    dataset = dataset.repeat()
+    dataset = dataset.batch(FLAGS.batch_size)
+
     try:
-        dataset = embedder.get_embeddings(dataset)
+        for batch in list(dataset.as_numpy_iterator()):
+            batch = embedder.get_embeddings(batch)
     except Exception as e:
         print("An exception occured during the get embeddings.")
         print(e)
 
-    dataset = dataset.repeat()
-    dataset = dataset.batch(FLAGS.batch_size)
+    # dataset = dataset.repeat()
+    # dataset = dataset.batch(FLAGS.batch_size)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
