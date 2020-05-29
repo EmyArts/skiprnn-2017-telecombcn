@@ -18,9 +18,9 @@ class Gensim_Embedding:
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
 		self.vec_len = 50
 		self.glove_input_file = 'glove.6B.50d.txt'
-		self.encoder_file = 'glove.word2vec'
+		self.model_file = 'glove.word2vec'
 		# self.decoder_file = 'decode.pkl'
-		# self.encoder_file = 'encode.pkl'
+		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
 		self.vocab_size = 3000 * 25000
 
@@ -35,12 +35,12 @@ class Gensim_Embedding:
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 		else:
 			# self.encoder, self.decoder, self.probs = self.train_embedding()
-			glove2word2vec(self.glove_input_file, self.encoder_file)
+			glove2word2vec(self.glove_input_file, self.model_file)
 			self.encoder, self.probs = self.train_embedding()
 
 	def train_embedding(self):
 		print("\nTraining embedding\n")
-		model = KeyedVectors.load_word2vec_format(self.encoder_file, binary=False)
+		model = KeyedVectors.load_word2vec_format(self.model_file, binary=False)
 		encoder = {self.pad_word: np.zeros(self.vec_len)}#, self.unk_word: np.zeros(self.vec_len)}
 		probs = {self.pad_word: 1}#, self.unk_word: 1}
 		data = tfds.load('imdb_reviews/plain_text', split='unsupervised', data_dir=DATA_DIR)
