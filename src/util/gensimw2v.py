@@ -88,8 +88,8 @@ class Gensim_Embedding:
 			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
 				if t in self.encoder.keys():
-					inp[t] = self.encoder[t]
-					p[t] = self.probs[t]
+					inp[i] = self.encoder[t]
+					p[i] = self.probs[t]
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
