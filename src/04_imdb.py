@@ -81,8 +81,8 @@ def input_fn(split):
         print("An exception occured during the get embeddings.")
         print(e)
 
-    # dataset = dataset.repeat()
-    # dataset = dataset.batch(FLAGS.batch_size)
+    #dataset = dataset.repeat()
+    dataset = dataset.batch(FLAGS.batch_size)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
