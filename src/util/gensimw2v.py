@@ -8,6 +8,7 @@ import pickle
 import nltk
 import tensorflow
 import tensorflow_datasets as tfds
+import tensorflow as tf
 import multiprocessing
 nltk.download("punkt")
 DATA_DIR = '.../data'
@@ -42,11 +43,11 @@ class Gensim_Embedding:
 	def train_embedding(self):
 		print("\nTraining embedding\n")
 		model = KeyedVectors.load_word2vec_format(self.encoder_file, binary=False)
-		encoder = {self.pad_word: np.zeros(self.vec_len), self.unk_word: np.zeros(self.vec_len)}
-		probs = {self.pad_word: 1, self.unk_word: 1}
+		encoder = {self.pad_word: np.zeros(self.vec_len)}#, self.unk_word: np.zeros(self.vec_len)}
+		probs = {self.pad_word: 1}#, self.unk_word: 1}
 		data = tfds.load('imdb_reviews/plain_text', split='unsupervised', data_dir=DATA_DIR)
-		total_words = 2 # pad and unknown
-		idx = 2.0
+		total_words = 1 # pad and unknown
+		idx = 1
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			# the example is a tuple (text, label)
@@ -70,7 +71,7 @@ class Gensim_Embedding:
 		self.vocab_size = total_words
 		probs = {k: v / total_words for k, v in probs.items()}
 		probs[self.pad_word] = 1 - np.finfo(np.float32).eps
-		probs[self.unk_word] = np.finfo(np.float32).eps
+		#probs[self.unk_word] = np.finfo(np.float32).eps
 
 		#pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
 		#pickle.dump(decoder, open(self.decoder_file, 'wb'), protocol=0)
@@ -88,8 +89,9 @@ class Gensim_Embedding:
 			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
 			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
-				if not t in self.encoder.keys():
-					p[i] = self.probs[self.unk_word]
+				if t in self.encoder.keys():
+					inp[t] = self.encoder[t]
+					p[t] = self.probs[t]
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
