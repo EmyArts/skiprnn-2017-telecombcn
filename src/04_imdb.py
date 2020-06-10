@@ -225,7 +225,8 @@ def train():
             for _ in range(TEST_ITERS):
                 test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states])
                 test_accuracy += test_iter_accuracy
-                test_steps += compute_used_samples(test_used_inputs)
+                if test_used_inputs is not None:
+                    test_steps += compute_used_samples(test_used_inputs)
                 else:
                     test_steps += SEQUENCE_LENGTH
             test_accuracy /= TEST_ITERS
