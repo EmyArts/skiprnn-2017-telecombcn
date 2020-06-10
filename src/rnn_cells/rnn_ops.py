@@ -19,7 +19,7 @@ def get_variable(name, shape, initializer=None, dtype=tf.float32, device=None):
       Variable Tensor
     """
     if device is None:
-        device = '/job:localhost/replica:0/task:0/device:CPU:0'
+        device = 'CPU:0'
     if initializer is None:
         with tf.device(device):
             var = tf.get_variable(name, shape, dtype=dtype)

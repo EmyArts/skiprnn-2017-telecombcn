@@ -79,18 +79,13 @@ class Gensim_Embedding:
 
 	def get_embeddings(self, data):
 		print("Creating embeddings.")
-		inputs = []
-		ps = []
-		l = []
-		for text, label in tfds.as_numpy(data):
-			inp = np.zeros((self.max_sent_len, self.vec_len))
-			p = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word])
+		data = tfds.as_numpy(data)
+		inputs = np.zeros((self.max_sent_len, self.vec_len), dtype=np.float32)
+		ps = np.full((self.max_sent_len, self.vec_len), self.probs[self.pad_word], dtype=np.float32)
+		for idx, text in enumerate(data[0]):
 			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
 				if t in self.encoder.keys():
-					inp[i] = self.encoder[t]
-					p[i] = self.probs[t]
-			inputs.append(inp)
-			ps.append(p)
-			l.append(label)
-		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.float32), np.array(ps, dtype=np.float32), np.array(l)))
+					inputs[idx][i] = self.encoder[t]
+					ps[idx][i] = self.probs[t]
+		return tf.data.Dataset.from_tensor_slices(inputs, ps, data[1])

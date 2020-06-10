@@ -102,3 +102,9 @@ ENV/
 
 # .idea/
 .idea/*
+/src/util/local_embedding_creation.py
+/src/util/glove.word2vec
+/src/util/glove.6B.50d.txt
+/src/util/encode.pkl
+/src/util/probs.pkl
+/src/util/emb_matrix.npy
