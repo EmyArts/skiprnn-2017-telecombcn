@@ -33,10 +33,10 @@ class Embedding:
 		self.unk_word = 'unk'
 		self.pad_word = 'pad_word'
 
-		if path.exists(self.encoder_file) and path.exists(self.probs_file):
+		if path.exists(self.encoder_file) and path.exists(self.probs_file) and path.exists(self.matrix_file) :
 			# if path.exists(self.encoder_file) and path.exists(self.decoder_file) and path.exists(self.probs_file):
 			print("\nUsing pkl files for embedding\n")
-			self.encoder = np.load(open(self.encoder_file, 'rb'))
+			self.encoder = pickle.load(open(self.encoder_file, 'rb'))
 			# self.decoder = pickle.load(open(self.decoder_file, 'rb'))
 			self.probs = pickle.load(open(self.probs_file, 'rb'))
 			self.emb_matrix = np.load(open(self.matrix_file, 'rb'))
@@ -88,7 +88,7 @@ class Embedding:
 
 		print(f"Skipped {skipped_words} out of {entry_count}")
 		np.save(open(self.matrix_file, 'wb'), emb_matrix)
-		np.save(open(self.encoder_file, 'wb'), encoder)
+		pickle.dump(encoder, open(self.encoder_file, 'wb'), protocol=0)
 		pickle.dump(probs, open(self.probs_file, 'wb'), protocol=0)
 
 		return encoder, probs, emb_matrix
