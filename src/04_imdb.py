@@ -43,7 +43,7 @@ if FLAGS.embedding == 'simple':
 else:
     embedder = Gensim_Embedding()
 
-SEQUENCE_LENGTH = embedder.max_sent_len * embedder.vec_len
+SEQUENCE_LENGTH = embedder.max_sent_len
 # EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()
 
@@ -93,7 +93,7 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    samples = tf.reshape(inputs["text"], (-1, SEQUENCE_LENGTH, 1))
+    samples = tf.nn.embedding_lookup(embedder.embedding_matrix(), inputs["text"])
     #probs = inputs["probs"]
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     #samples = inputs["text"]
@@ -225,8 +225,6 @@ def train():
             for _ in range(TEST_ITERS):
                 test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states])
                 test_accuracy += test_iter_accuracy
-                test_loss += test_iter_loss
-                if test_used_inputs is not None:
                     test_steps += compute_used_samples(test_used_inputs)
                 else:
                     test_steps += SEQUENCE_LENGTH

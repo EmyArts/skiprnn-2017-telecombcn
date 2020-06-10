@@ -113,3 +113,5 @@ class Embedding:
 			l.append(label)
 		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.float32), np.array(ps, dtype=np.float32), np.array(l)))
 
+	def embedding_matrix(self):
+		return self.emb_matrix
