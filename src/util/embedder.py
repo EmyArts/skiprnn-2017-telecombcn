@@ -3,7 +3,7 @@ import tensorflow_datasets as tfds
 import tensorflow as tf
 import nltk
 from gensim.models import Word2Vec
-from gensim.utils import simple_tokenize
+from gensim.utils import tokenize
 import numpy as np
 from os import path
 from gensim.models import KeyedVectors
@@ -55,7 +55,7 @@ class Embedding:
 		entry_count = 1
 		max_len = 0
 		for text in tfds.as_numpy(data):
-			tokens = list(simple_tokenize(str(text)))[3:]
+			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for idx, word in enumerate(tokens):
 				total_words += 1
 				if not word in encoder.keys():
@@ -102,7 +102,7 @@ class Embedding:
 		for text, label in tfds.as_numpy(data):
 			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
 			p = np.full(self.max_sent_len, self.probs[self.pad_word])
-			tokens = list(simple_tokenize(str(text)))[3:]
+			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
 				if not t in self.encoder:
 					t = self.unk_word
