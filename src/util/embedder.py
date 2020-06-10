@@ -22,7 +22,7 @@ class Embedding:
 		# self.decoder_file = 'decode.pkl'
 
 		# Files for avoiding initialization between calls.
-		self.encoder_file = 'encode.npy'
+		self.encoder_file = 'encode.pkl'
 		self.probs_file = 'probs.pkl'
 		self.matrix_file = 'emb_matrix.npy'
 
