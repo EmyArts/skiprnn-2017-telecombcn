@@ -65,7 +65,7 @@ def linear(args, output_size, bias, weights_init=None, bias_start=0.0):
     # Now the computation.
     scope = tf.get_variable_scope()
     with tf.variable_scope(scope) as outer_scope:
-        weights = get_variable("Weights", [total_arg_size, output_size], initializer=weights_init)
+        weights = get_variable("Weights", [total_arg_size, 50, output_size], initializer=weights_init)
         if len(args) == 1:
             res = tf.matmul(args[0], weights)
         else:
