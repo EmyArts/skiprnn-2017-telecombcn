@@ -115,3 +115,6 @@ class Embedding:
 
 	def embedding_matrix(self):
 		return self.emb_matrix
+
+	def vector_length(self):
+		return self.vec_len
