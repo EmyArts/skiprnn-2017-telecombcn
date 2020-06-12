@@ -71,9 +71,6 @@ def input_fn(split):
     else:
         raise ValueError()
 
-    dataset = dataset.repeat()
-    dataset = dataset.batch(FLAGS.batch_size)
-
     try:
         dataset = embedder.get_embeddings(dataset)
     except Exception as e:
