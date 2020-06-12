@@ -91,7 +91,7 @@ def input_fn(split):
 
 def model_fn(mode, inputs, reuse=False):
     samples = tf.nn.embedding_lookup(embedder.embedding_matrix(), inputs["text"])
-    samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
+    #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     #samples = inputs["text"]
     #print(f"\n\nSample shape is {tf.shape(samples).numpy()}")
