@@ -78,7 +78,7 @@ class Embedding:
 
 		print("Creating matrix")
 		skipped_words=0
-		emb_matrix = np.zeros((entry_count, self.vec_len))
+		emb_matrix = np.zeros((entry_count, self.vec_len), dtype=np.float32)
 		for i, word in enumerate(encoder.keys()):
 			try:
 				emb_matrix[i] = model[word]
