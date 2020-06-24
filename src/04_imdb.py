@@ -44,6 +44,7 @@ else:
     embedder = Gensim_Embedding()
 
 SEQUENCE_LENGTH = embedder.max_sent_len
+EMB_TABLE = embedder.embedding_matrix()
 # EMBEDDING_LENGTH =
 # datasets = mnist_builder.as_dataset()
 
@@ -90,8 +91,8 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    emb_table = tf.convert_to_tensor(embedder.embedding_matrix())
-    samples = tf.nn.embedding_lookup(emb_table, inputs["text"])
+    #emb_table = tf.convert_to_tensor(embedder.embedding_matrix())
+    samples = tf.nn.embedding_lookup(EMB_TABLE, inputs["text"])
     #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     #samples = inputs["text"]
