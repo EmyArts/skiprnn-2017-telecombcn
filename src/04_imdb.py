@@ -96,7 +96,7 @@ def model_fn(mode, inputs, reuse=False):
     #samples = inputs["text"]
     #print(f"\n\nSample shape is {tf.shape(samples).numpy()}")
 
-    print(f"\nSample probabilities are {probs}.\n")
+    print(f"\nSampls are {samples}.\n")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
