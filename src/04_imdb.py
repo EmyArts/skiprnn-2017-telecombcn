@@ -90,7 +90,7 @@ def input_fn(split):
 
 
 def model_fn(mode, inputs, reuse=False):
-    emb_table = tf.get_variable(embedder.embedding_matrix())
+    emb_table = tf.convert_to_tensor(embedder.embedding_matrix())
     samples = tf.nn.embedding_lookup(emb_table, inputs["text"])
     #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
