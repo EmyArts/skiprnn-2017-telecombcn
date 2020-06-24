@@ -98,11 +98,11 @@ class Embedding:
 		print("Creating embeddings.")
 		inputs = []
 		ps = []
-		labels = []
-		for d in tfds.as_numpy(data):
+		l = []
+		for text, label in tfds.as_numpy(data):
 			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
 			p = np.full(self.max_sent_len, self.probs[self.pad_word])
-			tokens = list(tokenize(str(d["text"]), lowercase=True))[3:]
+			tokens = list(tokenize(str(text), lowercase=True))[3:]
 			for i, t in enumerate(tokens):
 				if not t in self.encoder:
 					t = self.unk_word
@@ -110,8 +110,8 @@ class Embedding:
 				p[i] = self.probs[t]
 			inputs.append(inp)
 			ps.append(p)
-			labels.append(d["label"])
-		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.int64), np.array(ps, dtype=np.float32), np.array(labels)))
+			l.append(label)
+		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.int64), np.array(ps, dtype=np.float32), np.array(l)))
 
 	def embedding_matrix(self):
 		return self.emb_matrix
