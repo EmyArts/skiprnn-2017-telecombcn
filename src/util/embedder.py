@@ -114,7 +114,7 @@ class Embedding:
 		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.int64), np.array(ps, dtype=np.float32), np.array(l)))
 
 	def embedding_matrix(self):
-		return tf.convert_to_tensor(self.emb_matrix)
+		return self.emb_matrix
 
 	def vector_length(self):
 		return self.vec_len
