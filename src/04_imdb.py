@@ -252,7 +252,7 @@ def train():
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
-            print(f"First embedding samples {samples[:10]}")
+            #print(f"First embedding samples {samples[:10]}")
     except KeyboardInterrupt:
         pass
 
