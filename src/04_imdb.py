@@ -190,7 +190,7 @@ def train():
             accuracy = valid_model_spec['accuracy']
             loss = valid_model_spec['loss']
             updated_states = valid_model_spec['updated_states']
-            samples = tf.make_ndarray(tf.make_tensor_proto(valid_model_spec['samples']))
+            samples = tf.make_ndarray(tf.make_tensor_proto(tf.stack(valid_model_spec['samples'])))
 
             # Load the validation dataset into the pipeline
             sess.run(valid_model_spec['iterator_init_op'])
