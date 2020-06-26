@@ -31,7 +31,8 @@ FLAGS = tf.app.flags.FLAGS
 # Constants
 OUTPUT_SIZE = 2
 SEQUENCE_LENGTH = 2520
-VALIDATION_SAMPLES = 5000
+VALIDATION_SAMPLES = 500 # Just for debugging
+#VALIDATION_SAMPLES = 5000
 NUM_EPOCHS = 50
 
 # Load data
@@ -58,10 +59,12 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 
 def input_fn(split):
-    test_split = f'test[:{TEST_SAMPLES}]'
-    valid_split = f'test[{TEST_SAMPLES}:]'
+    test_split = f'test[:100]'
+    valid_split = f'test[100:200]'
+    # test_split = f'test[:{TEST_SAMPLES}]'
+    # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
-        dataset = imdb_builder.as_dataset(as_supervised=True, split='train')
+        dataset = imdb_builder.as_dataset(as_supervised=True, split='train[:10%]')
         #print("Total amount of training samples: " + str(len(list(dataset))))
     elif split == 'val':
         dataset = imdb_builder.as_dataset(as_supervised=True, split=valid_split)
