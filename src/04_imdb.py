@@ -95,8 +95,6 @@ def model_fn(mode, inputs, reuse=False):
     samples = tf.gather(EMB_TABLE, inputs["text"], axis=0, batch_dims=1)
     #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
-    #samples = inputs["text"]
-    #print(f"\n\nSample shape is {tf.shape(samples).numpy()}")
 
     print(f"\nSampls are {samples}.\n")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
@@ -190,6 +188,7 @@ def train():
             accuracy = valid_model_spec['accuracy']
             loss = valid_model_spec['loss']
             updated_states = valid_model_spec['updated_states']
+            samples = tf.make_ndarray(tf.make_tensor_proto(tf.stack(valid_model_spec['samples'])))
 
             # Load the validation dataset into the pipeline
             sess.run(valid_model_spec['iterator_init_op'])
@@ -252,7 +251,7 @@ def train():
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
-            #print(f"First embedding samples {samples[:10]}")
+            print(f"First embedding samples {samples[:10]}")
     except KeyboardInterrupt:
         pass
 
