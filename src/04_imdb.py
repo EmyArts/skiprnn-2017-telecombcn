@@ -190,6 +190,7 @@ def train():
             accuracy = valid_model_spec['accuracy']
             loss = valid_model_spec['loss']
             updated_states = valid_model_spec['updated_states']
+            samples = valid_model_spec['samples']
 
             # Load the validation dataset into the pipeline
             sess.run(valid_model_spec['iterator_init_op'])
@@ -208,6 +209,7 @@ def train():
             valid_steps /= VAL_ITERS
 
             valid_writer.add_summary(scalar_summary('accuracy', valid_accuracy), epoch)
+            #valid_writer.add_summary(scalar_summary('samples', samples), epoch)
             valid_writer.add_summary(scalar_summary('loss', valid_loss), epoch)
             valid_writer.add_summary(scalar_summary('used_samples', valid_steps / SEQUENCE_LENGTH), epoch)
             valid_writer.flush()
@@ -251,6 +253,7 @@ def train():
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
+            print(f"First embedding samples {samples[:10]}")
     except KeyboardInterrupt:
         pass
 
