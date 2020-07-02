@@ -195,7 +195,7 @@ def train():
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 sess.run([train_fn])
-                train_acc_plt[epoch][iteration] = loss
+                train_acc_plt[epoch][iteration] = loss[0]
             duration = time.time() - start_time
 
             # Evaluate on validation data
