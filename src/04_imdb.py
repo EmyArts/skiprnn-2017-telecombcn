@@ -100,7 +100,8 @@ def model_fn(mode, inputs, reuse=False):
     #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
 
-    print(f"\nSampls are {samples}.\n")
+
+    print_samples = tf.Print(samples, [samples[0]], "\nSampls are: \n")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
@@ -145,7 +146,7 @@ def model_fn(mode, inputs, reuse=False):
 
     model_spec = inputs
     model_spec['variable_init_op'] = tf.global_variables_initializer()
-    model_spec['samples'] = samples
+    model_spec['samples'] = print_samples
     model_spec['labels'] = ground_truth
     model_spec['loss'] = loss
     model_spec['accuracy'] = accuracy
