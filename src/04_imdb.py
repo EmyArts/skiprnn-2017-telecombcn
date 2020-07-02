@@ -101,7 +101,7 @@ def model_fn(mode, inputs, reuse=False):
     probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
 
 
-    print_samples = tf.Print(samples, [samples, samples.shape], "\nSamples are: \n")
+    print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
 
     is_training = (mode == 'train')
