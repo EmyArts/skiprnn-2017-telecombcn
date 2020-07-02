@@ -59,6 +59,7 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 
 def input_fn(split):
+    # Reset datasets once done debugging
     test_split = f'test[:100]'
     valid_split = f'test[100:200]'
     # test_split = f'test[:{TEST_SAMPLES}]'
