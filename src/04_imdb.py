@@ -17,6 +17,9 @@ import tensorflow as tf
 import tensorflow.contrib.layers as layers
 import tensorflow_datasets as tfds
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 from util.misc import *
 from util.graph_definition import *
 from util.embedder import Embedding
@@ -33,7 +36,7 @@ OUTPUT_SIZE = 2
 SEQUENCE_LENGTH = 2520
 VALIDATION_SAMPLES = 500 # Just for debugging
 #VALIDATION_SAMPLES = 5000
-NUM_EPOCHS = 50
+NUM_EPOCHS = 5
 
 # Load data
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
@@ -177,6 +180,9 @@ def train():
     sess.run(train_model_spec['variable_init_op'])
 
     try:
+        train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
+        val_acc_plt = np.empty((NUM_EPOCHS, VAL_ITERS))
+
         for epoch in range(NUM_EPOCHS):
             train_fn = train_model_spec['train_fn']
 
@@ -184,10 +190,13 @@ def train():
             sess.run(train_model_spec['iterator_init_op'])
             sess.run(train_model_spec['samples'])
 
+            loss = train_model_spec['loss']
             start_time = time.time()
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 sess.run([train_fn])
+                loss = sess.run[loss]
+                train_acc_plt[epoch][iteration] = loss
             duration = time.time() - start_time
 
             # Evaluate on validation data
@@ -200,7 +209,7 @@ def train():
             sess.run(valid_model_spec['iterator_init_op'])
 
             valid_accuracy, valid_loss, valid_steps = 0, 0, 0
-            for _ in range(VAL_ITERS):
+            for iter in range(VAL_ITERS):
                 valid_iter_accuracy, valid_iter_loss, valid_used_inputs = sess.run([accuracy, loss, updated_states])
                 valid_loss += valid_iter_loss
                 valid_accuracy += valid_iter_accuracy
@@ -208,6 +217,7 @@ def train():
                     valid_steps += compute_used_samples(valid_used_inputs)
                 else:
                     valid_steps += SEQUENCE_LENGTH
+                val_acc_plt[epoch][iter] = valid_iter_loss
             valid_accuracy /= VAL_ITERS
             valid_loss /= VAL_ITERS
             valid_steps /= VAL_ITERS
@@ -257,7 +267,21 @@ def train():
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
-            #print(f"First embedding samples {samples[:10]}")
+
+        # Training curve for epochs
+        plt.plot(train_acc_plt[:, 0], label='Training loss')
+        plt.plot(val_acc_plt[:, 0], label='Validation loss')
+        plt.title("Training curve for epochs")
+        plt.show()
+
+        plt.plot(train_acc_plt.flatten(), label='Training loss')
+        plt.title("Training curve for all iterations")
+        plt.show()
+
+        plt.plot(val_acc_plt.flatten(), label='Validation loss')
+        plt.title("Validation curve for all iterations")
+        plt.show()
+
     except KeyboardInterrupt:
         pass
 
