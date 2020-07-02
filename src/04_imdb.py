@@ -63,12 +63,12 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 def input_fn(split):
     # Reset datasets once done debugging
-    test_split = f'test[:100]'
-    valid_split = f'test[100:200]'
-    # test_split = f'test[:{TEST_SAMPLES}]'
-    # valid_split = f'test[{TEST_SAMPLES}:]'
+    # test_split = f'test[:100]'
+    # valid_split = f'test[100:200]'
+    test_split = f'test[:{TEST_SAMPLES}]'
+    valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
-        dataset = imdb_builder.as_dataset(as_supervised=True, split='train[:10%]')
+        dataset = imdb_builder.as_dataset(as_supervised=True, split='train')
         #print("Total amount of training samples: " + str(len(list(dataset))))
     elif split == 'val':
         dataset = imdb_builder.as_dataset(as_supervised=True, split=valid_split)
