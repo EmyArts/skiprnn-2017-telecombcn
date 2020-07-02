@@ -195,6 +195,7 @@ def train():
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 sess.run([train_fn])
+                loss = sess.run(loss)
                 print(loss)
                 #train_acc_plt[epoch][iteration] = loss
             duration = time.time() - start_time
