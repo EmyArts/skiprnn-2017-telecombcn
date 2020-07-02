@@ -182,6 +182,7 @@ def train():
 
             # Load the training dataset into the pipeline
             sess.run(train_model_spec['iterator_init_op'])
+            sess.run(train_model_spec['samples'])
 
             start_time = time.time()
             for iteration in range(ITERATIONS_PER_EPOCH):
