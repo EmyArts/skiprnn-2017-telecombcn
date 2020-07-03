@@ -273,14 +273,17 @@ def train():
         plt.plot(train_acc_plt[:, 0], label='Training loss')
         plt.plot(val_acc_plt[:, 0], label='Validation loss')
         plt.title("Training curve for epochs")
+        plt.savefig("Epoch.png")
         plt.show()
 
         plt.plot(train_acc_plt.flatten(), label='Training loss')
         plt.title("Training curve for all iterations")
+        plt.savefig("train_iter.png")
         plt.show()
 
         plt.plot(val_acc_plt.flatten(), label='Validation loss')
         plt.title("Validation curve for all iterations")
+        plt.savefig("val_iter.png")
         plt.show()
 
     except KeyboardInterrupt:
