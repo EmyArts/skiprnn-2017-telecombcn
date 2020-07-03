@@ -18,7 +18,7 @@ class Embedding:
 	def __init__(self):
 
 		self.max_sent_len = 2520  # Value emperically found, longest length was 2514
-		self.vec_len = 100
+		self.vec_len = 200
 		# self.decoder_file = 'decode.pkl'
 
 		# Files for avoiding initialization between calls.
@@ -27,7 +27,7 @@ class Embedding:
 		self.matrix_file = 'emb_matrix.npy'
 
 		# Files for pre trained embedding.
-		self.glove_input_file = 'glove.6B.100d.txt'
+		self.glove_input_file = 'glove.6B.200d.txt'
 		self.model_file = 'glove.word2vec'
 
 		self.unk_word = 'unk'
