@@ -28,7 +28,7 @@ def create_generic_flags():
     tf.app.flags.DEFINE_string('embedding', 'simple', "Type of embedding used for the imdb task")
 
     # Flags for the Skip RNN cells
-    tf.app.flags.DEFINE_float('cost_per_sample', 0.00000001, "Cost per used sample. Set to 0 to disable this option.")
+    tf.app.flags.DEFINE_float('cost_per_sample', 0.000001, "Cost per used sample. Set to 0 to disable this option.")
 
 
 def compute_gradients(loss, learning_rate, gradient_clipping=-1):

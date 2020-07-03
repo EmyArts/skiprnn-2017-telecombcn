@@ -197,7 +197,7 @@ def train():
                 loss = sess.run(train_model_spec['loss'])
                 sess.run(train_model_spec['samples'])
                 print(loss)
-                #train_acc_plt[epoch][iteration] = loss
+                train_acc_plt[epoch][iteration] = loss
             duration = time.time() - start_time
 
             # Evaluate on validation data
