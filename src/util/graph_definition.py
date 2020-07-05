@@ -19,7 +19,7 @@ def create_generic_flags():
     """
     # Generic flags
     tf.app.flags.DEFINE_string('model', 'lstm', "Select RNN cell: {lstm, gru, skip_lstm, skip_gru}")
-    tf.app.flags.DEFINE_integer("rnn_cells", 128, "Number of RNN cells.")
+    tf.app.flags.DEFINE_integer("rnn_cells", 64, "Number of RNN cells.")
     tf.app.flags.DEFINE_integer("rnn_layers", 1, "Number of RNN layers.")
     tf.app.flags.DEFINE_integer('batch_size', 32, "Batch size.")
     tf.app.flags.DEFINE_float('learning_rate', 0.01, "Learning rate.")

@@ -187,7 +187,7 @@ def train():
             train_fn = train_model_spec['train_fn']
 
             # Load the training dataset into the pipeline
-            sess.run(train_model_spec['iterator_init_op'])
+            # sess.run(train_model_spec['iterator_init_op'])
             #sess.run(train_model_spec['samples'])
 
             start_time = time.time()
@@ -195,7 +195,7 @@ def train():
                 # Perform SGD update
                 sess.run([train_fn])
                 loss = sess.run(train_model_spec['loss'])
-                sess.run(train_model_spec['samples'])
+                # sess.run(train_model_spec['samples'])
                 print(loss)
                 train_acc_plt[epoch][iteration] = loss
             duration = time.time() - start_time
