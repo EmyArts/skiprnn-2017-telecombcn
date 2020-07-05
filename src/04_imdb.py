@@ -36,7 +36,7 @@ OUTPUT_SIZE = 2
 SEQUENCE_LENGTH = 2520
 VALIDATION_SAMPLES = 500 # Just for debugging
 #VALIDATION_SAMPLES = 5000
-NUM_EPOCHS = 14
+NUM_EPOCHS = 12
 
 # Load data
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
