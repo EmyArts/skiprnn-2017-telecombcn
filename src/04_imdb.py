@@ -104,10 +104,10 @@ def input_fn(split):
 
 def model_fn(mode, inputs, reuse=False):
     #emb_table = tf.convert_to_tensor(embedder.embedding_matrix())
-    samples = tf.gather(EMB_TABLE, inputs["text"], axis=0, batch_dims=1)
+    # samples = tf.gather(EMB_TABLE, inputs["text"], axis=0, batch_dims=1)
     #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     # probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
-
+    samples = inputs["text"]
 
     print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
     ground_truth = tf.cast(inputs['labels'], tf.int64)
