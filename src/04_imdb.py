@@ -95,7 +95,7 @@ def input_fn(split):
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
     iterator = dataset.make_initializable_iterator()
-    text, labels = iterator.get_next()
+    text, probs, labels = iterator.get_next()
     iterator_init_op = iterator.initializer
     inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
