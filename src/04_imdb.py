@@ -83,7 +83,7 @@ def input_fn(split):
         raise ValueError()
 
     try:
-        dataset = embedder.get_embeddings(dataset)
+        inputs, ps, l = embedder.get_embeddings(dataset)
         # dataset = embedder.tay_get_embedding(dataset, size)
         print(dataset)
     except Exception as e:
@@ -98,7 +98,7 @@ def input_fn(split):
     # iterator = dataset.make_initializable_iterator()
     # text, probs, labels = iterator.get_next()
     # iterator_init_op = iterator.initializer
-    inputs = {'text': dataset[0], 'probs': dataset[1], 'labels': dataset[2]}
+    inputs = {'text': inputs, 'probs': ps, 'labels': l}
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     #print(f"\n\n Input shape is {text.shape}, probs shape is {probs.shape}, labels shape is {labels.shape}")
     return inputs
