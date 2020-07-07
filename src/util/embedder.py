@@ -115,9 +115,9 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		inputs = tf.constant(inputs, dtype=tf.int32)
-		ps = tf.constant(ps, dtype=tf.float32)
-		l = tf.constant(l, dtype=tf.int32)
+		inputs = tf.constant(inputs)
+		ps = tf.constant(ps)
+		l = tf.constant(l)
 		print(f"\n\nDuring embedding {unk_count} out of {word_count} were unknown\n")
 		return tf.data.Dataset.from_tensors((inputs, ps, l))
 
