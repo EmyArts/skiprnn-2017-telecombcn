@@ -151,7 +151,7 @@ class Embedding:
 				else:
 					c_unk += 1
 				word_count += 1
-		labels[line_index] = int(label)
-		line_index += 1
+			labels[line_index] = int(label)
+			line_index += 1
 		print(f"{c_unk} words out of {word_count} total words")
 		return tf.data.Dataset.from_tensor_slices((embedding_matrix, labels))
