@@ -115,9 +115,9 @@ class Embedding:
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-		inputs = tf.constant(np.vstack(inputs))
-		ps = tf.constant(np.vstack(ps))
-		l = tf.constant(l)
+		inputs = tf.constant(np.vstack(inputs), shape=(-1, 64, self.max_sent_len, self.vec_len))
+		ps = tf.constant(np.vstack(ps), shape=(-1, 64, self.max_sent_len, self.vec_len))
+		l = tf.constant(l, shape=(-1, 64))
 		print(f"\n\nDuring embedding {unk_count} out of {word_count} were unknown\n")
 		return tf.data.Dataset.from_tensors((inputs, ps, l))
 

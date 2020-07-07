@@ -90,14 +90,15 @@ def input_fn(split):
         print("An exception occured during the get embeddings.")
         print(e)
 
-    dataset = dataset.repeat()
-    dataset = dataset.batch(FLAGS.batch_size)
-    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-    iterator = dataset.make_initializable_iterator()
-    text, probs, labels = iterator.get_next()
-    iterator_init_op = iterator.initializer
-    inputs = {'text': text, 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    # dataset = dataset.repeat()
+    # dataset = dataset.batch(FLAGS.batch_size)
+    # dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+    # iterator = dataset.make_initializable_iterator()
+    # text, probs, labels = iterator.get_next()
+    # iterator_init_op = iterator.initializer
+    inputs = {'text': , 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     #print(f"\n\n Input shape is {text.shape}, probs shape is {probs.shape}, labels shape is {labels.shape}")
     return inputs
@@ -106,6 +107,7 @@ def input_fn(split):
 def model_fn(mode, inputs, reuse=False):
     #emb_table = tf.convert_to_tensor(embedder.embedding_matrix())
     samples = tf.gather(EMB_TABLE, inputs["text"], axis=0, batch_dims=1)
+
     #samples = samples.reshape(samples, (-1, SEQUENCE_LENGTH, embedder.vector_length()))
     # probs = tf.reshape(inputs["probs"], (-1, SEQUENCE_LENGTH, 1))
     # samples = inputs["text"]
