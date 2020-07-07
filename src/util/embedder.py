@@ -99,6 +99,8 @@ class Embedding:
 		inputs = []
 		ps = []
 		l = []
+		unk_count = 0
+		word_count = 0
 		for text, label in tfds.as_numpy(data):
 			inp = np.full(self.max_sent_len, self.encoder[self.pad_word])
 			p = np.full(self.max_sent_len, self.probs[self.pad_word])
@@ -106,11 +108,14 @@ class Embedding:
 			for i, t in enumerate(tokens):
 				if not t in self.encoder:
 					t = self.unk_word
+					unk_count += 1
 				inp[i] = self.encoder[t]
 				p[i] = self.probs[t]
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
+			word_count+= 1
+		print(f"\n\nDuring embedding {unk_count} out of {word_count} were unknown\n")
 		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.int64), np.array(ps, dtype=np.float32), np.array(l)))
 
 	def embedding_matrix(self):
