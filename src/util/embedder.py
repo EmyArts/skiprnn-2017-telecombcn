@@ -111,10 +111,10 @@ class Embedding:
 					unk_count += 1
 				inp[i] = self.encoder[t]
 				p[i] = self.probs[t]
+				word_count += 1
 			inputs.append(inp)
 			ps.append(p)
 			l.append(label)
-			word_count+= 1
 		print(f"\n\nDuring embedding {unk_count} out of {word_count} were unknown\n")
 		return tf.data.Dataset.from_tensor_slices((np.array(inputs, dtype=np.int64), np.array(ps, dtype=np.float32), np.array(l)))
 
