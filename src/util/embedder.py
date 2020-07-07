@@ -30,7 +30,7 @@ class Embedding:
 		self.glove_input_file = 'glove.6B.200d.txt'
 		self.model_file = 'glove.word2vec'
 
-		self.unk_word = 'unk'
+		self.unk_word = 'unk_word'
 		self.pad_word = 'pad_word'
 
 		if path.exists(self.encoder_file) and path.exists(self.probs_file) and path.exists(self.matrix_file) :
@@ -79,10 +79,9 @@ class Embedding:
 		print("Creating matrix")
 		skipped_words = 0
 		emb_matrix = np.zeros((entry_count, self.vec_len), dtype=np.float32)
-		emb_matrix[1] = model['unk']
 		for i, word in enumerate(encoder.keys()):
 			try:
-				emb_matrix[i+2] = model[word]
+				emb_matrix[i] = model[word]
 			except:
 				skipped_words += 1
 				pass
