@@ -63,24 +63,28 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 
 def input_fn(split):
     # Reset datasets once done debugging
-    test_split = f'test[:200]'
-    valid_split = f'test[200:400]'
+    test_split = f'test[:500]'
+    valid_split = f'test[500:750]'
     # test_split = f'test[:{TEST_SAMPLES}]'
     # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
-        dataset = imdb_builder.as_dataset(as_supervised=True, split='train[:10%]')
+        dataset = imdb_builder.as_dataset(as_supervised=True, split='train[:5000]')
+        size = 5000
         #print("Total amount of training samples: " + str(len(list(dataset))))
     elif split == 'val':
         dataset = imdb_builder.as_dataset(as_supervised=True, split=valid_split)
+        size = 250
         #print("Total amount of validation samples: " + str(len(list(dataset))))
     elif split == 'test':
         dataset = imdb_builder.as_dataset(as_supervised=True, split=test_split)
+        size = 500
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
 
     try:
-        dataset = embedder.get_embeddings(dataset)
+        # dataset = embedder.get_embeddings(dataset)
+        dataset = embedder.tay_get_embedding(dataset, size)
     except Exception as e:
         print("An exception occured during the get embeddings.")
         print(e)
