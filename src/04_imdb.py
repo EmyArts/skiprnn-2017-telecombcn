@@ -98,7 +98,7 @@ def input_fn(split):
     # iterator = dataset.make_initializable_iterator()
     # text, probs, labels = iterator.get_next()
     # iterator_init_op = iterator.initializer
-    inputs = {'text': , 'probs': probs, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    inputs = {'text': dataset[0], 'probs': dataset[1], 'labels': dataset[2]}
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     #print(f"\n\n Input shape is {text.shape}, probs shape is {probs.shape}, labels shape is {labels.shape}")
     return inputs
@@ -195,7 +195,8 @@ def train():
             train_fn = train_model_spec['train_fn']
 
             # Load the training dataset into the pipeline
-            sess.run(train_model_spec['iterator_init_op'])
+            # sess.run(train_model_spec['iterator_init_op'])
+            sess.run(train_model_spec)
             # sess.run(train_model_spec['samples'])
 
             start_time = time.time()
@@ -215,7 +216,8 @@ def train():
             #samples = tf.make_ndarray(tf.make_tensor_proto(valid_model_spec['samples']))
 
             # Load the validation dataset into the pipeline
-            sess.run(valid_model_spec['iterator_init_op'])
+            # sess.run(valid_model_spec['iterator_init_op'])
+            sess.run(valid_model_spec)
 
             valid_accuracy, valid_loss, valid_steps = 0, 0, 0
             for iter in range(VAL_ITERS):
@@ -243,7 +245,8 @@ def train():
             updated_states = test_model_spec['updated_states']
 
             # Load the test dataset into the pipeline
-            sess.run(test_model_spec['iterator_init_op'])
+            # sess.run(test_model_spec['iterator_init_op'])
+            sess.run(test_model_spec)
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
             for _ in range(TEST_ITERS):
