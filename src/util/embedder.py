@@ -135,7 +135,7 @@ class Embedding:
 		f.close()
 		print('Total %s word vectors.' % len(embeddings_index))
 
-		print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
+		# print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
 		embedding_matrix = np.zeros((data_size, 2500, 50))
 		labels = np.empty(data_size)
 		line_index = 0
@@ -151,7 +151,7 @@ class Embedding:
 				else:
 					c_unk += 1
 				word_count += 1
-			labels[i] = int(label)
-			line_index += 1
+		labels[line_index] = int(label)
+		line_index += 1
 		print(f"{c_unk} words out of {word_count} total words")
 		return tf.data.Dataset.from_tensor_slices((embedding_matrix, labels))
