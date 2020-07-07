@@ -119,7 +119,7 @@ class Embedding:
 		ps = tf.constant(ps, dtype=tf.float32)
 		l = tf.constant(l, dtype=tf.int32)
 		print(f"\n\nDuring embedding {unk_count} out of {word_count} were unknown\n")
-		return tf.data.Dataset.from_tensors((inputs, ps,l))
+		return tf.data.Dataset.from_tensors((inputs, ps, l))
 
 	def embedding_matrix(self):
 		return self.emb_matrix
