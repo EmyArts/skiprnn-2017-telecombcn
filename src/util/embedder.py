@@ -52,7 +52,7 @@ class Embedding:
 		probs = {self.pad_word: 1, self.unk_word: 1}
 		data = tfds.load('imdb_reviews/plain_text', split='unsupervised', data_dir=DATA_DIR)
 		total_words = 2  # pad and unknown
-		entry_count = 1
+		entry_count = 2
 		max_len = 0
 		for text in tfds.as_numpy(data):
 			tokens = list(tokenize(str(text), lowercase=True))[3:]
@@ -79,9 +79,10 @@ class Embedding:
 		print("Creating matrix")
 		skipped_words = 0
 		emb_matrix = np.zeros((entry_count, self.vec_len), dtype=np.float32)
+		emb_matrix[1] = model['unk']
 		for i, word in enumerate(encoder.keys()):
 			try:
-				emb_matrix[i] = model[word]
+				emb_matrix[i+2] = model[word]
 			except:
 				skipped_words += 1
 				pass
@@ -123,3 +124,35 @@ class Embedding:
 
 	def vector_length(self):
 		return self.vec_len
+
+	def tay_get_embedding(self, data, data_size):
+		embeddings_index = {}
+		f = open('glove.6B.50d.txt')
+		for line in f:
+			values = line.split()
+			word = values[0]
+			coefs = np.asarray(values[1:], dtype='float32')
+			embeddings_index[word] = coefs
+		f.close()
+		print('Total %s word vectors.' % len(embeddings_index))
+
+		print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
+		embedding_matrix = np.zeros((data_size, 2500, 50))
+		labels = np.empty(data_size)
+		line_index = 0
+		c_unk = 0
+		word_count = 0
+		for text, label in tfds.as_numpy(data):
+			tokens = list(tokenize(str(text), lowercase=True))[3:]
+			for i, t in enumerate(tokens):
+				embedding_vector = embeddings_index.get(t)
+				if embedding_vector is not None:
+					# words not found in embedding index will be all-zeros.
+					embedding_matrix[line_index][i] = embedding_vector
+				else:
+					c_unk += 1
+				word_count += 1
+			labels[i] = int(label)
+			line_index += 1
+		print(f"{c_unk} words out of {word_count} total words")
+		return tf.data.Dataset.from_tensor_slices((embedding_matrix, labels))
