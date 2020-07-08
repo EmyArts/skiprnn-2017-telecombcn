@@ -99,7 +99,7 @@ def input_fn(split):
             else:
                 c_unk += 1
             word_count += 1
-        labels[batch_index][entry] = int(label)
+        labels[batch_index][entry] = label
         line_index += 1
         entry = line_index % BATCH_SIZE
         if entry == 0:
