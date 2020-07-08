@@ -90,6 +90,8 @@ def input_fn(split):
     word_count = 0
     entry = 0
     for text, label in tfds.as_numpy(data):
+        labels[batch_index][entry] = label
+        print(label)
         tokens = list(tokenize(str(text), lowercase=True))[3:]
         for i, t in enumerate(tokens):
             embedding_vector = EMBEDDING_DICT.get(t)
@@ -99,7 +101,6 @@ def input_fn(split):
             else:
                 c_unk += 1
             word_count += 1
-        labels[batch_index][entry] = label
         line_index += 1
         entry = line_index % BATCH_SIZE
         if entry == 0:
