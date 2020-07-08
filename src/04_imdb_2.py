@@ -38,6 +38,7 @@ SEQUENCE_LENGTH = 2520
 #VALIDATION_SAMPLES = 5000
 EMBEDDING_LENGTH = 50
 NUM_EPOCHS = 12
+BATCH_SIZE = FLAGS.batch_size
 
 # Load data
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
@@ -50,9 +51,10 @@ info = imdb_builder.info
 TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
 TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples
 
-ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
-TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
-BATCH_SIZE = FLAGS.batch_size
+# ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
+# TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
+ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
+TEST_ITERS = int(5000/BATCH_SIZE)
 
 EMBEDDING_DICT = {}
 f = open(f'glove.6B.{str(EMBEDDING_LENGTH)}d.txt')
@@ -71,12 +73,12 @@ def input_fn(split):
     # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
         data = imdb_builder.as_dataset(as_supervised=True, split='train[:5000]')
-        tot_len = math.ceil(5000/BATCH_SIZE) +1  #This will be the ITERATIONS_PER_EPOCH
+        tot_len = math.ceil(5000/BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
         #print("Total amount of training samples: " + str(len(list(dataset))))
         #print("Total amount of validation samples: " + str(len(list(dataset))))
     elif split == 'test':
         data = imdb_builder.as_dataset(as_supervised=True, split=test_split)
-        tot_len = math.ceil(5000/BATCH_SIZE) + 1 # This will be TEST_ITERS
+        tot_len = math.ceil(5000/BATCH_SIZE) # This will be TEST_ITERS
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
