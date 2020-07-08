@@ -107,7 +107,7 @@ def input_fn(split):
         entry = line_index % BATCH_SIZE
         if entry == 0:
             batch_index += 1
-    print(f"{c_unk} words out of {word_count} total words")
+    print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}")
@@ -179,14 +179,14 @@ def train():
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 # print(train_labels[iteration])
-                print(sess.run([train_fn, loss], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]}))
+                out = sess.run([train_fn, loss], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
 
                 # print(loss)
                 # _, loss =
                 # loss = sess.run(loss)
                 # # sess.run(train_model_spec['samples'])
                 # print(loss)
-                # train_acc_plt[epoch][iteration] = loss
+                train_acc_plt[epoch][iteration] = out[1]
                 # test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
             duration = time.time() - start_time
 
