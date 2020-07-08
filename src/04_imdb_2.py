@@ -83,7 +83,7 @@ def input_fn(split):
 
     # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
     embedding_matrix = np.zeros((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH))
-    labels = np.empty((tot_len, BATCH_SIZE), dtype=tf.int64)
+    labels = np.empty((tot_len, BATCH_SIZE), dtype=np.int64)
     line_index = 0
     batch_index = 0
     c_unk = 0
