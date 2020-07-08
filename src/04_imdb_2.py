@@ -177,12 +177,12 @@ def train():
             start_time = time.time()
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
-                sess.run(train_fn, feed_dict={samples: train_inputs['text'][iteration], ground_truth: train_inputs['labels'][iteration]})
+                sess.run([train_fn], feed_dict={samples: train_inputs['text'][iteration], ground_truth: train_inputs['labels'][iteration]})
                 loss = sess.run(loss)
                 # # sess.run(train_model_spec['samples'])
                 # print(loss)
                 train_acc_plt[epoch][iteration] = loss
-                test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
+                # test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
             duration = time.time() - start_time
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
