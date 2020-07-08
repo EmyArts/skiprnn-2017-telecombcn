@@ -117,8 +117,8 @@ def train():
     train_inputs = input_fn(split='train')
     test_inputs = input_fn(split='test')
 
-    samples = tf.placeholder(tf.float32, [BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
-    ground_truth = tf.placeholder(tf.int64, [BATCH_SIZE])
+    samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
+    ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE])
 
     with tf.variable_scope('model'):
         cell, initial_state = create_model(model=FLAGS.model,
