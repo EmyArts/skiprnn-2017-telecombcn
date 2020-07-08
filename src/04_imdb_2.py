@@ -82,7 +82,7 @@ def input_fn(split):
         raise ValueError()
 
     # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
-    embedding_matrix = np.zeros((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH))
+    embedding_matrix = np.zeros((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH), dtype=np.float32)
     labels = np.empty((tot_len, BATCH_SIZE), dtype=np.int64)
     line_index = 0
     batch_index = 0
