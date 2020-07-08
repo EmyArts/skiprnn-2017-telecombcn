@@ -120,7 +120,7 @@ def train():
     samples = tf.placeholder(tf.float32, [BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, [BATCH_SIZE])
 
-    with tf.variable_scope('model', reuse=reuse):
+    with tf.variable_scope('model'):
         cell, initial_state = create_model(model=FLAGS.model,
                                            num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
                                            batch_size=FLAGS.batch_size)
