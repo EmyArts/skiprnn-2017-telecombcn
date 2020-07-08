@@ -148,7 +148,9 @@ def train():
     # surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
 
     loss = cross_entropy + budget_loss# + surprisal_loss
-    loss = tf.reshape(loss, [])
+
+    loss = tf.cond(tf.is_nan(loss), 1, tf.reshape(loss, []))
+
 
     # Optimizer
     opt, grads_and_vars = compute_gradients(loss, FLAGS.learning_rate, FLAGS.grad_clip)
