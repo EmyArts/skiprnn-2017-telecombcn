@@ -36,6 +36,7 @@ OUTPUT_SIZE = 2
 SEQUENCE_LENGTH = 2520
 #VALIDATION_SAMPLES = 500 # Just for debugging
 #VALIDATION_SAMPLES = 5000
+EMBEDDING_LENGTH = 50
 NUM_EPOCHS = 12
 
 # Load data
@@ -43,8 +44,6 @@ imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
 info = imdb_builder.info
 
-SEQUENCE_LENGTH = 2500
-EMBEDDING_LENGTH = 50
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
@@ -118,7 +117,7 @@ def train():
     train_inputs = input_fn(split='train')
     test_inputs = input_fn(split='test')
 
-    samples = tf.placeholder(tf.float32, [BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH ])  # (batch, time, in)
+    samples = tf.placeholder(tf.float32, [BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, [BATCH_SIZE])
 
     with tf.variable_scope('model', reuse=reuse):
