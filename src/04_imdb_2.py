@@ -91,7 +91,7 @@ def input_fn(split):
     entry = 0
     for text, label in tfds.as_numpy(data):
         labels[batch_index][entry] = label
-        print(label)
+        # print(label)
         tokens = list(tokenize(str(text), lowercase=True))[3:]
         for i, t in enumerate(tokens):
             embedding_vector = EMBEDDING_DICT.get(t)
@@ -104,7 +104,7 @@ def input_fn(split):
         line_index += 1
         entry = line_index % BATCH_SIZE
         if entry == 0:
-            batch_index += batch_index
+            batch_index += 1
     print(f"{c_unk} words out of {word_count} total words")
 
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
