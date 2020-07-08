@@ -113,23 +113,22 @@ def input_fn(split):
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
 def train():
-    samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
-    ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE])
+    samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH], name='Samples')  # (batch, time, in)
+    ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE], name='GroundTruth')
 
-    with tf.variable_scope('model'):
-        cell, initial_state = create_model(model=FLAGS.model,
-                                           num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
-                                           batch_size=FLAGS.batch_size)
+    cell, initial_state = create_model(model=FLAGS.model,
+                                       num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
+                                       batch_size=FLAGS.batch_size)
 
-        rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
+    rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
-        # Split the outputs of the RNN into the actual outputs and the state update gate
-        rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
+    # Split the outputs of the RNN into the actual outputs and the state update gate
+    rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
 
-        print(f"\nUpdated states are {updated_states}.\n")
+    print(f"\nUpdated states are {updated_states}.\n")
 
-        logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=OUTPUT_SIZE)
-        predictions = tf.argmax(logits, 1)
+    logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=OUTPUT_SIZE)
+    predictions = tf.argmax(logits, 1)
 
     # Compute cross-entropy loss
     cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
