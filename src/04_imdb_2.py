@@ -71,12 +71,12 @@ def input_fn(split):
     # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
         data = imdb_builder.as_dataset(as_supervised=True, split='train[:5000]')
-        tot_len = math.ceil(5000/BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
+        tot_len = math.ceil(5000/BATCH_SIZE) +1  #This will be the ITERATIONS_PER_EPOCH
         #print("Total amount of training samples: " + str(len(list(dataset))))
         #print("Total amount of validation samples: " + str(len(list(dataset))))
     elif split == 'test':
         data = imdb_builder.as_dataset(as_supervised=True, split=test_split)
-        tot_len = math.ceil(5000/BATCH_SIZE) # This will be TEST_ITERS
+        tot_len = math.ceil(5000/BATCH_SIZE) + 1 # This will be TEST_ITERS
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
@@ -176,7 +176,7 @@ def train():
             start_time = time.time()
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
-                print(train_labels[iteration])
+                # print(train_labels[iteration])
                 sess.run([train_fn], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
                 # _, loss =
                 # loss = sess.run(loss)
