@@ -106,17 +106,13 @@ def input_fn(split):
             batch_index += batch_index
     print(f"{c_unk} words out of {word_count} total words")
 
-    inputs = {'text': embedding_matrix, 'labels': labels}
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
-    #print(f"\n\n Input shape is {text.shape}, probs shape is {probs.shape}, labels shape is {labels.shape}")
-    return inputs
+    print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}")
+    return embedding_matrix, labels
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
 def train():
-    train_inputs = input_fn(split='train')
-    test_inputs = input_fn(split='test')
-
     samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE])
 
@@ -164,6 +160,9 @@ def train():
     sess.run(tf.global_variables_initializer())
 
     try:
+        train_matrix, train_labels = input_fn(split='train')
+        test_matrix, test_labels = input_fn(split='test')
+
         train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
         val_acc_plt = np.empty((NUM_EPOCHS))
 
@@ -177,7 +176,7 @@ def train():
             start_time = time.time()
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
-                sess.run([train_fn], feed_dict={samples: train_inputs['text'][iteration], ground_truth: train_inputs['labels'][iteration]})
+                sess.run([train_fn], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
                 loss = sess.run(loss)
                 # # sess.run(train_model_spec['samples'])
                 # print(loss)
@@ -187,7 +186,7 @@ def train():
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
             for iteration in range(TEST_ITERS):
-                test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs['text'][iteration], ground_truth: test_inputs['labels'][iteration]})
+                test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states], feed_dict={samples: test_matrix[iteration], ground_truth: test_labels[iteration]})
                 test_accuracy += test_iter_accuracy
                 if test_used_inputs is not None:
                     test_steps += compute_used_samples(test_used_inputs)
