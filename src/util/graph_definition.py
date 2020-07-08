@@ -119,7 +119,7 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
     """
     if using_skip_rnn(model):
         sample_loss = tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
-        if not tf.math.is_nan(sample_loss):
+        if not any(tf.is_nan(sample_loss)):
             return sample_loss
         else:
             return tf.reduce_sum(cost_per_sample * updated_states, 1)
