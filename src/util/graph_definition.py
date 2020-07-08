@@ -28,7 +28,9 @@ def create_generic_flags():
     tf.app.flags.DEFINE_string('embedding', 'simple', "Type of embedding used for the imdb task")
 
     # Flags for the Skip RNN cells
-    tf.app.flags.DEFINE_float('cost_per_sample', 0.000001, "Cost per used sample. Set to 0 to disable this option.")
+    tf.app.flags.DEFINE_float('cost_per_sample', 0.0001, "Cost per used sample. Set to 0 to disable this option.")
+    tf.app.flags.DEFINE_float('suprisal_cost', 0.0001, "How much it gets punished for average surprisal or discarded samples.")
+    tf.app.flags.DEFINE_float('use_surprisal', False, "Whether to use surprisal punishment on loss function")
 
 
 def compute_gradients(loss, learning_rate, gradient_clipping=-1):
@@ -116,7 +118,10 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
     Compute penalization term on the number of updated states (i.e. used samples)
     """
     if using_skip_rnn(model):
-        return tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
+        if len(updated_states) == 0:
+            return 1
+        else:
+            return tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
     else:
         return tf.zeros(loss.get_shape())
 
