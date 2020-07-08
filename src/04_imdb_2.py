@@ -137,6 +137,7 @@ def train():
     cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
     cross_entropy = tf.reduce_mean(cross_entropy_per_sample)
 
+
     # Compute accuracy
     accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
 
