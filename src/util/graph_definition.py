@@ -118,10 +118,11 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
     Compute penalization term on the number of updated states (i.e. used samples)
     """
     if using_skip_rnn(model):
-        if len(updated_states) == 0:
-            return 1
+        sample_loss = tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
+        if not tf.math.is_nan(sample_loss):
+            return sample_loss
         else:
-            return tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
+            return tf.reduce_sum(cost_per_sample * updated_states, 1)
     else:
         return tf.zeros(loss.get_shape())
 
