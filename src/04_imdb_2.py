@@ -150,7 +150,7 @@ def train():
     loss = cross_entropy + budget_loss# + surprisal_loss
     loss = tf.reshape(loss, [])
 
-    loss = tf.cond(tf.is_nan(loss), tf.constant(1, shape=loss.shape), loss)
+    loss = tf.cond(tf.is_nan(loss), tf.constant(1.0, shape=loss.shape), loss)
 
 
     # Optimizer
