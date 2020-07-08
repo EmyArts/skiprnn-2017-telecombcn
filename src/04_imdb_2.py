@@ -175,9 +175,9 @@ def train():
             start_time = time.time()
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
-                print(train_matrix[iteration].shape, train_matrix[iteration].dtype)
-                sess.run([train_fn], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
-                loss = sess.run(loss)
+                # print(train_matrix[iteration].shape, train_matrix[iteration].dtype)
+                _, loss = sess.run([train_fn, loss], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
+                # loss = sess.run(loss)
                 # # sess.run(train_model_spec['samples'])
                 # print(loss)
                 train_acc_plt[epoch][iteration] = loss
