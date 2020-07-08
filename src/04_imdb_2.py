@@ -83,7 +83,7 @@ def input_fn(split):
 
     # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
     embedding_matrix = np.zeros((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH))
-    labels = np.empty((tot_len, BATCH_SIZE))
+    labels = np.empty((tot_len, BATCH_SIZE), dtype=tf.int64)
     line_index = 0
     batch_index = 0
     c_unk = 0
@@ -118,7 +118,7 @@ def train():
     test_inputs = input_fn(split='test')
 
     samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH])  # (batch, time, in)
-    ground_truth = tf.placeholder(tf.int32, shape=[BATCH_SIZE])
+    ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE])
 
     with tf.variable_scope('model'):
         cell, initial_state = create_model(model=FLAGS.model,
