@@ -184,7 +184,6 @@ def train():
                 # Perform SGD update
                 # print(train_labels[iteration])
                 out = sess.run([train_fn, loss], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
-
                 # print(loss)
                 # _, loss =
                 # loss = sess.run(loss)
@@ -198,6 +197,7 @@ def train():
             for iteration in range(TEST_ITERS):
                 test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states], feed_dict={samples: test_matrix[iteration], ground_truth: test_labels[iteration]})
                 test_accuracy += test_iter_accuracy
+                test_loss += test_iter_loss
                 if test_used_inputs is not None:
                     test_steps += compute_used_samples(test_used_inputs)
                 else:
