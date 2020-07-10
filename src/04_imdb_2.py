@@ -119,7 +119,7 @@ def input_fn(split):
 
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}")
-    return embedding_matrix, labels, np.expand_dims(probs_matrix, axis=0)
+    return embedding_matrix, labels, probs_matrix
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
@@ -155,7 +155,7 @@ def train():
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
 
     # Compute loss for the amount of surprisal
-    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
+    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, np.expand_dims(probs, axis=0), 0.0001)
 
     loss = cross_entropy + budget_loss + surprisal_loss
     loss = tf.reshape(loss, [])
