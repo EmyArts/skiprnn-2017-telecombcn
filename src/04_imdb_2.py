@@ -118,13 +118,14 @@ def input_fn(split):
 
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}")
-    return embedding_matrix, labels
+    return embedding_matrix, labels, probs_matrix
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
 def train():
     samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH], name='Samples')  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE], name='GroundTruth')
+    probs = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH], name='Probs')
 
     cell, initial_state = create_model(model=FLAGS.model,
                                        num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
@@ -173,8 +174,8 @@ def train():
     sess.run(tf.global_variables_initializer())
 
     try:
-        train_matrix, train_labels = input_fn(split='train')
-        test_matrix, test_labels = input_fn(split='test')
+        train_matrix, train_labels, train_probs = input_fn(split='train')
+        test_matrix, test_labels, val_probs = input_fn(split='test')
 
         train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
         val_acc_plt = np.empty((NUM_EPOCHS))
@@ -190,7 +191,11 @@ def train():
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 # print(train_labels[iteration])
-                out = sess.run([train_fn, loss], feed_dict={samples: train_matrix[iteration], ground_truth: train_labels[iteration]})
+                out = sess.run([train_fn, loss],
+                               feed_dict={samples: train_matrix[iteration],
+                                          ground_truth: train_labels[iteration],
+                                          probs: train_probs[iteration]
+                                          })
                 # print(loss)
                 # _, loss =
                 # loss = sess.run(loss)
