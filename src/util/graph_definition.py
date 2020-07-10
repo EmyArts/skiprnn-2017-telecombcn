@@ -136,14 +136,14 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     if using_skip_rnn(model):
         neg_updated_states = tf.subtract(tf.ones(updated_states.shape, dtype=tf.dtypes.float32), updated_states)
         surprisal_values = tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities)))
-        printer_0 = tf.Print(surprisal_values, [neg_updated_states], "Inverse of the updated states is ")
+        # printer_0 = tf.Print(surprisal_values, [neg_updated_states], "Inverse of the updated states is ")
         surprisals = tf.multiply(neg_updated_states, tf.where(tf.is_nan(surprisal_values), tf.zeros_like(surprisal_values), surprisal_values))
         tot_surprisal = tf.reduce_sum(surprisals)
-        printer_1 = tf.Print(tot_surprisal, [tot_surprisal], "Total surprisal is ")
+        # printer_1 = tf.Print(tot_surprisal, [tot_surprisal], "Total surprisal is ")
         non_read_samples = tf.reduce_sum(neg_updated_states)
-        printer_2 = tf.Print(non_read_samples, [non_read_samples], "Non read samples is ")
-        with tf.control_dependencies([printer_0, printer_1, printer_2]):
-            average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
-        return average_surprisal
+        # printer_2 = tf.Print(non_read_samples, [non_read_samples], "Non read samples is ")
+        # with tf.control_dependencies([printer_0, printer_1, printer_2]):
+        average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
+        return surprisal_influence * average_surprisal
     else:
         return tf.zeros(loss.get_shape())
