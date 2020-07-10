@@ -251,6 +251,7 @@ def train():
                                                    duration,
                                                    100. * train_accuracy,
                                                    train_steps,
+                                                   100. * train_steps / SEQUENCE_LENGTH,
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
