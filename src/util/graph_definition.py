@@ -30,8 +30,8 @@ def create_generic_flags():
 
     # Flags for the Skip RNN cells
     tf.app.flags.DEFINE_float('cost_per_sample', 0.0001, "Cost per used sample. Set to 0 to disable this option.")
-    tf.app.flags.DEFINE_float('suprisal_cost', 0.0001, "How much it gets punished for average surprisal or discarded samples.")
-    tf.app.flags.DEFINE_string('use_surprisal', 'yes', "Whether to use surprisal punishment on loss function")
+    tf.app.flags.DEFINE_float('suprisal_influence', 0.0001, "How much it gets punished for average surprisal or discarded samples.")
+    # tf.app.flags.DEFINE_string('use_surprisal', 'yes', "Whether to use surprisal punishment on loss function")
 
 
 def compute_gradients(loss, learning_rate, gradient_clipping=-1):
