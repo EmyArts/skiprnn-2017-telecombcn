@@ -155,7 +155,7 @@ def train():
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
 
     # Compute loss for the amount of surprisal
-    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, np.expand_dims(probs, axis=0), 0.0001)
+    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, tf.expand_dims(probs, axis=2), 0.0001)
 
     loss = cross_entropy + budget_loss + surprisal_loss
     loss = tf.reshape(loss, [])
