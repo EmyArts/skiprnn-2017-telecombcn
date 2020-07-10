@@ -125,7 +125,7 @@ def input_fn(split):
 def train():
     samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH], name='Samples')  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE], name='GroundTruth')
-    probs = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH], name='Probs')
+    probs = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, 1], name='Probs')
 
     cell, initial_state = create_model(model=FLAGS.model,
                                        num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
