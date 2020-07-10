@@ -181,6 +181,7 @@ def train():
 
         train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
         val_acc_plt = np.empty((NUM_EPOCHS))
+        loss_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH, 3))
 
         for epoch in range(NUM_EPOCHS):
 
@@ -193,7 +194,7 @@ def train():
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 # print(iteration, train_probs[iteration].shape)
-                out = sess.run([train_fn, loss],
+                out = sess.run([train_fn, loss, cross_entropy, budget_loss, surprisal_loss],
                                feed_dict={samples: train_matrix[iteration],
                                           ground_truth: train_labels[iteration],
                                           probs: train_probs[iteration]
@@ -203,7 +204,9 @@ def train():
                 # loss = sess.run(loss)
                 # # sess.run(train_model_spec['samples'])
                 # print(loss)
+                print(f"entropy: {out[2]}, budget: {out[3]}, surprisal: {out[4]}.")
                 train_acc_plt[epoch][iteration] = out[1]
+                # loss_plt[epoch][iteration] = out[2:]
                 # test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
             duration = time.time() - start_time
 
