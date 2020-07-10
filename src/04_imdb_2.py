@@ -50,14 +50,16 @@ info = imdb_builder.info
 
 # datasets = mnist_builder.as_dataset()
 
-#Originalli 25k for training and 25k for testing -> 20k for testing and 5k for validation
-TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
-TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples
+#Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
+TRAIN_SAMPLES = 10000
+TEST_SAMPLES = 5000
+# TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
+# TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples
 
-# ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
-# TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
-ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
-TEST_ITERS = int(5000/BATCH_SIZE)
+ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
+TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
+# ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
+# TEST_ITERS = int(5000/BATCH_SIZE)
 
 PROBS_DICT = pickle.load(open(PROBS_FILE, 'rb'))
 
@@ -73,17 +75,17 @@ print('Total %s word vectors.' % len(EMBEDDING_DICT))
 
 def input_fn(split):
     # Reset datasets once done debugging
-    test_split = f'test[:5000]'
+    test_split = f'test[:{TEST_SAMPLES}]'
     # test_split = f'test[:{TEST_SAMPLES}]'
     # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
-        data = imdb_builder.as_dataset(as_supervised=True, split='train[:5000]')
-        tot_len = math.ceil(5000/BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
+        data = imdb_builder.as_dataset(as_supervised=True, split=f'train[:{TRAIN_SAMPLES}]')
+        tot_len = math.ceil(TRAIN_SAMPLES/BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
         #print("Total amount of training samples: " + str(len(list(dataset))))
         #print("Total amount of validation samples: " + str(len(list(dataset))))
     elif split == 'test':
         data = imdb_builder.as_dataset(as_supervised=True, split=test_split)
-        tot_len = math.ceil(5000/BATCH_SIZE) # This will be TEST_ITERS
+        tot_len = math.ceil(TEST_SAMPLES/BATCH_SIZE) # This will be TEST_ITERS
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
@@ -193,24 +195,28 @@ def train():
             # sess.run(train_model_spec['samples'])
 
             start_time = time.time()
+            train_accuracy, train_steps, train_loss = 0, 0, 0
             for iteration in range(ITERATIONS_PER_EPOCH):
                 # Perform SGD update
                 # print(iteration, train_probs[iteration].shape)
-                out = sess.run([train_fn, loss, cross_entropy, budget_loss, surprisal_loss],
+                out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss, surprisal_loss],
                                feed_dict={samples: train_matrix[iteration],
                                           ground_truth: train_labels[iteration],
                                           probs: train_probs[iteration]
                                           })
-                # print(loss)
-                # _, loss =
-                # loss = sess.run(loss)
-                # # sess.run(train_model_spec['samples'])
-                # print(loss)
-                # print(f"entropy: {out[2]}, budget: {out[3]}, surprisal: {out[4]}.")
-                train_acc_plt[epoch][iteration] = out[1]
-                loss_plt[epoch][iteration] = out[2:] # entropy, budget, surprisal
-                # test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
+                train_accuracy += out[2]
+                train_loss += out[1]
+                loss_plt[epoch][iteration] = out[4:] # entropy, budget, surprisal
+                if out[3] is not None:
+                    train_steps += compute_used_samples(test_used_inputs)
+                else:
+                    test_steps += SEQUENCE_LENGTH
             duration = time.time() - start_time
+
+            train_accuracy /= ITERATIONS_PER_EPOCH
+            train_loss /= ITERATIONS_PER_EPOCH
+            train_steps /= ITERATIONS_PER_EPOCH
+
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
             for iteration in range(TEST_ITERS):
@@ -243,12 +249,15 @@ def train():
                   "test samples: %.2f (%.2f%%)" % (epoch + 1,
                                                    NUM_EPOCHS,
                                                    duration,
+                                                   100. * train_accuracy,
+
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
+
             loss_perc = loss_plt[epoch, :, :].mean()
-            loss_perc = loss_perc / loss_perc.sum()
-            print(f"entropy: {loss_perc[0]}, budget: {loss_perc[1]}, surprisal: {loss_perc[2]}.")
+            loss_perc = (loss_perc / loss_perc.sum()) * 100
+            print(f"entropy: {loss_perc[0]}%, budget: {loss_perc[1]}%, surprisal: {loss_perc[2]}%.")
 
             # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
