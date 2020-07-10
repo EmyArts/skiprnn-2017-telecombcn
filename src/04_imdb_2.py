@@ -250,7 +250,7 @@ def train():
                                                    NUM_EPOCHS,
                                                    duration,
                                                    100. * train_accuracy,
-
+                                                   train_steps,
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
