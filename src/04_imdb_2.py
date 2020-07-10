@@ -90,7 +90,7 @@ def input_fn(split):
 
     # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
     embedding_matrix = np.zeros((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH), dtype=np.float32)
-    probs_matrix = np.ones((tot_len, BATCH_SIZE, SEQUENCE_LENGTH), dtype=np.float32)
+    probs_matrix = np.ones((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, 1), dtype=np.float32)
     labels = np.empty((tot_len, BATCH_SIZE), dtype=np.int64)
     line_index = 0
     batch_index = 0
@@ -118,8 +118,9 @@ def input_fn(split):
     print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
-    print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}")
-    return embedding_matrix, labels, np.expand_dims(probs_matrix, axis=-1)
+    print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
+    # np.expand_dims(probs_matrix, axis=-1)
+    return embedding_matrix, labels, probs_matrix
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
