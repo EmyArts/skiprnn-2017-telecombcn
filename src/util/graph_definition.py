@@ -141,8 +141,8 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
         printer_1 = tf.Print(tot_surprisal, [tot_surprisal], "Total surprisal is ")
         non_read_samples = tf.reduce_sum(neg_updated_states)
         printer_2 = (non_read_samples, [non_read_samples], "Non read samples is ")
-        with tf.control_dependencies([printer_0, printer_1, printer_2]):
-            average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
+        # with tf.control_dependencies([printer_0, printer_1, printer_2]):
+        average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
         return surprisal_influence * average_surprisal
     else:
         return tf.zeros(loss.get_shape())
