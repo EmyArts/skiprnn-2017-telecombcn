@@ -135,7 +135,7 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     print(updated_states)
     if using_skip_rnn(model):
         neg_updated_states = tf.subtract(tf.ones(updated_states.shape, dtype=tf.dtypes.float32), updated_states)
-        surprisal_values = tf.multiply(-1, (tf.log(sample_probabilities)))
+        surprisal_values = tf.multiply(tf.constant(-1), (tf.log(sample_probabilities)))
         printer_0 = tf.Print(surprisal_values, [neg_updated_states], "Inverse of the updated states is ")
         surprisals = tf.multiply(neg_updated_states, tf.where(tf.is_nan(surprisal_values), tf.zeros_like(surprisal_values), surprisal_values))
         tot_surprisal = tf.reduce_sum(surprisals)
