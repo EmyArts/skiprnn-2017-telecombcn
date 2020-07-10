@@ -177,7 +177,7 @@ def train():
 
     try:
         train_matrix, train_labels, train_probs = input_fn(split='train')
-        test_matrix, test_labels, val_probs = input_fn(split='test')
+        test_matrix, test_labels, test_probs = input_fn(split='test')
 
         train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
         val_acc_plt = np.empty((NUM_EPOCHS))
@@ -209,7 +209,11 @@ def train():
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
             for iteration in range(TEST_ITERS):
-                test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states], feed_dict={samples: test_matrix[iteration], ground_truth: test_labels[iteration]})
+                test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
+                                                                                feed_dict={samples: test_matrix[iteration],
+                                                                                           ground_truth: test_labels[iteration],
+                                                                                           probs: test_probs[iteration]
+                                                                                           })
                 test_accuracy += test_iter_accuracy
                 test_loss += test_iter_loss
                 if test_used_inputs is not None:
