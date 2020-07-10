@@ -160,7 +160,7 @@ def train():
     loss = cross_entropy + budget_loss + surprisal_loss
     loss = tf.reshape(loss, [])
 
-    loss = tf.cond(tf.is_nan(loss), lambda: tf.constant(1.0, shape=loss.shape), lambda: loss)
+    loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
 
 
     # Optimizer
@@ -209,7 +209,6 @@ def train():
                 loss_plt[epoch][iteration] = out[2:] # entropy, budget, surprisal
                 # test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
             duration = time.time() - start_time
-            print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
             for iteration in range(TEST_ITERS):
@@ -236,6 +235,8 @@ def train():
 
             print("Epoch %d/%d, "
                   "duration: %.2f seconds, " 
+                  "train accuracy: %.2f%%, "
+                  "train samples: %.2f (%.2f%%)"
                   "test accuracy: %.2f%%, "
                   "test samples: %.2f (%.2f%%)" % (epoch + 1,
                                                    NUM_EPOCHS,
@@ -243,6 +244,11 @@ def train():
                                                    100. * test_accuracy,
                                                    test_steps,
                                                    100. * test_steps / SEQUENCE_LENGTH))
+            loss_perc = loss_plt[epoch, :, :].mean()
+            loss_perc = loss_perc / loss_perc.sum()
+            print(f"entropy: {loss_perc[0]}, budget: {loss_perc[1]}, surprisal: {loss_perc[2]}.")
+
+            # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
         # Training curve for epochs
         plt.plot(train_acc_plt[:, 0], label='Training loss')
