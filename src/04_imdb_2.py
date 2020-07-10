@@ -103,10 +103,11 @@ def input_fn(split):
         tokens = list(tokenize(str(text), lowercase=True))[3:]
         for i, t in enumerate(tokens):
             embedding_vector = EMBEDDING_DICT.get(t)
+            prob = PROBS_DICT.get(t)
             if embedding_vector is not None:
                 # words not found in embedding index will be all-zeros.
                 embedding_matrix[batch_index][entry][i] = embedding_vector
-                probs_matrix[batch_index][entry][i] = PROBS_DICT[t]
+                probs_matrix[batch_index][entry][i] = prob
             else:
                 c_unk += 1
             word_count += 1
