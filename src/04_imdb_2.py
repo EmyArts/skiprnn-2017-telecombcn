@@ -204,11 +204,12 @@ def train():
                 # loss = sess.run(loss)
                 # # sess.run(train_model_spec['samples'])
                 # print(loss)
-                print(f"entropy: {out[2]}, budget: {out[3]}, surprisal: {out[4]}.")
+                # print(f"entropy: {out[2]}, budget: {out[3]}, surprisal: {out[4]}.")
                 train_acc_plt[epoch][iteration] = out[1]
-                # loss_plt[epoch][iteration] = out[2:]
+                loss_plt[epoch][iteration] = out[2:] # entropy, budget, surprisal
                 # test_iter_accuracy, test_iter_loss, test_used_inputs= sess.run([accuracy, loss, updated_states], feed_dict={samples: test_inputs[iteration], ground_truth: test_inputs[iteration]})
             duration = time.time() - start_time
+            print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
             test_accuracy, test_loss, test_steps = 0, 0, 0
             for iteration in range(TEST_ITERS):
@@ -251,6 +252,13 @@ def train():
         plt.show()
 
         plt.plot(train_acc_plt.flatten(), label='Training loss')
+        plt.title("Training curve for all iterations")
+        plt.savefig("train_iter.png")
+        plt.show()
+
+        plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
+        plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
+        plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
         plt.title("Training curve for all iterations")
         plt.savefig("train_iter.png")
         plt.show()
