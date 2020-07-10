@@ -12,6 +12,7 @@ from __future__ import print_function
 import os
 import time
 import datetime
+import pickle
 
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
@@ -40,6 +41,8 @@ EMBEDDING_LENGTH = 50
 NUM_EPOCHS = FLAGS.epochs
 BATCH_SIZE = FLAGS.batch_size
 
+PROBS_FILE = 'probs.pkl'
+
 # Load data
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
 imdb_builder.download_and_prepare()
@@ -55,6 +58,8 @@ TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples
 # TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
 TEST_ITERS = int(5000/BATCH_SIZE)
+
+PROBS_DICT = pickle.load(open(PROBS_FILE, 'rb'))
 
 EMBEDDING_DICT = {}
 f = open(f'glove.6B.{str(EMBEDDING_LENGTH)}d.txt')
@@ -85,6 +90,7 @@ def input_fn(split):
 
     # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
     embedding_matrix = np.zeros((tot_len, BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH), dtype=np.float32)
+    probs_matrix = np.ones((tot_len, BATCH_SIZE, SEQUENCE_LENGTH), dtype=np.float32)
     labels = np.empty((tot_len, BATCH_SIZE), dtype=np.int64)
     line_index = 0
     batch_index = 0
@@ -100,6 +106,7 @@ def input_fn(split):
             if embedding_vector is not None:
                 # words not found in embedding index will be all-zeros.
                 embedding_matrix[batch_index][entry][i] = embedding_vector
+                probs_matrix[batch_index][entry][i] = PROBS_DICT[t]
             else:
                 c_unk += 1
             word_count += 1
@@ -145,9 +152,9 @@ def train():
     budget_loss = compute_budget_loss(FLAGS.model, cross_entropy, updated_states, FLAGS.cost_per_sample)
 
     # Compute loss for the amount of surprisal
-    # surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
+    surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, 0.0001)
 
-    loss = cross_entropy + budget_loss# + surprisal_loss
+    loss = cross_entropy + budget_loss + surprisal_loss
     loss = tf.reshape(loss, [])
 
     loss = tf.cond(tf.is_nan(loss), lambda: tf.constant(1.0, shape=loss.shape), lambda: loss)
