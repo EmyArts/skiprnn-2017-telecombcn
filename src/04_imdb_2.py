@@ -156,6 +156,8 @@ def train():
 
     # Compute loss for the amount of surprisal
     surprisal_loss = compute_surprisal_loss(FLAGS.model, cross_entropy, updated_states, probs, FLAGS.surprisal_influence)
+    # Avoid encouraging to not skip.
+    surprisal_loss = tf.where(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)), tf.ones_like(surprisal_loss), surprisal_loss)
 
     loss = cross_entropy + budget_loss + surprisal_loss
     loss = tf.reshape(loss, [])
