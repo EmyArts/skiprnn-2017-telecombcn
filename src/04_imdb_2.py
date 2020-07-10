@@ -119,7 +119,7 @@ def input_fn(split):
 
     # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
     print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}")
-    return embedding_matrix, labels, np.expand_dims(probs_matrix, axis=2)
+    return embedding_matrix, labels, np.expand_dims(probs_matrix, axis=-1)
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
