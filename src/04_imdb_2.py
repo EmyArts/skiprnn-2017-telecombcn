@@ -208,9 +208,9 @@ def train():
                 train_loss += out[1]
                 loss_plt[epoch][iteration] = out[4:] # entropy, budget, surprisal
                 if out[3] is not None:
-                    train_steps += compute_used_samples(test_used_inputs)
+                    train_steps += compute_used_samples(out[3])
                 else:
-                    test_steps += SEQUENCE_LENGTH
+                    train_steps += SEQUENCE_LENGTH
             duration = time.time() - start_time
 
             train_accuracy /= ITERATIONS_PER_EPOCH
