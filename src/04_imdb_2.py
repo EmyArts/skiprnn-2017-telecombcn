@@ -136,6 +136,7 @@ def train():
     # Split the outputs of the RNN into the actual outputs and the state update gate
     rnn_outputs, updated_states = split_rnn_outputs(FLAGS.model, rnn_outputs)
 
+    printer = tf.Print(updated_states.shape, [updated_states], "\nUpdated states are: \n")
     # print(f"\nUpdated states are {updated_states}.\n")
 
     logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=OUTPUT_SIZE)
@@ -196,6 +197,7 @@ def train():
                                           ground_truth: train_labels[iteration],
                                           probs: train_probs[iteration]
                                           })
+                sess.run(printer)
                 # print(loss)
                 # _, loss =
                 # loss = sess.run(loss)
