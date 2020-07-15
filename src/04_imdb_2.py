@@ -41,7 +41,7 @@ EMBEDDING_LENGTH = 50
 NUM_EPOCHS = FLAGS.epochs
 BATCH_SIZE = FLAGS.batch_size
 
-PROBS_FILE = 'probs.pkl'
+PROBS_FILE = 'util/probs.pkl'
 
 # Load data
 imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir=FLAGS.data_path)
@@ -64,7 +64,7 @@ TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
 PROBS_DICT = pickle.load(open(PROBS_FILE, 'rb'))
 
 EMBEDDING_DICT = {}
-f = open(f'glove.6B.{str(EMBEDDING_LENGTH)}d.txt')
+f = open(f'util/glove.6B.{str(EMBEDDING_LENGTH)}d.txt')
 for line in f:
     values = line.split()
     word = values[0]
