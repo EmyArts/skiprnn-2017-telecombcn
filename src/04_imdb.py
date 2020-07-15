@@ -261,8 +261,7 @@ def train():
 
             loss_perc = loss_plt[epoch].mean(axis=0)
             loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
-            print(loss_perc)
-            print(f"entropy: {loss_perc[0]}%, budget: {loss_perc[1]}%, surprisal: {loss_perc[2]}%.")
+            print("entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
             # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
