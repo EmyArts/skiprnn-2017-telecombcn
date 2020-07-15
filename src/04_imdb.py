@@ -247,7 +247,7 @@ def train():
             print("Epoch %d/%d, "
                   "duration: %.2f seconds, " 
                   "train accuracy: %.2f%%, "
-                  "train samples: %.2f (%.2f%%)"
+                  "train samples: %.2f (%.2f%%), "
                   "val accuracy: %.2f%%, "
                   "val samples: %.2f (%.2f%%)" % (epoch + 1,
                                                    NUM_EPOCHS,
