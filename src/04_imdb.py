@@ -259,7 +259,7 @@ def train():
                                                    val_steps,
                                                    100. * val_steps / SEQUENCE_LENGTH))
 
-            loss_perc = loss_plt[epoch, :].mean(axis=2)
+            loss_perc = loss_plt[epoch].mean(axis=0)
             loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
             print(loss_perc)
             print(f"entropy: {loss_perc[0]}%, budget: {loss_perc[1]}%, surprisal: {loss_perc[2]}%.")
