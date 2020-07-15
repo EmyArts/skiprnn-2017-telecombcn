@@ -78,7 +78,7 @@ print('Total %s word vectors.' % len(EMBEDDING_DICT))
 
 def input_fn(split):
     # Reset datasets once done debugging
-    val_split = f'train[{TRAIN_SAMPLES}:]'
+    val_split = f'train[{TRAIN_SAMPLES}:{TRAIN_SAMPLES + VAL_SAMPLES}]'
     # test_split = f'test[{TRAIN_SAMPLES:{TEST_SAMPLES}]'
     # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
