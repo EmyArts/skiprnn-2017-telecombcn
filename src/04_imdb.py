@@ -52,8 +52,8 @@ info = imdb_builder.info
 
 #Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
 # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-TRAIN_SAMPLES = 15000
-VAL_SAMPLES = 10000
+TRAIN_SAMPLES = 12000
+VAL_SAMPLES = 80000
 # TRAIN and VAL samples should always sum up to 25k
 
 # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
