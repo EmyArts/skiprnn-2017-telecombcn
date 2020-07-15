@@ -51,13 +51,16 @@ info = imdb_builder.info
 # datasets = mnist_builder.as_dataset()
 
 #Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
-TRAIN_SAMPLES = 10000
-TEST_SAMPLES = 5000
+# Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
+TRAIN_SAMPLES = 15000
+VAL_SAMPLES = 10000
+# TRAIN and VAL samples should always sum up to 25k
+
 # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
 # TEST_SAMPLES = info.splits[tfds.Split.TEST].num_examples
 
 ITERATIONS_PER_EPOCH = int(TRAIN_SAMPLES / FLAGS.batch_size)
-TEST_ITERS = int(TEST_SAMPLES / FLAGS.batch_size)
+VAL_ITERS = int(VAL_SAMPLES / FLAGS.batch_size)
 # ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
 # TEST_ITERS = int(5000/BATCH_SIZE)
 
@@ -75,17 +78,17 @@ print('Total %s word vectors.' % len(EMBEDDING_DICT))
 
 def input_fn(split):
     # Reset datasets once done debugging
-    test_split = f'test[:{TEST_SAMPLES}]'
-    # test_split = f'test[:{TEST_SAMPLES}]'
+    val_split = f'train[{TRAIN_SAMPLES}:]'
+    # test_split = f'test[{TRAIN_SAMPLES:{TEST_SAMPLES}]'
     # valid_split = f'test[{TEST_SAMPLES}:]'
     if split == 'train':
         data = imdb_builder.as_dataset(as_supervised=True, split=f'train[:{TRAIN_SAMPLES}]')
         tot_len = math.ceil(TRAIN_SAMPLES/BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
         #print("Total amount of training samples: " + str(len(list(dataset))))
         #print("Total amount of validation samples: " + str(len(list(dataset))))
-    elif split == 'test':
-        data = imdb_builder.as_dataset(as_supervised=True, split=test_split)
-        tot_len = math.ceil(TEST_SAMPLES/BATCH_SIZE) # This will be TEST_ITERS
+    elif split == 'val':
+        data = imdb_builder.as_dataset(as_supervised=True, split=val_split)
+        tot_len = math.ceil(VAL_SAMPLES / BATCH_SIZE) # This will be VAL_ITERS
         #print("Total amount of test samples: " + str(len(list(dataset))))
     else:
         raise ValueError()
@@ -174,14 +177,14 @@ def train():
     sess = tf.Session()
 
     log_dir = os.path.join(FLAGS.logdir, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-    test_writer = tf.summary.FileWriter(log_dir + '/test')
+    val_writer = tf.summary.FileWriter(log_dir + '/validation')
 
     # Initialize weights
     sess.run(tf.global_variables_initializer())
 
     try:
         train_matrix, train_labels, train_probs = input_fn(split='train')
-        test_matrix, test_labels, test_probs = input_fn(split='test')
+        val_matrix, val_labels, val_probs = input_fn(split='val')
 
         train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
         val_acc_plt = np.empty((NUM_EPOCHS))
@@ -218,43 +221,43 @@ def train():
             train_steps /= ITERATIONS_PER_EPOCH
 
 
-            test_accuracy, test_loss, test_steps = 0, 0, 0
-            for iteration in range(TEST_ITERS):
-                test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
-                                                                                feed_dict={samples: test_matrix[iteration],
-                                                                                           ground_truth: test_labels[iteration],
-                                                                                           probs: test_probs[iteration]
+            val_accuracy, val_loss, val_steps = 0, 0, 0
+            for iteration in range(VAL_ITERS):
+                val_iter_accuracy, val_iter_loss, val_used_inputs = sess.run([accuracy, loss, updated_states],
+                                                                                feed_dict={samples: val_matrix[iteration],
+                                                                                           ground_truth: val_labels[iteration],
+                                                                                           probs: val_probs[iteration]
                                                                                            })
-                test_accuracy += test_iter_accuracy
-                test_loss += test_iter_loss
-                if test_used_inputs is not None:
-                    test_steps += compute_used_samples(test_used_inputs)
+                val_accuracy += val_iter_accuracy
+                val_loss += val_iter_loss
+                if val_used_inputs is not None:
+                    val_steps += compute_used_samples(val_used_inputs)
                 else:
-                    test_steps += SEQUENCE_LENGTH
-            test_accuracy /= TEST_ITERS
-            test_loss /= TEST_ITERS
-            test_steps /= TEST_ITERS
-            val_acc_plt[epoch] = test_loss
+                    val_steps += SEQUENCE_LENGTH
+            val_accuracy /= VAL_ITERS
+            val_loss /= VAL_ITERS
+            val_steps /= VAL_ITERS
+            val_acc_plt[epoch] = val_loss
 
-            test_writer.add_summary(scalar_summary('accuracy', test_accuracy), epoch)
-            test_writer.add_summary(scalar_summary('loss', test_loss), epoch)
-            test_writer.add_summary(scalar_summary('used_samples', test_steps / SEQUENCE_LENGTH), epoch)
-            test_writer.flush()
+            val_writer.add_summary(scalar_summary('accuracy', val_accuracy), epoch)
+            val_writer.add_summary(scalar_summary('loss', val_loss), epoch)
+            val_writer.add_summary(scalar_summary('used_samples', val_steps / SEQUENCE_LENGTH), epoch)
+            val_writer.flush()
 
             print("Epoch %d/%d, "
                   "duration: %.2f seconds, " 
                   "train accuracy: %.2f%%, "
                   "train samples: %.2f (%.2f%%)"
-                  "test accuracy: %.2f%%, "
-                  "test samples: %.2f (%.2f%%)" % (epoch + 1,
+                  "val accuracy: %.2f%%, "
+                  "val samples: %.2f (%.2f%%)" % (epoch + 1,
                                                    NUM_EPOCHS,
                                                    duration,
                                                    100. * train_accuracy,
                                                    train_steps,
                                                    100. * train_steps / SEQUENCE_LENGTH,
-                                                   100. * test_accuracy,
-                                                   test_steps,
-                                                   100. * test_steps / SEQUENCE_LENGTH))
+                                                   100. * val_accuracy,
+                                                   val_steps,
+                                                   100. * val_steps / SEQUENCE_LENGTH))
 
             loss_perc = loss_plt[epoch, :].mean(axis=2)
             loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
@@ -265,7 +268,7 @@ def train():
 
         # Training curve for epochs
         plt.plot(train_acc_plt[:, 0], label='Training loss')
-        plt.plot(val_acc_plt, label='Test loss')
+        plt.plot(val_acc_plt, label='Validation loss')
         plt.title("Training curve for epochs")
         plt.savefig("Epoch.png")
         plt.show()
