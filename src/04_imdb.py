@@ -274,7 +274,7 @@ def train(hyper_params = BASE_CONF):
         plt.plot(train_acc_plt[:, 0], label='Training loss')
         plt.plot(val_acc_plt, label='Validation loss')
         plt.title("Training curve for epochs")
-        plt.savefig("Epoch.png")
+        plt.savefig(f"hu{FLAGS.rnn_cells}_bs{BATCH_SIZE}_lr{FLAGS.learning_rate}_b{FLAGS.cost_per_sample}_s{FLAGS.surprisal_influence}.png")
         plt.show()
 
         plt.plot(train_acc_plt.flatten(), label='Training loss')
