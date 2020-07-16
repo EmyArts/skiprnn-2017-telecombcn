@@ -31,7 +31,7 @@ def create_generic_flags():
     # Flags for the Skip RNN cells
     tf.app.flags.DEFINE_float('cost_per_sample', 0.0001, "Cost per used sample. Set to 0 to disable this option.")
     tf.app.flags.DEFINE_float('surprisal_influence', 0.0001, "How much it gets punished for average surprisal or discarded samples.")
-    # tf.app.flags.DEFINE_string('use_surprisal', 'yes', "Whether to use surprisal punishment on loss function")
+    tf.app.flags.DEFINE_string('early_stopping', 'no', "Whether to use early stopping or not")
 
 
 def compute_gradients(loss, learning_rate, gradient_clipping=-1):
@@ -132,7 +132,6 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     """
     Compute penalization term on the average surprisal of the unread samples.
     """
-    print(updated_states)
     if using_skip_rnn(model):
         neg_updated_states = tf.subtract(tf.ones(updated_states.shape, dtype=tf.dtypes.float32), updated_states)
         surprisal_values = tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities)))

@@ -27,6 +27,7 @@ def print_setup(task_specific_setup=None):
     print('\tBatch size: %d' % FLAGS.batch_size)
     print('\tLearning rate: %.2E' % Decimal(FLAGS.learning_rate))
 
+
     if FLAGS.grad_clip > 0:
         print('\tGradient clipping: %.1f' % FLAGS.grad_clip)
     else:
@@ -34,6 +35,7 @@ def print_setup(task_specific_setup=None):
 
     if FLAGS.model.lower().startswith('skip'):
         print('\tCost per sample: %.2E' % Decimal(FLAGS.cost_per_sample))
+        print('\tSurprisal cost: %.2E' % Decimal(FLAGS.surprisal_influence))
 
     if isinstance(task_specific_setup, types.FunctionType):
         print('')

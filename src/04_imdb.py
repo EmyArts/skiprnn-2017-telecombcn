@@ -32,6 +32,8 @@ create_generic_flags()
 tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
 FLAGS = tf.app.flags.FLAGS
 
+EARLY_STOPPING = (FLAGS.early_stopping == 'yes')
+
 # Constants
 OUTPUT_SIZE = 2
 SEQUENCE_LENGTH = 2520
@@ -129,7 +131,7 @@ def input_fn(split):
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
-def train():
+def train(hyper_params = BASE_CONF):
     samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH], name='Samples')  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE], name='GroundTruth')
     probs = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, 1], name='Probs')
@@ -260,10 +262,13 @@ def train():
                                                    100. * val_steps / SEQUENCE_LENGTH))
 
             loss_perc = loss_plt[epoch].mean(axis=0)
+            print("Absolute losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (loss_perc[0], loss_perc[1], loss_perc[2]))
             loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
-            print("entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
+            print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
             # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
+
+            # if EARLY_STOPPING:
 
         # Training curve for epochs
         plt.plot(train_acc_plt[:, 0], label='Training loss')
