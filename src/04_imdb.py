@@ -74,8 +74,10 @@ class SkipRNN():
 
         # Setting up logger
         # os.mkdir(self.FOLDER)
-        logging.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s',
-                    level=logging.INFO)
+        # logging.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s',
+        #             level=logging.INFO)
+        if not os.path.exists(self.FOLDER):
+            os.makedirs(self.FOLDER)
         self.logger = logging.getLogger("Net Logger")
         fh = logging.FileHandler(f"{self.FOLDER}/log.log")
         self.logger.addHandler(fh)
