@@ -53,8 +53,8 @@ class SkipRNN():
         self.LOG_DIR = '../logs'
 
         # Load data
-        imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
-        imdb_builder.download_and_prepare()
+        self.imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
+        self.imdb_builder.download_and_prepare()
         # info = imdb_builder.info
 
         # datasets = mnist_builder.as_dataset()
@@ -79,7 +79,7 @@ class SkipRNN():
         # test_split = f'test[{TRAIN_SAMPLES:{TEST_SAMPLES}]'
         # valid_split = f'test[{TEST_SAMPLES}:]'
         if split == 'train':
-            data = imdb_builder.as_dataset(as_supervised=True, split=f'train[:{self.TRAIN_SAMPLES}]')
+            data = self.imdb_builder.as_dataset(as_supervised=True, split=f'train[:{self.TRAIN_SAMPLES}]')
             tot_len = math.ceil(self.TRAIN_SAMPLES/self.BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
             #print("Total amount of training samples: " + str(len(list(dataset))))
             #print("Total amount of validation samples: " + str(len(list(dataset))))
