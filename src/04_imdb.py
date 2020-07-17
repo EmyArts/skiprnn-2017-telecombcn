@@ -73,7 +73,7 @@ class SkipRNN():
         # info = imdb_builder.info
 
         # Setting up logger
-        logging.basicConfig(filename=f"{self.FOLDER}/log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+        logging.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
     def input_fn(self, split):
