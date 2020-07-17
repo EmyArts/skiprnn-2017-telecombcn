@@ -73,9 +73,9 @@ class SkipRNN():
         # info = imdb_builder.info
 
         # Setting up logger
-        os.mkdir(self.FOLDER)
+        # os.mkdir(self.FOLDER)
         self.logger = logging.getLogger("Net Logger")
-        fh = logging.FileHandler('spam.log')
+        fh = logging.FileHandler(f"{self.FOLDER}/log.log")
         self.logger.addHandler(fh)
         # self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
