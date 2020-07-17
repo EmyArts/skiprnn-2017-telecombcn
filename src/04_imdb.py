@@ -305,7 +305,7 @@ def get_embedding_dicts(embedding_length):
     return embedding_dict, probs_dict
 
 def main(argv=None):
-    EMBEDDING_DICT, PROBS_DICT = get_embedding_dicts()
+    EMBEDDING_DICT, PROBS_DICT = get_embedding_dicts(embedding_length=50)
     tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
     FLAGS = tf.app.flags.FLAGS
     command_configs = {
