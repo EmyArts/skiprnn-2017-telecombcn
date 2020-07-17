@@ -43,6 +43,7 @@ class SkipRNN():
         self.HIDDEN_UNITS = config_dict['hidden_units']
         self.SURPRISAL_COST = config_dict['surprisal_cost']
         self.COST_PER_SAMPLE = config_dict['cost_per_sample']
+        self.FOLDER = config_dict['folder']
 
 
         # Constants
@@ -51,14 +52,6 @@ class SkipRNN():
         self.EARLY_STOPPING = False
         #VALIDATION_SAMPLES = 5000
         self.EMBEDDING_LENGTH = 50
-        self.LOG_DIR = '../logs'
-
-        # Load data
-        self.imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
-        self.imdb_builder.download_and_prepare()
-        # info = imdb_builder.info
-
-        # datasets = mnist_builder.as_dataset()
 
         #Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
@@ -73,6 +66,15 @@ class SkipRNN():
         self.VAL_ITERS = int(self.VAL_SAMPLES / self.BATCH_SIZE)
         # ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
         # TEST_ITERS = int(5000/BATCH_SIZE)
+
+        # Load data
+        self.imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
+        self.imdb_builder.download_and_prepare()
+        # info = imdb_builder.info
+
+        # Setting up logger
+        logging.basicConfig(filename=f"{self.FOLDER}/log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+
 
     def input_fn(self, split):
         # Reset datasets once done debugging
@@ -118,6 +120,7 @@ class SkipRNN():
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
                 batch_index += 1
+        logging.info(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
         print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
         # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
@@ -175,8 +178,8 @@ class SkipRNN():
 
         sess = tf.Session()
 
-        log_dir = os.path.join(self.LOG_DIR, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-        val_writer = tf.summary.FileWriter(log_dir + '/validation')
+        # log_dir = os.path.join(self.LOG_DIR, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        # val_writer = tf.summary.FileWriter(log_dir + '/validation')
 
         # Initialize weights
         sess.run(tf.global_variables_initializer())
@@ -240,10 +243,10 @@ class SkipRNN():
                 val_steps /= self.VAL_ITERS
                 val_acc_plt[epoch] = val_loss
 
-                val_writer.add_summary(scalar_summary('accuracy', val_accuracy), epoch)
-                val_writer.add_summary(scalar_summary('loss', val_loss), epoch)
-                val_writer.add_summary(scalar_summary('used_samples', val_steps / self.SEQUENCE_LENGTH), epoch)
-                val_writer.flush()
+                # val_writer.add_summary(scalar_summary('accuracy', val_accuracy), epoch)
+                # val_writer.add_summary(scalar_summary('loss', val_loss), epoch)
+                # val_writer.add_summary(scalar_summary('used_samples', val_steps / self.SEQUENCE_LENGTH), epoch)
+                # val_writer.flush()
 
                 print("Epoch %d/%d, "
                       "duration: %.2f seconds, " 
@@ -265,33 +268,54 @@ class SkipRNN():
                 loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
                 print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
+                logging.info("Epoch %d/%d, "
+                      "duration: %.2f seconds, "
+                      "train accuracy: %.2f%%, "
+                      "train samples: %.2f (%.2f%%), "
+                      "val accuracy: %.2f%%, "
+                      "val samples: %.2f (%.2f%%)" % (epoch + 1,
+                                                      self.NUM_EPOCHS,
+                                                      duration,
+                                                      100. * train_accuracy,
+                                                      train_steps,
+                                                      100. * train_steps / self.SEQUENCE_LENGTH,
+                                                      100. * val_accuracy,
+                                                      val_steps,
+                                                      100. * val_steps / self.SEQUENCE_LENGTH))
+                logging.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
+                loss_perc[0], loss_perc[1], loss_perc[2]))
+                logging.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
+                loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
                 # if EARLY_STOPPING:
 
             # Training curve for epochs
-            plt.plot(train_acc_plt[:, 0], label='Training loss')
-            plt.plot(val_acc_plt, label='Validation loss')
-            plt.title("Training curve for epochs")
-            plt.legend()
-            plt.savefig(f"hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-            plt.show()
-
-            plt.plot(train_acc_plt.flatten(), label='Training loss')
-            plt.title("Training curve for all iterations")
-            plt.savefig("train_iter.png")
-            plt.show()
-
-            plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
-            plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
-            plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
-            plt.title("Training losses over time")
-            plt.legend()
-            plt.savefig(f"losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-            plt.show()
 
         except KeyboardInterrupt:
             pass
+
+        plt.plot(train_acc_plt[:, 0], label='Training loss')
+        plt.plot(val_acc_plt, label='Validation loss')
+        plt.title("Training curve for epochs")
+        plt.legend()
+        plt.savefig(
+            f"{self.FOLDER}/hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
+        plt.show()
+
+        # plt.plot(train_acc_plt.flatten(), label='Training loss')
+        # plt.title("Training curve for all iterations")
+        # plt.savefig("train_iter.png")
+        # plt.show()
+
+        plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
+        plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
+        plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
+        plt.title("Training losses over time")
+        plt.legend()
+        plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
+        plt.show()
+
 
 def get_embedding_dicts(embedding_length):
     PROBS_FILE = 'util/probs.pkl'
@@ -319,7 +343,7 @@ def main(argv=None):
         'hidden_units': FLAGS.rnn_cells,
         'cost_per_sample': FLAGS.cost_per_sample,
         'surprisal_cost': FLAGS.surprisal_influence,
-        'log_file': f'../LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}/log'
+        'folder': f'../LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}'
     }
     net = SkipRNN(command_configs, emb_dict = EMBEDDING_DICT, probs_dict=PROBS_DICT)
     print_setup()
