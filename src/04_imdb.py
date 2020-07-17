@@ -33,7 +33,7 @@ class SkipRNN():
 
     def __init__(self, config_dict, emb_dict, probs_dict):
 
-        self.EMBEDDING_DICT =emb_dict
+        self.EMBEDDING_DICT = emb_dict
         self.PROBS_DICT = probs_dict
 
         self.LEARNING_RATE = config_dict['learning_rate']
@@ -50,11 +50,12 @@ class SkipRNN():
         self.EARLY_STOPPING = False
         #VALIDATION_SAMPLES = 5000
         self.EMBEDDING_LENGTH = 50
+        self.LOG_DIR = '../logs'
 
         # Load data
         imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
         imdb_builder.download_and_prepare()
-        info = imdb_builder.info
+        # info = imdb_builder.info
 
         # datasets = mnist_builder.as_dataset()
 
