@@ -75,7 +75,9 @@ class SkipRNN():
         # Setting up logger
         os.mkdir(self.FOLDER)
         self.logger = logging.getLogger("Net Logger")
-        self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+        fh = logging.FileHandler('spam.log')
+        self.logger.addHandler(fh)
+        # self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
     def input_fn(self, split):
