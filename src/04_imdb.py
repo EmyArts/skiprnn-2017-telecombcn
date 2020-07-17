@@ -13,6 +13,7 @@ import os
 import time
 import datetime
 import pickle
+import logging
 
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
@@ -184,7 +185,8 @@ class SkipRNN():
             train_matrix, train_labels, train_probs = self.input_fn(split='train')
             val_matrix, val_labels, val_probs = self.input_fn(split='val')
 
-            train_acc_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH))
+            # train_acc_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH))
+            train_acc_plt = np.empty((self.NUM_EPOCHS))
             val_acc_plt = np.empty((self.NUM_EPOCHS))
             loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
 
@@ -217,6 +219,7 @@ class SkipRNN():
                 train_accuracy /= self.ITERATIONS_PER_EPOCH
                 train_loss /= self.ITERATIONS_PER_EPOCH
                 train_steps /= self.ITERATIONS_PER_EPOCH
+                train_acc_plt[epoch] = train_loss
 
 
                 val_accuracy, val_loss, val_steps = 0, 0, 0
@@ -307,7 +310,7 @@ def get_embedding_dicts(embedding_length):
 
 def main(argv=None):
     EMBEDDING_DICT, PROBS_DICT = get_embedding_dicts(embedding_length=50)
-    tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
+    # tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
     FLAGS = tf.app.flags.FLAGS
     command_configs = {
         'learning_rate': FLAGS.learning_rate,
@@ -316,6 +319,7 @@ def main(argv=None):
         'hidden_units': FLAGS.rnn_cells,
         'cost_per_sample': FLAGS.cost_per_sample,
         'surprisal_cost': FLAGS.surprisal_influence,
+        'log_file': f'../LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}/log'
     }
     net = SkipRNN(command_configs, emb_dict = EMBEDDING_DICT, probs_dict=PROBS_DICT)
     print_setup()
