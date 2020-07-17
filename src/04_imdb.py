@@ -73,7 +73,8 @@ class SkipRNN():
         # info = imdb_builder.info
 
         # Setting up logger
-        logging.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+        self.logger = logging.getLogger("Net Logger")
+        self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
     def input_fn(self, split):
@@ -120,7 +121,7 @@ class SkipRNN():
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
                 batch_index += 1
-        logging.info(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
+        self.logger.info(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
         print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
         # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
@@ -269,7 +270,7 @@ class SkipRNN():
                 loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
                 print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
-                logging.info("Epoch %d/%d, "
+                self.logger.info("Epoch %d/%d, "
                       "duration: %.2f seconds, "
                       "train accuracy: %.2f%%, "
                       "train samples: %.2f (%.2f%%), "
@@ -283,9 +284,9 @@ class SkipRNN():
                                                       100. * val_accuracy,
                                                       val_steps,
                                                       100. * val_steps / self.SEQUENCE_LENGTH))
-                logging.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
+                self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                 loss_perc[0], loss_perc[1], loss_perc[2]))
-                logging.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
+                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
                 loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
