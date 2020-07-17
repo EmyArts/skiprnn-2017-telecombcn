@@ -181,14 +181,14 @@ class SkipRNN():
         sess.run(tf.global_variables_initializer())
 
         try:
-            train_matrix, train_labels, train_probs = input_fn(split='train')
-            val_matrix, val_labels, val_probs = input_fn(split='val')
+            train_matrix, train_labels, train_probs = self.input_fn(split='train')
+            val_matrix, val_labels, val_probs = self.input_fn(split='val')
 
-            train_acc_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH))
-            val_acc_plt = np.empty((NUM_EPOCHS))
-            loss_plt = np.empty((NUM_EPOCHS, ITERATIONS_PER_EPOCH, 3))
+            train_acc_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH))
+            val_acc_plt = np.empty((self.NUM_EPOCHS))
+            loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
 
-            for epoch in range(NUM_EPOCHS):
+            for epoch in range(self.NUM_EPOCHS):
 
                 # Load the training dataset into the pipeline
                 # sess.run(train_model_spec['iterator_init_op'])
