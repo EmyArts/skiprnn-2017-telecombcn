@@ -158,8 +158,8 @@ class SkipRNN():
 
         # Compute loss for the amount of surprisal
         surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
-        # Avoid encouraging to not skip. LOOK INTO THIS use tf.clip_by_values.
-        surprisal_loss = tf.where(surprisal_loss, tf.zeros_like(surprisal_loss), tf.ones_like(surprisal_loss), surprisal_loss)
+        # Avoid encouraging to not skip.
+        surprisal_loss = tf.where(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)), tf.ones_like(surprisal_loss), surprisal_loss)
 
         loss = cross_entropy + budget_loss + surprisal_loss
         loss = tf.reshape(loss, [])
@@ -257,7 +257,7 @@ class SkipRNN():
                                                        100. * val_steps / self.SEQUENCE_LENGTH))
 
                 loss_perc = loss_plt[epoch].mean(axis=0)
-                print("Absolute losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (loss_perc[0], loss_perc[1], loss_perc[2]))
+                print("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (loss_perc[0], loss_perc[1], loss_perc[2]))
                 loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
                 print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
