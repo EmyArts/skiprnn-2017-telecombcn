@@ -197,7 +197,7 @@ class SkipRNN():
 
                 start_time = time.time()
                 train_accuracy, train_steps, train_loss = 0, 0, 0
-                for iteration in range(ITERATIONS_PER_EPOCH):
+                for iteration in range(self.ITERATIONS_PER_EPOCH):
                     # Perform SGD update
                     # print(iteration, train_probs[iteration].shape)
                     out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss, surprisal_loss],
