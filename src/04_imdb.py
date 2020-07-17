@@ -84,7 +84,7 @@ class SkipRNN():
             #print("Total amount of training samples: " + str(len(list(dataset))))
             #print("Total amount of validation samples: " + str(len(list(dataset))))
         elif split == 'val':
-            data = imdb_builder.as_dataset(as_supervised=True, split=val_split)
+            data = self.imdb_builder.as_dataset(as_supervised=True, split=val_split)
             tot_len = math.ceil(self.VAL_SAMPLES / self.BATCH_SIZE) # This will be VAL_ITERS
             #print("Total amount of test samples: " + str(len(list(dataset))))
         else:
