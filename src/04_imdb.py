@@ -131,7 +131,8 @@ def input_fn(split):
 
 # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
-def train(hyper_params = BASE_CONF):
+# def train(hyper_params = BASE_CONF):
+def train():
     samples = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, EMBEDDING_LENGTH], name='Samples')  # (batch, time, in)
     ground_truth = tf.placeholder(tf.int64, shape=[BATCH_SIZE], name='GroundTruth')
     probs = tf.placeholder(tf.float32, shape=[BATCH_SIZE, SEQUENCE_LENGTH, 1], name='Probs')
