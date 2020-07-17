@@ -26,24 +26,25 @@ def create_generic_flags():
     tf.app.flags.DEFINE_float('learning_rate', 0.01, "Learning rate.")
     tf.app.flags.DEFINE_float('grad_clip', 1., "Clip gradients at this value. Set to <=0 to disable clipping.")
     tf.app.flags.DEFINE_string('logdir', '../logs', "Directory where TensorBoard logs will be stored.")
-    tf.app.flags.DEFINE_string('embedding', 'simple', "Type of embedding used for the imdb task")
+    # tf.app.flags.DEFINE_string('embedding', 'simple', "Type of embedding used for the imdb task")
 
     # Flags for the Skip RNN cells
     tf.app.flags.DEFINE_float('cost_per_sample', 0.0001, "Cost per used sample. Set to 0 to disable this option.")
     tf.app.flags.DEFINE_float('surprisal_influence', 0.0001, "How much it gets punished for average surprisal or discarded samples.")
-    tf.app.flags.DEFINE_string('early_stopping', 'no', "Whether to use early stopping or not")
+    # tf.app.flags.DEFINE_string('early_stopping', 'no', "Whether to use early stopping or not")
 
 
 def compute_gradients(loss, learning_rate, gradient_clipping=-1):
     """
     Create optimizer, compute gradients and (optionally) apply gradient clipping
     """
-    opt = tf.train.AdamOptimizer(learning_rate)
     if gradient_clipping > 0:
         vars_to_optimize = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(loss, vars_to_optimize), clip_norm=gradient_clipping)
         grads_and_vars = list(zip(grads, vars_to_optimize))
+        opt = tf.train.AdamOptimizer(learning_rate) # PUT THIS BEFORE IF
     else:
+        opt = tf.train.AdamOptimizer(learning_rate)
         grads_and_vars = opt.compute_gradients(loss)
     return opt, grads_and_vars
 
