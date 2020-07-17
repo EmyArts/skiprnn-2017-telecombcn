@@ -73,6 +73,7 @@ class SkipRNN():
         # info = imdb_builder.info
 
         # Setting up logger
+        os.mkdir(self.FOLDER)
         self.logger = logging.getLogger("Net Logger")
         self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -265,9 +266,9 @@ class SkipRNN():
                                                        val_steps,
                                                        100. * val_steps / self.SEQUENCE_LENGTH))
 
-                loss_perc = loss_plt[epoch].mean(axis=0)
-                print("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (loss_perc[0], loss_perc[1], loss_perc[2]))
-                loss_perc = np.divide(loss_perc, (loss_perc.sum())) * 100
+                loss_abs = loss_plt[epoch].mean(axis=0)
+                print("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (loss_abs[0], loss_abs[1], loss_abs[2]))
+                loss_perc = np.divide(loss_abs, (loss_abs.sum())) * 100
                 print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
                 self.logger.info("Epoch %d/%d, "
@@ -285,7 +286,7 @@ class SkipRNN():
                                                       val_steps,
                                                       100. * val_steps / self.SEQUENCE_LENGTH))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
-                loss_perc[0], loss_perc[1], loss_perc[2]))
+                loss_abs[0], loss_abs[1], loss_abs[2]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
                 loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
