@@ -184,14 +184,15 @@ class SkipRNN():
         # Initialize weights
         sess.run(tf.global_variables_initializer())
 
+        train_acc_plt = np.empty((self.NUM_EPOCHS))
+        val_acc_plt = np.empty((self.NUM_EPOCHS))
+        loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
+
         try:
             train_matrix, train_labels, train_probs = self.input_fn(split='train')
             val_matrix, val_labels, val_probs = self.input_fn(split='val')
 
-            # train_acc_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH))
-            train_acc_plt = np.empty((self.NUM_EPOCHS))
-            val_acc_plt = np.empty((self.NUM_EPOCHS))
-            loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
+            # train_acc_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
 
             for epoch in range(self.NUM_EPOCHS):
 
@@ -295,7 +296,7 @@ class SkipRNN():
         except KeyboardInterrupt:
             pass
 
-        plt.plot(train_acc_plt[:, 0], label='Training loss')
+        plt.plot(train_acc_plt, label='Training loss')
         plt.plot(val_acc_plt, label='Validation loss')
         plt.title("Training curve for epochs")
         plt.legend()
