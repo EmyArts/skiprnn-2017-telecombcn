@@ -159,7 +159,7 @@ class SkipRNN():
         # Compute loss for the amount of surprisal
         surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
         # Avoid encouraging to not skip. LOOK INTO THIS use tf.clip_by_values.
-        surprisal_loss = tf.where(surprisal_loss, tf.zeros_like(surprisal_loss)), tf.ones_like(surprisal_loss), surprisal_loss)
+        surprisal_loss = tf.where(surprisal_loss, tf.zeros_like(surprisal_loss), tf.ones_like(surprisal_loss), surprisal_loss)
 
         loss = cross_entropy + budget_loss + surprisal_loss
         loss = tf.reshape(loss, [])
