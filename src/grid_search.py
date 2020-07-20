@@ -1,14 +1,6 @@
 from sklearn.model_selection import ParameterGrid
-from
-
-04
-_imdb
-import SkipRNN
-from
-
-04
-_imdb
-import get_embedding_dicts
+from imdb import SkipRNN
+from imdb import get_embedding_dicts
 import argparse
 
 command_configs = {
