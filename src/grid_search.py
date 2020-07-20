@@ -19,7 +19,7 @@ if __name__ == '__main__':
 	embedding_dict, probs_dict = get_embedding_dicts(50)
 	for params in list(ParameterGrid(command_configs)):
 		params['learning_rate'] = args.learning_rate
-		params['epoch'] = 50
+		params['epochs'] = 50
 		params['folder'] = '../LR' + str(params['learning_rate']) + '_BS' + str(params['batch_size']) + \
 						   '_HU' + str(params['hidden_units']) + '_CPS' + str(params['cost_per_sample']) + '_SC' + \
 						   str(params['surprisal_cost'])
