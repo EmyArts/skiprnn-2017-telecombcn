@@ -294,7 +294,7 @@ class SkipRNN():
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                 loss_abs[0], loss_abs[1], loss_abs[2]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
-                loss_perc[0], loss_perc[1], loss_perc[2]))
+                    loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
                 # if EARLY_STOPPING:
@@ -304,26 +304,29 @@ class SkipRNN():
         except KeyboardInterrupt:
             pass
 
-        plt.plot(train_acc_plt, label='Training loss')
-        plt.plot(val_acc_plt, label='Validation loss')
-        plt.title("Training curve for epochs")
-        plt.legend()
-        plt.savefig(
-            f"{self.FOLDER}/hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-        plt.show()
+        try:
+            plt.plot(train_acc_plt, label='Training loss')
+            plt.plot(val_acc_plt, label='Validation loss')
+            plt.title("Training curve for epochs")
+            plt.legend()
+            plt.savefig(
+                f"{self.FOLDER}/hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
+            plt.show()
 
-        # plt.plot(train_acc_plt.flatten(), label='Training loss')
-        # plt.title("Training curve for all iterations")
-        # plt.savefig("train_iter.png")
-        # plt.show()
+            # plt.plot(train_acc_plt.flatten(), label='Training loss')
+            # plt.title("Training curve for all iterations")
+            # plt.savefig("train_iter.png")
+            # plt.show()
 
-        plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
-        plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
-        plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
-        plt.title("Training losses over time")
-        plt.legend()
-        plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-        plt.show()
+            plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
+            plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
+            plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
+            plt.title("Training losses over time")
+            plt.legend()
+            plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
+            plt.show()
+        except:
+            pass
 
 
 def get_embedding_dicts(embedding_length):
