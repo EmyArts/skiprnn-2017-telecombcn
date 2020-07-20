@@ -22,6 +22,6 @@ if __name__ == '__main__':
 		params['epoch'] = 50
 		params['folder'] = '../LR' + str(params['learning_rate']) + '_BS' + str(params['batch_size']) + \
 						   '_HU' + str(params['hidden_units']) + '_CPS' + str(params['cost_per_sample']) + '_SC' + \
-						   params['surprisal_cost']
+						   str(params['surprisal_cost'])
 		model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 		model.train()
