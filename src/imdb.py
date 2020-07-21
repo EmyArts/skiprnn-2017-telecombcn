@@ -328,6 +328,7 @@ class SkipRNN():
         except:
             pass
         sess.close()
+        tf.reset_default_graph()
 
 
 def get_embedding_dicts(embedding_length):
