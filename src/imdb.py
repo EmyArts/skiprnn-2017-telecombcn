@@ -327,6 +327,7 @@ class SkipRNN():
             plt.show()
         except:
             pass
+        sess.close()
 
 
 def get_embedding_dicts(embedding_length):
@@ -360,7 +361,6 @@ def main(argv=None):
     net = SkipRNN(command_configs, emb_dict = EMBEDDING_DICT, probs_dict=PROBS_DICT)
     print_setup()
     net.train()
-    tf.reset_default_graph()
 
 
 if __name__ == '__main__':
