@@ -45,18 +45,19 @@ class SkipRNN():
         self.COST_PER_SAMPLE = config_dict['cost_per_sample']
         self.FOLDER = config_dict['folder']
 
-
         # Constants
         self.OUTPUT_SIZE = 2
         self.SEQUENCE_LENGTH = 2520
         self.EARLY_STOPPING = False
-        #VALIDATION_SAMPLES = 5000
+        # VALIDATION_SAMPLES = 5000
         self.EMBEDDING_LENGTH = 50
 
-        #Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
+        # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        self.TRAIN_SAMPLES = 12000
-        self.VAL_SAMPLES = 8000
+        # self.TRAIN_SAMPLES = 12000
+        # self.VAL_SAMPLES = 8000
+        self.TRAIN_SAMPLES = 15000
+        self.VAL_SAMPLES = 10000
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
