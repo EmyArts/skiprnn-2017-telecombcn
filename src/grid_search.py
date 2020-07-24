@@ -5,8 +5,6 @@ import tensorflow as tf
 import argparse
 import wandb as wb
 
-wb.init()
-
 command_configs = {
 	# 'learning_rate': [0.01, 0.001, 0.0001],
 	'batch_size': [32, 64],
@@ -16,6 +14,8 @@ command_configs = {
 }
 
 if __name__ == '__main__':
+
+	wb.init()
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--learning_rate", type=float, help="the learning rate")
 	args = parser.parse_args()
