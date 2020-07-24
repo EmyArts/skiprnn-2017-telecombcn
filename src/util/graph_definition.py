@@ -125,7 +125,8 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
         # else:
         #     return tf.reduce_sum(cost_per_sample * updated_states, 1)
         print = tf.cond(tf.math.is_nan(sample_loss),
-                        lambda: tf.Print(sample_loss, [sample_loss], "Sample loss is null "))
+                        true_fn=lambda: tf.Print(sample_loss, [sample_loss], "Sample loss is null "),
+                        false_fn=lambda: tf.no_op())
         with tf.control_dependencies([print]):
             return sample_loss
     else:
@@ -150,7 +151,8 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
         average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
         surprisal_loss = surprisal_influence * average_surprisal
         print = tf.cond(tf.math.is_nan(surprisal_loss),
-                        lambda: tf.Print(surprisal_loss, [surprisal_loss], "Surprisal loss is null "))
+                        true_fn=lambda: tf.Print(surprisal_loss, [surprisal_loss], "Surprisal loss is null "),
+                        false_fn=lambda: tf.no_op())
         with tf.control_dependencies([print]):
             return surprisal_loss
     else:
