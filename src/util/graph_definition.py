@@ -38,13 +38,12 @@ def compute_gradients(loss, learning_rate, gradient_clipping=-1):
     """
     Create optimizer, compute gradients and (optionally) apply gradient clipping
     """
+    opt = tf.train.AdamOptimizer(learning_rate)
     if gradient_clipping > 0:
         vars_to_optimize = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(loss, vars_to_optimize), clip_norm=gradient_clipping)
         grads_and_vars = list(zip(grads, vars_to_optimize))
-        opt = tf.train.AdamOptimizer(learning_rate) # PUT THIS BEFORE IF
     else:
-        opt = tf.train.AdamOptimizer(learning_rate)
         grads_and_vars = opt.compute_gradients(loss)
     return opt, grads_and_vars
 
@@ -125,7 +124,10 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
         #     return sample_loss
         # else:
         #     return tf.reduce_sum(cost_per_sample * updated_states, 1)
-        return sample_loss
+        print = tf.cond(tf.math.is_nan(sample_loss),
+                        lambda: tf.Print(sample_loss, [sample_loss], "Sample loss is null "))
+        with tf.control_dependencies([print]):
+            return sample_loss
     else:
         return tf.zeros(loss.get_shape())
 
@@ -134,16 +136,22 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     Compute penalization term on the average surprisal of the unread samples.
     """
     if using_skip_rnn(model):
-        neg_updated_states = tf.subtract(tf.ones(updated_states.shape, dtype=tf.dtypes.float32), updated_states)
+        neg_updated_states = tf.subtract(tf.ones(updated_states.get_shape(), dtype=tf.dtypes.float32), updated_states)
         surprisal_values = tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities)))
-        # printer_0 = tf.Print(surprisal_values, [neg_updated_states], "Inverse of the updated states is ")
-        surprisals = tf.multiply(neg_updated_states, tf.where(tf.is_nan(surprisal_values), tf.zeros_like(surprisal_values), surprisal_values))
+        # printer_0 = tf.Print(neg_updated_states, [neg_updated_states], "Inverse of the updated states is ")
+        surprisals = tf.multiply(neg_updated_states,
+                                 tf.where(tf.is_nan(surprisal_values), tf.zeros_like(surprisal_values),
+                                          surprisal_values))
         tot_surprisal = tf.reduce_sum(surprisals)
         # printer_1 = tf.Print(tot_surprisal, [tot_surprisal], "Total surprisal is ")
         non_read_samples = tf.reduce_sum(neg_updated_states)
         # printer_2 = tf.Print(non_read_samples, [non_read_samples], "Non read samples is ")
         # with tf.control_dependencies([printer_0, printer_1, printer_2]):
         average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
-        return surprisal_influence * average_surprisal
+        surprisal_loss = surprisal_influence * average_surprisal
+        print = tf.cond(tf.math.is_nan(surprisal_loss),
+                        lambda: tf.Print(surprisal_loss, [surprisal_loss], "Surprisal loss is null "))
+        with tf.control_dependencies([print]):
+            return surprisal_loss
     else:
         return tf.zeros(loss.get_shape())
