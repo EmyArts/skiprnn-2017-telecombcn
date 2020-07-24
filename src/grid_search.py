@@ -3,7 +3,7 @@ from imdb import SkipRNN
 from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
-import wandb as wb
+# import wandb as wb
 
 command_configs = {
 	# 'learning_rate': [0.01, 0.001, 0.0001],
@@ -15,7 +15,8 @@ command_configs = {
 
 if __name__ == '__main__':
 
-	wb.init()
+	# wb.init()
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--learning_rate", type=float, help="the learning rate")
 	args = parser.parse_args()
