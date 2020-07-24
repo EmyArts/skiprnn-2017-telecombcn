@@ -3,6 +3,9 @@ from imdb import SkipRNN
 from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
+import wandb as wb
+
+wb.init(sync_tensorboard=True)
 
 command_configs = {
 	# 'learning_rate': [0.01, 0.001, 0.0001],
