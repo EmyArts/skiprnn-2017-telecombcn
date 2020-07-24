@@ -162,8 +162,9 @@ class SkipRNN():
 
         # Compute cross-entropy loss
         cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
-        cross_entropy = tf.reduce_mean(tf.where(tf.math.is_nan(cross_entropy_per_sample), cross_entropy_per_sample,
-                                                tf.ones(cross_entropy_per_sample.get_shape())))
+        cross_entropy = tf.reduce_mean(
+            tf.where(tf.math.is_nan(cross_entropy_per_sample), tf.ones(cross_entropy_per_sample.get_shape()),
+                     cross_entropy_per_sample))
 
 
         # Compute accuracy
