@@ -22,6 +22,7 @@ import tensorflow_datasets as tfds
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from util.misc import *
 from util.graph_definition import *
@@ -36,6 +37,7 @@ class SkipRNN():
 
         self.EMBEDDING_DICT = emb_dict
         self.PROBS_DICT = probs_dict
+        self.CONFIG_DICT = config_dict
 
         self.LEARNING_RATE = config_dict['learning_rate']
         self.NUM_EPOCHS = config_dict['epochs']
@@ -196,15 +198,21 @@ class SkipRNN():
         # Initialize weights
         sess.run(tf.global_variables_initializer())
 
-        train_acc_plt = np.empty((self.NUM_EPOCHS))
-        val_acc_plt = np.empty((self.NUM_EPOCHS))
+        train_loss_plt = np.empty((self.NUM_EPOCHS))
+        val_loss_plt = np.empty((self.NUM_EPOCHS))
         loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
+        val_acc_df = np.empty((self.NUM_EPOCHS))
+        train_acc_df = np.empty((self.NUM_EPOCHS))
+        train_update_df = np.empty((self.NUM_EPOCHS))
+        val_update_df = np.empty((self.NUM_EPOCHS))
+
+        FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}'
 
         try:
             train_matrix, train_labels, train_probs = self.input_fn(split='train')
             val_matrix, val_labels, val_probs = self.input_fn(split='val')
 
-            # train_acc_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
+            # train_loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
 
             for epoch in range(self.NUM_EPOCHS):
 
@@ -225,7 +233,7 @@ class SkipRNN():
                                               })
                     train_accuracy += out[2]
                     train_loss += out[1]
-                    loss_plt[epoch][iteration] = out[4:] # entropy, budget, surprisal
+                    loss_plt[epoch][iteration] = out[4:]  # entropy, budget, surprisal
                     if out[3] is not None:
                         train_steps += compute_used_samples(out[3])
                     else:
@@ -235,16 +243,19 @@ class SkipRNN():
                 train_accuracy /= self.ITERATIONS_PER_EPOCH
                 train_loss /= self.ITERATIONS_PER_EPOCH
                 train_steps /= self.ITERATIONS_PER_EPOCH
-                train_acc_plt[epoch] = train_loss
-
+                train_loss_plt[epoch] = train_loss
+                train_acc_df[epoch] = train_accuracy
+                train_updates_df[epoch] = train_steps
 
                 val_accuracy, val_loss, val_steps = 0, 0, 0
                 for iteration in range(self.VAL_ITERS):
                     val_iter_accuracy, val_iter_loss, val_used_inputs = sess.run([accuracy, loss, updated_states],
-                                                                                    feed_dict={samples: val_matrix[iteration],
-                                                                                               ground_truth: val_labels[iteration],
-                                                                                               probs: val_probs[iteration]
-                                                                                               })
+                                                                                 feed_dict={
+                                                                                     samples: val_matrix[iteration],
+                                                                                     ground_truth: val_labels[
+                                                                                         iteration],
+                                                                                     probs: val_probs[iteration]
+                                                                                     })
                     val_accuracy += val_iter_accuracy
                     val_loss += val_iter_loss
                     if val_used_inputs is not None:
@@ -254,7 +265,9 @@ class SkipRNN():
                 val_accuracy /= self.VAL_ITERS
                 val_loss /= self.VAL_ITERS
                 val_steps /= self.VAL_ITERS
-                val_acc_plt[epoch] = val_loss
+                val_loss_plt[epoch] = val_loss
+                val_acc_df[epoch] = val_accuracy
+                val_update_df[epoch] = val_steps
 
                 # val_writer.add_summary(scalar_summary('accuracy', val_accuracy), epoch)
                 # val_writer.add_summary(scalar_summary('loss', val_loss), epoch)
@@ -262,7 +275,7 @@ class SkipRNN():
                 # val_writer.flush()
 
                 print("Epoch %d/%d, "
-                      "duration: %.2f seconds, " 
+                      "duration: %.2f seconds, "
                       "train accuracy: %.2f%%, "
                       "train samples: %.2f (%.2f%%), "
                       "val accuracy: %.2f%%, "
@@ -306,21 +319,16 @@ class SkipRNN():
             # Training curve for epochs
 
         except KeyboardInterrupt:
+            self.logger.info("Training was interrupted")
             pass
 
         try:
-            plt.plot(train_acc_plt, label='Training loss')
-            plt.plot(val_acc_plt, label='Validation loss')
-            plt.title("Training curve for epochs")
+            plt.plot(train_loss_plt, label='Training loss')
+            plt.plot(val_loss_plt, label='Validation loss')
+            plt.title(f"Max accuracy {np.max(val_acc_df)}")
             plt.legend()
-            plt.savefig(
-                f"{self.FOLDER}/hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-            plt.show()
-
-            # plt.plot(train_acc_plt.flatten(), label='Training loss')
-            # plt.title("Training curve for all iterations")
-            # plt.savefig("train_iter.png")
-            # plt.show()
+            plt.savefig(f"{self.FOLDER}/{FILE_NAME}.png")
+            plt.clf()
 
             plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
             plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
@@ -328,12 +336,28 @@ class SkipRNN():
             plt.title("Training losses over time")
             plt.legend()
             plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-            plt.show()
+            plt.clf()
         except:
+            self.logger.info("Could not create figures")
             pass
+
+        try:
+            df_dict = self.CONFIG_DICT
+            df_dict['val_acc'] = val_acc_df
+            df_dict['val_updates'] = val_update_df
+            df_dict['train_acc'] = train_acc_df
+            df_dict['train_updates'] = train_update_df
+            df = pd.DataFrame(df_dict)
+            csv_loc = '../csvs'
+            if not os.path.exists(csv_loc):
+                os.makedirs(csv_loc)
+            df.to_csv(f"{csv_loc}/{FILE_NAME}.csv")
+        except:
+            self.logger.info("Could not create csvs")
+            pass
+
         sess.close()
         tf.reset_default_graph()
-
 
 def get_embedding_dicts(embedding_length):
     PROBS_FILE = 'util/probs.pkl'

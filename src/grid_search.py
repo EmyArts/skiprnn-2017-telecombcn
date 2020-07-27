@@ -6,7 +6,7 @@ import argparse
 # import wandb as wb
 
 command_configs = {
-	# 'learning_rate': [0.01, 0.001, 0.0001],
+	'learning_rate': [0.01, 0.001, 0.0001],
 	'batch_size': [32, 64],
 	'hidden_units': [32, 64, 96],
 	'cost_per_sample': [0.005, 0.001, 0.0005, 0.0001],
@@ -18,8 +18,12 @@ if __name__ == '__main__':
 	# wb.init()
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--learning_rate", type=float, help="the learning rate")
+	parser.add_argument("--exp_id", type=int, help="id of the specific run")
+	parser.add_argument("--tot_exps", type=int, default=54, help="The total amount of parallel experiments")
+
 	args = parser.parse_args()
+	exp_id = args.exp_id
+	tot_exps = args.tot_exps
 
 	gpus = tf.config.experimental.list_physical_devices('GPU')
 	if gpus:
@@ -34,11 +38,11 @@ if __name__ == '__main__':
 			print(e)
 
 	embedding_dict, probs_dict = get_embedding_dicts(50)
-	for params in list(ParameterGrid(command_configs)):
-		params['learning_rate'] = args.learning_rate
-		params['epochs'] = 50
-		params['folder'] = '../LR' + str(params['learning_rate']) + '_BS' + str(params['batch_size']) + \
-						   '_HU' + str(params['hidden_units']) + '_CPS' + str(params['cost_per_sample']) + '_SC' + \
-						   str(params['surprisal_cost'])
-		model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
-		model.train()
+	for idx, params in enumerate(ParameterGrid(command_configs)):
+		if tot_exps % idx == exp_id:
+			params['epochs'] = 50
+			params['folder'] = '../LR' + str(params['learning_rate']) + '_BS' + str(params['batch_size']) + \
+							   '_HU' + str(params['hidden_units']) + '_CPS' + str(params['cost_per_sample']) + '_SC' + \
+							   str(params['surprisal_cost'])
+			model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+			model.train()
