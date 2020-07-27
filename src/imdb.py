@@ -27,8 +27,11 @@ import pandas as pd
 from util.misc import *
 from util.graph_definition import *
 from gensim.utils import tokenize
+
+
 # Task-independent flags
-create_generic_flags()
+
+# create_generic_flags() # has to be uncommented to run imdb file
 
 class SkipRNN():
     # Task-specific flags
