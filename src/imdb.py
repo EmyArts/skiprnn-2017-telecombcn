@@ -31,10 +31,7 @@ from gensim.utils import tokenize
 
 # Task-independent flags
 
-# create_generic_flags() # has to be uncommented to run imdb file
-
 class SkipRNN():
-    # Task-specific flags
 
     def __init__(self, config_dict, emb_dict, probs_dict):
 
@@ -152,7 +149,7 @@ class SkipRNN():
         probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
 
         cell, initial_state = create_model(model='skip_lstm',
-                                           num_cells=[FLAGS.rnn_cells] * FLAGS.rnn_layers,
+                                           num_cells=[self.HIDDEN_UNITS],
                                            batch_size=self.BATCH_SIZE)
 
         rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
@@ -378,6 +375,7 @@ def get_embedding_dicts(embedding_length):
     return embedding_dict, probs_dict
 
 def main(argv=None):
+    create_generic_flags()
     EMBEDDING_DICT, PROBS_DICT = get_embedding_dicts(embedding_length=50)
     # tf.app.flags.DEFINE_string('data_path', '../data', "Path where the MNIST data will be stored.")
     FLAGS = tf.app.flags.FLAGS
