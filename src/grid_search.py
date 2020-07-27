@@ -4,12 +4,19 @@ from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
 
+# command_configs = {
+# 	'learning_rate': [0.01, 0.001, 0.0001],
+# 	'batch_size': [32, 64],
+# 	'hidden_units': [32, 64, 96],
+# 	'cost_per_sample': [0.005, 0.001, 0.0001],
+# 	'surprisal_cost': [0.1, 0.01, 0.001]
+# }
 command_configs = {
-	'learning_rate': [0.01, 0.001, 0.0001],
-	'batch_size': [32, 64],
-	'hidden_units': [32, 64, 96],
-	'cost_per_sample': [0.005, 0.001, 0.0001],
-	'surprisal_cost': [0.1, 0.01, 0.001]
+	'learning_rate': [0.01],
+	'batch_size': [32],
+	'hidden_units': [32],
+	'cost_per_sample': [0.005],
+	'surprisal_cost': [0.1]
 }
 
 if __name__ == '__main__':
