@@ -3,7 +3,6 @@ from imdb import SkipRNN
 from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
-# import wandb as wb
 
 command_configs = {
 	'learning_rate': [0.01, 0.001, 0.0001],
@@ -14,8 +13,6 @@ command_configs = {
 }
 
 if __name__ == '__main__':
-
-	# wb.init()
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--exp_id", type=int, help="id of the specific run")
