@@ -245,7 +245,7 @@ class SkipRNN():
                 train_steps /= self.ITERATIONS_PER_EPOCH
                 train_loss_plt[epoch] = train_loss
                 train_acc_df[epoch] = train_accuracy
-                train_updates_df[epoch] = train_steps
+                train_update_df[epoch] = train_steps
 
                 val_accuracy, val_loss, val_steps = 0, 0, 0
                 for iteration in range(self.VAL_ITERS):
