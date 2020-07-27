@@ -37,7 +37,7 @@ if __name__ == '__main__':
 	embedding_dict, probs_dict = get_embedding_dicts(50)
 	for idx, params in enumerate(ParameterGrid(command_configs)):
 		if idx % tot_exps == exp_id:
-			params['epochs'] = 2
+			params['epochs'] = 40
 			params['folder'] = '../LR' + str(params['learning_rate']) + '_BS' + str(params['batch_size']) + \
 							   '_HU' + str(params['hidden_units']) + '_CPS' + str(params['cost_per_sample']) + '_SC' + \
 							   str(params['surprisal_cost'])
