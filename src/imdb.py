@@ -56,10 +56,10 @@ class SkipRNN():
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        # self.TRAIN_SAMPLES = 12000
-        # self.VAL_SAMPLES = 8000
-        self.TRAIN_SAMPLES = 15000
-        self.VAL_SAMPLES = 10000
+        self.TRAIN_SAMPLES = 10000
+        self.VAL_SAMPLES = 5000
+        # self.TRAIN_SAMPLES = 15000
+        # self.VAL_SAMPLES = 10000
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -164,10 +164,14 @@ class SkipRNN():
 
         # Compute cross-entropy loss
         cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
-        cross_entropy = tf.reduce_mean(
-            tf.where(tf.math.is_nan(cross_entropy_per_sample), tf.ones(cross_entropy_per_sample.get_shape()),
-                     cross_entropy_per_sample))
-
+        max_ce = tf.math.maximum(cross_entropy_per_sample)
+        median_ce = tf.math.median(cross_entropy_per_sample)
+        printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
+        printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
+        with tf.control_dependencies(printer_max, printer_median):
+            cross_entropy = tf.reduce_mean(
+                tf.where(tf.math.is_nan(cross_entropy_per_sample), cross_entropy_per_sample,
+                         tf.ones(cross_entropy_per_sample.get_shape())))
 
         # Compute accuracy
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))

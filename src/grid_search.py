@@ -9,7 +9,7 @@ command_configs = {
 	'batch_size': [32, 64],
 	'hidden_units': [32, 64, 96],
 	'cost_per_sample': [0.005, 0.001, 0.0001],
-	'surprisal_cost': [0.1, 0.01, 0.001]
+	'surprisal_cost': [0.1, 0.005]
 }
 # command_configs = {
 # 	'learning_rate': [0.01],
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--exp_id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=54, help="The total amount of parallel experiments")
+	parser.add_argument("--tot_exps", type=int, default=42, help="The total amount of parallel experiments")
 
 	args = parser.parse_args()
 	exp_id = args.exp_id
