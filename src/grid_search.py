@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--exp_id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=42, help="The total amount of parallel experiments")
+	parser.add_argument("--tot_exps", type=int, default=48, help="The total amount of parallel experiments")
 
 	args = parser.parse_args()
 	exp_id = args.exp_id
