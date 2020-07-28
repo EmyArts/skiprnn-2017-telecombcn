@@ -168,7 +168,7 @@ class SkipRNN():
         median_ce = tf.math.reduce_mean(cross_entropy_per_sample)
         printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
         printer_mean = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
-        with tf.control_dependencies(printer_max, printer_mean):
+        with tf.control_dependencies([printer_max, printer_mean]):
             cross_entropy = tf.reduce_mean(
                 tf.where(tf.math.is_nan(cross_entropy_per_sample), cross_entropy_per_sample,
                          tf.ones(cross_entropy_per_sample.get_shape())))
