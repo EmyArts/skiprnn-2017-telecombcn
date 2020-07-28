@@ -170,7 +170,7 @@ class SkipRNN():
         # printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
         cross_entropy = tf.reduce_mean(
             tf.where(tf.math.is_nan(cross_entropy_per_sample),
-                     tf.fill(cross_entropy_per_sample.get_shape(), 5),
+                     tf.ones(cross_entropy_per_sample.get_shape()),
                      cross_entropy_per_sample))
 
         # Compute accuracy
