@@ -46,8 +46,8 @@ if __name__ == '__main__':
 	for idx, params in enumerate(ParameterGrid(command_configs)):
 		if idx % tot_exps == exp_id:
 			csv_name = 'hu' + str(params['hidden_units']) + '_bs' + str(params['batch_size']) + '_lr' + str(
-				params['learning_rate']) + \
-					   '_b' + str(params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
+				params['learning_rate']) + '_b' + str(params['cost_per_sample']) + '_s' + str(
+				params['surprisal_cost']) + '.csv'
 			if not os.path.exists('../completed_csv' + csv_name):
 				params['epochs'] = 12
 				params['early_stopping'] = 'yes'
