@@ -7,7 +7,7 @@ import os
 
 command_configs = {
 	'learning_rate': [0.01, 0.001, 0.0001],
-	'batch_size': [32, 64],
+	'batch_size': [64],
 	'hidden_units': [32, 64, 96],
 	'cost_per_sample': [0.005, 0.001, 0.0001],
 	'surprisal_cost': [0.1, 0.005]
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 	embedding_dict, probs_dict = get_embedding_dicts(50)
 	for idx, params in enumerate(ParameterGrid(command_configs)):
 		if idx % tot_exps == exp_id:
-			params['epochs'] = 12
+			params['epochs'] = 40
 			params['early_stopping'] = 'yes'
 			params['folder'] = '../EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
 				params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
