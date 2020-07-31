@@ -49,7 +49,7 @@ if __name__ == '__main__':
 				params['learning_rate']) + \
 					   '_b' + str(params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
 			if not os.path.exists('../completed_csv' + csv_name):
-				params['epochs'] = 40
+				params['epochs'] = 12
 				params['early_stopping'] = 'yes'
 				params['folder'] = '../EXP' + exp_id + '_LR' + str(params['learning_rate']) + '_BS' + str(
 					params['batch_size']) + \
