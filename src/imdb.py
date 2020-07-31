@@ -85,6 +85,10 @@ class SkipRNN():
         fh = logging.FileHandler(f"{self.FOLDER}/log.log")
         self.logger.setLevel(logging.INFO)
         self.logger.addHandler(fh)
+
+        self.logger.info(
+            f"\nLearning rate: {self.LEARNING_RATE}\nBatch size: {self.BATCH_SIZE}\nHidden units: {self.HIDDEN_UNITS}"
+            f"\nCost per sample: {self.COST_PER_SAMPLE}\nSurprisal cost {self.SURPRISAL_COST}")
         # self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
