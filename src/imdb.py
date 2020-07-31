@@ -323,18 +323,25 @@ class SkipRNN():
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
                 if self.EARLY_STOPPING and epoch > 10:
-                    if np.equal(val_acc_df[epoch], val_acc_df[epoch - 5:epoch]):
+                    if epoch == 11:
+                        best_accuracy = val_acc_df.max()
+                        best_idx = val_acc_df.argmax()
+                    if best_accuracy < val_acc_df[epoch]:
+                        best_accuracy = val_acc_df[epoch]
+                        best_idx = epoch
+                    elif best_idx + 10 < epoch:
+                        self.logger.info("Training was interrupted with early stopping")
                         break
 
 
         except KeyboardInterrupt:
-            self.logger.info("Training was interrupted")
+            self.logger.info("Training was interrupted manually")
             pass
 
         try:
             plt.plot(train_loss_plt, label='Training loss')
             plt.plot(val_loss_plt, label='Validation loss')
-            plt.title(f"Max accuracy {np.max(val_acc_df)}")
+            plt.title(f"Max accuracy {val_acc_df.max()}")
             plt.legend()
             plt.savefig(f"{self.FOLDER}/{FILE_NAME}.png")
             plt.clf()
