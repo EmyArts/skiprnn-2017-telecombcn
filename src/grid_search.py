@@ -52,10 +52,8 @@ if __name__ == '__main__':
 				params['epochs'] = 12
 				params['early_stopping'] = 'yes'
 				params['folder'] = '../EXP' + exp_id + '_LR' + str(params['learning_rate']) + '_BS' + str(
-					params['batch_size']) + \
-								   '_HU' + str(params['hidden_units']) + '_CPS' + str(
-					params['cost_per_sample']) + '_SC' + \
-								   str(params['surprisal_cost'])
+					params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
+					params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
 				model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 				model.train()
 			else:
