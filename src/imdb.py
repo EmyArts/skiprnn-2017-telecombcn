@@ -46,11 +46,11 @@ class SkipRNN():
         self.SURPRISAL_COST = config_dict['surprisal_cost']
         self.COST_PER_SAMPLE = config_dict['cost_per_sample']
         self.FOLDER = config_dict['folder']
+        self.EARLY_STOPPING = config_dict['early_stopping']
 
         # Constants
         self.OUTPUT_SIZE = 2
         self.SEQUENCE_LENGTH = 2520
-        self.EARLY_STOPPING = False
         # VALIDATION_SAMPLES = 5000
         self.EMBEDDING_LENGTH = 50
 
@@ -313,14 +313,15 @@ class SkipRNN():
                                                       val_steps,
                                                       100. * val_steps / self.SEQUENCE_LENGTH))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
-                loss_abs[0], loss_abs[1], loss_abs[2]))
+                    loss_abs[0], loss_abs[1], loss_abs[2]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
-                # if EARLY_STOPPING:
+                if self.EARLY_STOPPING and epoch > 10:
+                    if np.equal(val_acc_df[epoch], val_acc_df[epoch - 5:epoch]):
+                        break
 
-            # Training curve for epochs
 
         except KeyboardInterrupt:
             self.logger.info("Training was interrupted")
@@ -391,7 +392,8 @@ def main(argv=None):
         'hidden_units': FLAGS.rnn_cells,
         'cost_per_sample': FLAGS.cost_per_sample,
         'surprisal_cost': FLAGS.surprisal_influence,
-        'folder': f'../LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}'
+        'folder': f'../LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}',
+        'early_stopping': (FLAGS.early_stopping == 'yes')
     }
     net = SkipRNN(command_configs, emb_dict = EMBEDDING_DICT, probs_dict=PROBS_DICT)
     print_setup()
