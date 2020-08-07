@@ -42,7 +42,8 @@ def compute_gradients(loss, learning_rate, gradient_clipping=-1):
     opt = tf.train.AdamOptimizer(learning_rate)
     if gradient_clipping > 0:
         vars_to_optimize = tf.trainable_variables()
-        grads, _ = tf.clip_by_global_norm(tf.gradients(loss, vars_to_optimize), clip_norm=gradient_clipping)
+        # used to be clip_by_normal_norm
+        grads, _ = tf.clip_by_norm(tf.gradients(loss, vars_to_optimize), clip_norm=gradient_clipping)
         grads_and_vars = list(zip(grads, vars_to_optimize))
     else:
         grads_and_vars = opt.compute_gradients(loss)

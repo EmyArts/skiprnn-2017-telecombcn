@@ -56,3 +56,4 @@ if __name__ == '__main__':
 					params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
 				model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 				model.train()
+			# garbage collector

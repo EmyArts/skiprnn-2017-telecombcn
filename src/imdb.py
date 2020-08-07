@@ -195,7 +195,7 @@ class SkipRNN():
 
 
         # Optimizer
-        opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 1) #1 is for gradient clipping
+        opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 10)  # used to be 1 is for gradient clipping
         train_fn = opt.apply_gradients(grads_and_vars)
 
         sess = tf.Session()
