@@ -330,6 +330,10 @@ class SkipRNN():
                         best_accuracy = val_acc_df[epoch]
                         best_idx = epoch
                     elif best_idx + 10 < epoch:
+                        val_update_df[epoch:] = np.nan
+                        val_acc_df[epoch:] = np.nan
+                        train_acc_df[epoch:] = np.nan
+                        train_update_df[epoch:] = np.nan
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
