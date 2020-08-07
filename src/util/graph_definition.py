@@ -22,7 +22,7 @@ def create_generic_flags():
     tf.app.flags.DEFINE_integer("rnn_cells", 64, "Number of RNN cells.")
     tf.app.flags.DEFINE_integer("rnn_layers", 1, "Number of RNN layers.")
     tf.app.flags.DEFINE_integer('batch_size', 32, "Batch size.")
-    tf.app.flags.DEFINE_integer('epochs', 10, "Number of epochs")
+    tf.app.flags.DEFINE_integer('epochs', 50, "Number of epochs")
     tf.app.flags.DEFINE_float('learning_rate', 0.01, "Learning rate.")
     tf.app.flags.DEFINE_float('grad_clip', 1., "Clip gradients at this value. Set to <=0 to disable clipping.")
     tf.app.flags.DEFINE_string('logdir', '../logs', "Directory where TensorBoard logs will be stored.")
@@ -43,7 +43,7 @@ def compute_gradients(loss, learning_rate, gradient_clipping=-1):
     if gradient_clipping > 0:
         vars_to_optimize = tf.trainable_variables()
         # used to be clip_by_normal_norm
-        grads, _ = tf.clip_by_norm(tf.gradients(loss, vars_to_optimize), clip_norm=gradient_clipping)
+        grads, _ = tf.clip_by_global_norm(tf.gradients(loss, vars_to_optimize), clip_norm=gradient_clipping)
         grads_and_vars = list(zip(grads, vars_to_optimize))
     else:
         grads_and_vars = opt.compute_gradients(loss)
