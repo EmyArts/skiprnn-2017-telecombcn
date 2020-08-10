@@ -4,6 +4,7 @@ from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
 import os
+import gc
 import time
 from IPython.utils.io import Tee
 from contextlib import closing
@@ -86,8 +87,8 @@ if __name__ == '__main__':
 						params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
 						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
 					for trial in range(n_trials):
-						params['file_name'] += 'T' + str(trial)
+						params['file_name'] += '_T' + str(trial)
 						params['trial'] = trial
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
-	# garbage collector
+						gc.collect()
