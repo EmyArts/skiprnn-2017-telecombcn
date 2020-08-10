@@ -15,6 +15,7 @@ import datetime
 import pickle
 import logging
 
+
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
 import tensorflow_datasets as tfds
@@ -45,8 +46,9 @@ class SkipRNN():
         self.HIDDEN_UNITS = config_dict['hidden_units']
         self.SURPRISAL_COST = config_dict['surprisal_cost']
         self.COST_PER_SAMPLE = config_dict['cost_per_sample']
-        self.FOLDER = config_dict['folder']
+        self.FILE_NAME = config_dict['file_name']
         self.EARLY_STOPPING = config_dict['early_stopping']
+        self.TRIAL = config_dict['trial']
 
         # Constants
         self.OUTPUT_SIZE = 2
@@ -81,16 +83,16 @@ class SkipRNN():
         # os.mkdir(self.FOLDER)
         # logging.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s',
         #             level=logging.INFO)
-        if not os.path.exists(self.FOLDER):
-            os.makedirs(self.FOLDER)
+        if not os.path.exists('net_logs'):
+            os.makedirs('net_logs')
         self.logger = logging.getLogger("Net Logger")
-        fh = logging.FileHandler(f"{self.FOLDER}/log.log")
+        fh = logging.FileHandler(f"{self.FILE_NAME}.log")
         self.logger.setLevel(logging.INFO)
         self.logger.addHandler(fh)
 
         self.logger.info(
-            f"\nLearning rate: {self.LEARNING_RATE}\nBatch size: {self.BATCH_SIZE}\nHidden units: {self.HIDDEN_UNITS}"
-            f"\nCost per sample: {self.COST_PER_SAMPLE}\nSurprisal cost {self.SURPRISAL_COST}")
+            f"\n\nLearning rate: {self.LEARNING_RATE}\nBatch size: {self.BATCH_SIZE}\nHidden units: {self.HIDDEN_UNITS}"
+            f"\nCost per sample: {self.COST_PER_SAMPLE}\nSurprisal cost {self.SURPRISAL_COST}\n\n")
         # self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
@@ -216,7 +218,7 @@ class SkipRNN():
         train_update_df = np.empty((self.NUM_EPOCHS))
         val_update_df = np.empty((self.NUM_EPOCHS))
 
-        FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}'
+        # FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}_t{self.TRIAL}'
 
         try:
             train_matrix, train_labels, train_probs = self.input_fn(split='train')
@@ -332,8 +334,8 @@ class SkipRNN():
                         best_accuracy = val_acc_df[epoch]
                         best_idx = epoch
                     elif best_idx + 10 < epoch:
-                        val_update_df[epoch:] = np.nan
-                        val_acc_df[epoch:] = np.nan
+                        val_update_df = val_update_df[:epoch]
+                        val_acc_df = val_acc_df[:epoch]
                         train_acc_df[epoch:] = np.nan
                         train_update_df[epoch:] = np.nan
                         self.logger.info("Training was interrupted with early stopping")
@@ -344,24 +346,25 @@ class SkipRNN():
             self.logger.info("Training was interrupted manually")
             pass
 
-        try:
-            plt.plot(train_loss_plt, label='Training loss')
-            plt.plot(val_loss_plt, label='Validation loss')
-            plt.title(f"Max accuracy {val_acc_df.max()}")
-            plt.legend()
-            plt.savefig(f"{self.FOLDER}/{FILE_NAME}.png")
-            plt.clf()
-
-            plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
-            plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
-            plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
-            plt.title("Training losses over time")
-            plt.legend()
-            plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-            plt.clf()
-        except:
-            self.logger.info("Could not create figures")
-            pass
+        # Plotting is done in postprocessing
+        # try:
+        #     plt.plot(train_loss_plt, label='Training loss')
+        #     plt.plot(val_loss_plt, label='Validation loss')
+        #     plt.title(f"Max accuracy {val_acc_df.max()}")
+        #     plt.legend()
+        #     plt.savefig(f"{self.FOLDER}/{FILE_NAME}.png")
+        #     plt.clf()
+        #
+        #     plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
+        #     plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
+        #     plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
+        #     plt.title("Training losses over time")
+        #     plt.legend()
+        #     plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
+        #     plt.clf()
+        # except:
+        #     self.logger.info("Could not create figures")
+        #     pass
 
         try:
             df_dict = self.CONFIG_DICT
@@ -374,7 +377,7 @@ class SkipRNN():
             csv_loc = '../csvs'
             if not os.path.exists(csv_loc):
                 os.makedirs(csv_loc)
-            df.to_csv(f"{csv_loc}/{FILE_NAME}.csv")
+            df.to_csv(f"{csv_loc}/{self.FILE_NAME}.csv")
         except:
             self.logger.info("Could not create csvs")
             pass
