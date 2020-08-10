@@ -6,6 +6,24 @@ import argparse
 import os
 from IPython.utils.io import Tee
 from contextlib import closing
+import GPUtil
+
+
+class Monitor(Thread):
+	def __init__(self, delay):
+		super(Monitor, self).__init__()
+		self.stopped = False
+		self.delay = delay  # Time between calls to GPUtil
+		self.start()
+
+	def run(self):
+		while not self.stopped:
+			GPUtil.showUtilization()
+			time.sleep(self.delay)
+
+	def stop(self):
+		self.stopped = True
+
 
 command_configs = {
 	'learning_rate': [0.01, 0.001, 0.0001],
@@ -40,6 +58,7 @@ if __name__ == '__main__':
 		os.makedirs('../terminal_logs')
 
 	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
+		monitor = Monitor(30)
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:
