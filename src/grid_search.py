@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
-	with Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout"):
+	with Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout") as out:
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:
@@ -70,3 +70,4 @@ if __name__ == '__main__':
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
 	# garbage collector
+	out.close()
