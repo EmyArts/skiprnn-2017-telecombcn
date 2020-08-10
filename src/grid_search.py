@@ -4,9 +4,11 @@ from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
 import os
+import time
 from IPython.utils.io import Tee
 from contextlib import closing
 import GPUtil
+from threading import Thread
 
 
 class Monitor(Thread):
