@@ -29,6 +29,12 @@ from util.misc import *
 from util.graph_definition import *
 from gensim.utils import tokenize
 
+import GPUtil as GPU
+
+GPUs = GPU.getGPUs()
+# XXX: only one GPU on Colab and isn’t guaranteed
+gpu = GPUs[0]
+
 
 # Task-independent flags
 
@@ -326,6 +332,10 @@ class SkipRNN():
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
+                if epoch % 10 == 0:
+                    print("GPU RAM Free: {0:.0f}MB | Used: {1:.0f}MB | Util {2:3.0f}% | Total {3:.0f}MB".format(
+                        gpu.memoryFree, gpu.memoryUsed, gpu.memoryUtil * 100, gpu.memoryTotal))
+
                 if self.EARLY_STOPPING and epoch > 10:
                     if epoch == 11:
                         best_accuracy = val_acc_df.max()
@@ -340,6 +350,7 @@ class SkipRNN():
                         train_update_df[epoch:] = np.nan
                         self.logger.info("Training was interrupted with early stopping")
                         break
+
 
 
         except KeyboardInterrupt:
