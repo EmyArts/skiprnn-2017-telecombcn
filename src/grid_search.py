@@ -4,7 +4,8 @@ from imdb import get_embedding_dicts
 import tensorflow as tf
 import argparse
 import os
-from tee import StdoutTee, StderrTee
+from IPython.utils.io import Tee
+from contextlib import closing
 
 command_configs = {
 	'learning_rate': [0.01, 0.001, 0.0001],
@@ -38,8 +39,8 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
-	# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
-	with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"):
+	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout")) as outputstream:
+		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:
 				# Currently, memory growth needs to be the same across GPUs
