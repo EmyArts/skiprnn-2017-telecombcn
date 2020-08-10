@@ -65,7 +65,7 @@ if __name__ == '__main__':
 						params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
 						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
 					for trial in range(n_trials):
-						params['folder'] += 'T' + str(trial)
+						params['file_name'] += 'T' + str(trial)
 						params['trial'] = trial
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()

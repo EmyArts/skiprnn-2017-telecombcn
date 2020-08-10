@@ -373,7 +373,7 @@ class SkipRNN():
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
             df = pd.DataFrame(df_dict)
-            df.drop(columns=['epochs', 'folder'], inplace=True)
+            df.drop(columns=['epochs', 'file_name'], inplace=True)
             csv_loc = '../csvs'
             if not os.path.exists(csv_loc):
                 os.makedirs(csv_loc)
