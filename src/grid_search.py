@@ -39,34 +39,35 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
-	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
-		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
-		if gpus:
-			try:
-				# Currently, memory growth needs to be the same across GPUs
-				for gpu in gpus:
-					tf.config.experimental.set_memory_growth(gpu, True)
-				logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-				print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-			except RuntimeError as e:
-				# Memory growth must be set before GPUs have been initialized
-				print(e)
+	out = Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout")
+	# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
+	if gpus:
+		try:
+			# Currently, memory growth needs to be the same across GPUs
+			for gpu in gpus:
+				tf.config.experimental.set_memory_growth(gpu, True)
+			logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+			print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+		except RuntimeError as e:
+			# Memory growth must be set before GPUs have been initialized
+			print(e)
 
-		embedding_dict, probs_dict = get_embedding_dicts(50)
-		for idx, params in enumerate(ParameterGrid(command_configs)):
-			if idx % tot_exps == exp_id:
-				csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
-					params['batch_size']) + '_lr' + str(params['learning_rate']) + '_b' + str(
-					params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
-				if not os.path.exists('../csvs/' + csv_file):
-					params['epochs'] = 50
-					params['early_stopping'] = 'yes'
-					params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
-						params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
-						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
-					for trial in range(n_trials):
-						params['file_name'] += 'T' + str(trial)
-						params['trial'] = trial
-						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
-						model.train()
-		# garbage collector
+	embedding_dict, probs_dict = get_embedding_dicts(50)
+	for idx, params in enumerate(ParameterGrid(command_configs)):
+		if idx % tot_exps == exp_id:
+			csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
+				params['batch_size']) + '_lr' + str(params['learning_rate']) + '_b' + str(
+				params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
+			if not os.path.exists('../csvs/' + csv_file):
+				params['epochs'] = 50
+				params['early_stopping'] = 'yes'
+				params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
+					params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
+					params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
+				for trial in range(n_trials):
+					params['file_name'] += 'T' + str(trial)
+					params['trial'] = trial
+					model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+					model.train()
+	# garbage collector
+	out.close()
