@@ -35,10 +35,10 @@ if __name__ == '__main__':
 
 	gpus = tf.config.experimental.list_physical_devices('GPU')
 
-	if not os.path.exists('terminal_logs'):
-		os.makedirs('terminal_logs')
+	if not os.path.exists('../terminal_logs'):
+		os.makedirs('../terminal_logs')
 
-	with StdoutTee(f"terminal_logs/exp{exp_id}.txt"), StderrTee(f"terminal_logs/exp{exp_id}_err.txt"):
+	with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:
 				# Currently, memory growth needs to be the same across GPUs
