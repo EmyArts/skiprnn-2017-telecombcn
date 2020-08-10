@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
-	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout")) as outputstream:
+	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 					params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
 						params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
 						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
-					for trial in n_trials:
+					for trial in range(n_trials):
 						params['folder'] += 'T' + str(trial)
 						params['trial'] = trial
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
