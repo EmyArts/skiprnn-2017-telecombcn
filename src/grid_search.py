@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
-	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout")):
+	with Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stdout"):
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:
