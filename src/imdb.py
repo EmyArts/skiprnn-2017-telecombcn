@@ -179,10 +179,13 @@ class SkipRNN():
         # median_ce = tf.math.median(cross_entropy_per_sample)
         # printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
         # printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
-        cross_entropy = tf.reduce_mean(
-            tf.where(tf.math.is_nan(cross_entropy_per_sample),
-                     tf.ones(cross_entropy_per_sample.get_shape()),
-                     cross_entropy_per_sample))
+        printer_Nan = tf.cond(tf.math.is_nan(cross_entropy_per_sample).reduce_any(),
+                              lambda: tf.print("Found NaN in entropy loss"), lambda: tf.no_op())
+        with tf.control_dependencies([printer_Nan]):
+            cross_entropy = tf.reduce_mean(
+                tf.where(tf.math.is_nan(cross_entropy_per_sample),
+                         tf.ones(cross_entropy_per_sample.get_shape()),
+                         cross_entropy_per_sample))
 
         # Compute accuracy
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
