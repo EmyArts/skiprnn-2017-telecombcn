@@ -49,11 +49,14 @@ if __name__ == '__main__':
 	parser.add_argument("--exp_id", type=int, help="id of the specific run")
 	parser.add_argument("--tot_exps", type=int, default=12, help="The total amount of parallel experiments")
 	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
+	parser.add_argument("--print_gputil", type=bool, default=False,
+						help="Whether to show the GPU utilization on terminal")
 
 	args = parser.parse_args()
 	exp_id = args.exp_id
 	tot_exps = args.tot_exps
 	n_trials = args.trials
+	gputil = args.print_gputil
 
 	gpus = tf.config.experimental.list_physical_devices('GPU')
 
@@ -61,7 +64,8 @@ if __name__ == '__main__':
 		os.makedirs('../terminal_logs')
 
 	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
-		monitor = Monitor(30)
+		if gputil:
+			monitor = Monitor(30)
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
 		if gpus:
 			try:

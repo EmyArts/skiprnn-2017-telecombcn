@@ -32,6 +32,7 @@ from gensim.utils import tokenize
 
 
 
+
 # Task-independent flags
 
 class SkipRNN():
@@ -339,8 +340,8 @@ class SkipRNN():
                     elif best_idx + 10 < epoch:
                         val_update_df = val_update_df[:epoch]
                         val_acc_df = val_acc_df[:epoch]
-                        train_acc_df[epoch:] = np.nan
-                        train_update_df[epoch:] = np.nan
+                        train_acc_df = train_acc_df[:epoch]
+                        train_update_df = train_update_df[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
@@ -382,7 +383,7 @@ class SkipRNN():
             if not os.path.exists(csv_loc):
                 os.makedirs(csv_loc)
             df.to_csv(f"{csv_loc}/{self.FILE_NAME}.csv")
-        except:
+        except Exception:
             self.logger.info("Could not create csvs")
             pass
 
@@ -416,7 +417,7 @@ def main(argv=None):
         'hidden_units': FLAGS.rnn_cells,
         'cost_per_sample': FLAGS.cost_per_sample,
         'surprisal_cost': FLAGS.surprisal_influence,
-        'folder': f'../LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}',
+        'file_name': f'LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}',
         'early_stopping': (FLAGS.early_stopping == 'yes')
     }
     net = SkipRNN(command_configs, emb_dict = EMBEDDING_DICT, probs_dict=PROBS_DICT)
