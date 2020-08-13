@@ -96,3 +96,5 @@ if __name__ == '__main__':
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
 						gc.collect()
+		if gputil:
+			monitor.close()
