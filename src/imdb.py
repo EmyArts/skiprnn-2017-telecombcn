@@ -292,35 +292,35 @@ class SkipRNN():
                 # val_writer.add_summary(scalar_summary('used_samples', val_steps / self.SEQUENCE_LENGTH), epoch)
                 # val_writer.flush()
 
-                print("Epoch %d/%d, "
-                      "duration: %.2f seconds, "
-                      "train accuracy: %.2f%%, "
-                      "train samples: %.2f (%.2f%%), "
-                      "val accuracy: %.2f%%, "
-                      "val samples: %.2f (%.2f%%)" % (epoch + 1,
-                                                       self.NUM_EPOCHS,
-                                                       duration,
-                                                       100. * train_accuracy,
-                                                       train_steps,
-                                                       100. * train_steps / self.SEQUENCE_LENGTH,
-                                                       100. * val_accuracy,
-                                                       val_steps,
-                                                       100. * val_steps / self.SEQUENCE_LENGTH))
-
-                loss_abs = loss_plt[epoch].mean(axis=0)
-                print("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (loss_abs[0], loss_abs[1], loss_abs[2]))
-                loss_perc = np.divide(loss_abs, (loss_abs.sum())) * 100
-                print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
+                # print("Epoch %d/%d, "
+                #       "duration: %.2f seconds, "
+                #       "train accuracy: %.2f%%, "
+                #       "train samples: %.2f (%.2f%%), "
+                #       "val accuracy: %.2f%%, "
+                #       "val samples: %.2f (%.2f%%)" % (epoch + 1,
+                #                                        self.NUM_EPOCHS,
+                #                                        duration,
+                #                                        100. * train_accuracy,
+                #                                        train_steps,
+                #                                        100. * train_steps / self.SEQUENCE_LENGTH,
+                #                                        100. * val_accuracy,
+                #                                        val_steps,
+                #                                        100. * val_steps / self.SEQUENCE_LENGTH))
+                #
+                # loss_abs = loss_plt[epoch].mean(axis=0)
+                # print("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (loss_abs[0], loss_abs[1], loss_abs[2]))
+                # loss_perc = np.divide(loss_abs, (loss_abs.sum())) * 100
+                # print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
 
                 self.logger.info("Epoch %d/%d, "
-                      "duration: %.2f seconds, "
-                      "train accuracy: %.2f%%, "
-                      "train samples: %.2f (%.2f%%), "
-                      "val accuracy: %.2f%%, "
-                      "val samples: %.2f (%.2f%%)" % (epoch + 1,
-                                                      self.NUM_EPOCHS,
-                                                      duration,
-                                                      100. * train_accuracy,
+                                 "duration: %.2f seconds, "
+                                 "train accuracy: %.2f%%, "
+                                 "train samples: %.2f (%.2f%%), "
+                                 "val accuracy: %.2f%%, "
+                                 "val samples: %.2f (%.2f%%)" % (epoch + 1,
+                                                                 self.NUM_EPOCHS,
+                                                                 duration,
+                                                                 100. * train_accuracy,
                                                       train_steps,
                                                       100. * train_steps / self.SEQUENCE_LENGTH,
                                                       100. * val_accuracy,
