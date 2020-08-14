@@ -174,7 +174,8 @@ class SkipRNN():
         predictions = tf.argmax(logits, 1)
 
         # Compute cross-entropy loss
-        cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+        # cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+        cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
         # max_ce = tf.math.maximum(cross_entropy_per_sample)
         # median_ce = tf.math.median(cross_entropy_per_sample)
         # printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
