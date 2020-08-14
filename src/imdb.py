@@ -61,12 +61,12 @@ class SkipRNN():
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        # self.TRAIN_SAMPLES = 10000 # Colab
-        # self.VAL_SAMPLES = 5000
-        # self.TRAIN_SAMPLES = 15000 # Server
-        # self.VAL_SAMPLES = 10000
-        self.TRAIN_SAMPLES = 300  # Debug
-        self.VAL_SAMPLES = 200
+        # self.TRAIN_SAMPLES = 10024 # Colab
+        # self.VAL_SAMPLES = 5056
+        # self.TRAIN_SAMPLES = 15040 # Server
+        # self.VAL_SAMPLES = 10054
+        self.TRAIN_SAMPLES = 320  # Debug
+        self.VAL_SAMPLES = 192
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -105,9 +105,10 @@ class SkipRNN():
         # test_split = f'test[{TRAIN_SAMPLES:{TEST_SAMPLES}]'
         # valid_split = f'test[{TEST_SAMPLES}:]'
         if split == 'train':
+            tot_len = math.ceil(self.TRAIN_SAMPLES / self.BATCH_SIZE)
             data = self.imdb_builder.as_dataset(as_supervised=True, split=f'train[:{self.TRAIN_SAMPLES}]')
-            tot_len = math.ceil(self.TRAIN_SAMPLES/self.BATCH_SIZE)  #This will be the ITERATIONS_PER_EPOCH
-            #print("Total amount of training samples: " + str(len(list(dataset))))
+            # This will be the ITERATIONS_PER_EPOCH
+            # print("Total amount of training samples: " + str(len(list(dataset))))
             #print("Total amount of validation samples: " + str(len(list(dataset))))
         elif split == 'val':
             data = self.imdb_builder.as_dataset(as_supervised=True, split=val_split)
@@ -119,7 +120,7 @@ class SkipRNN():
         # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
         embedding_matrix = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         probs_matrix = np.ones((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.float32)
-        labels = np.empty((tot_len, self.BATCH_SIZE), dtype=np.int64)
+        labels = np.zeros((tot_len, self.BATCH_SIZE), dtype=np.int64)
         line_index = 0
         batch_index = 0
         c_unk = 0
@@ -174,8 +175,8 @@ class SkipRNN():
         predictions = tf.argmax(logits, 1)
 
         # Compute cross-entropy loss
-        # cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
-        cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+        cross_entropy_per_sample = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+        # cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
         # max_ce = tf.math.maximum(cross_entropy_per_sample)
         # median_ce = tf.math.median(cross_entropy_per_sample)
         # printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
