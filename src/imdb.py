@@ -192,20 +192,30 @@ class SkipRNN():
 
         # Compute loss for each updated state
         budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
+        printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
+                              lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
+        with tf.control_dependencies([printer_Nan]):
+            budget_loss = tf.where(tf.math.is_nan(budget_loss),
+                                   tf.ones(budget_loss.get_shape()),
+                                   budget_loss)
 
         # Compute loss for the amount of surprisal
         surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
         # Avoid encouraging to not skip.
-        surprisal_loss = tf.where(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)), tf.ones_like(surprisal_loss), surprisal_loss)
+        printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
+                              lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
+        with tf.control_dependencies([printer_Nan]):
+            surprisal_loss = tf.where(tf.math.logical_or(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)),
+                                                         tf.math.is_nan(surprisal_loss)), tf.ones_like(surprisal_loss),
+                                      surprisal_loss)
 
         loss = cross_entropy + budget_loss + surprisal_loss
         loss = tf.reshape(loss, [])
 
         loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
 
-
         # Optimizer
-        opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 10)  # used to be 1 is for gradient clipping
+        opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 1)  # used to be 1 is for gradient clipping
         train_fn = opt.apply_gradients(grads_and_vars)
 
         sess = tf.Session()
