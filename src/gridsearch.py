@@ -47,8 +47,8 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=24, help="The total amount of parallel experiments")
-	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
+	parser.add_argument("--tot_exps", type=int, default=20, help="The total amount of parallel experiments")
+	parser.add_argument("--trials", type=int, default=3, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
 
