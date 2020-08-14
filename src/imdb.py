@@ -307,10 +307,13 @@ class SkipRNN():
                 #                                        val_steps,
                 #                                        100. * val_steps / self.SEQUENCE_LENGTH))
                 #
-                # loss_abs = loss_plt[epoch].mean(axis=0)
+
                 # print("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (loss_abs[0], loss_abs[1], loss_abs[2]))
-                # loss_perc = np.divide(loss_abs, (loss_abs.sum())) * 100
+                #
                 # print("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (loss_perc[0], loss_perc[1], loss_perc[2]))
+
+                loss_abs = loss_plt[epoch].mean(axis=0)
+                loss_perc = np.divide(loss_abs, (loss_abs.sum())) * 100
 
                 self.logger.info("Epoch %d/%d, "
                                  "duration: %.2f seconds, "
