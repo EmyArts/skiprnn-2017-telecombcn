@@ -64,7 +64,7 @@ class SkipRNN():
         # self.TRAIN_SAMPLES = 10024 # Colab
         # self.VAL_SAMPLES = 5056
         self.TRAIN_SAMPLES = 14976  # Server
-        self.VAL_SAMPLES = 9952
+        self.VAL_SAMPLES = 9984
         # self.TRAIN_SAMPLES = 320  # Debug
         # self.VAL_SAMPLES = 192
         # TRAIN and VAL samples should always sum up to 25k
