@@ -63,10 +63,10 @@ class SkipRNN():
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
         # self.TRAIN_SAMPLES = 10024 # Colab
         # self.VAL_SAMPLES = 5056
-        # self.TRAIN_SAMPLES = 15040 # Server
-        # self.VAL_SAMPLES = 10054
-        self.TRAIN_SAMPLES = 320  # Debug
-        self.VAL_SAMPLES = 192
+        self.TRAIN_SAMPLES = 15040  # Server
+        self.VAL_SAMPLES = 10054
+        # self.TRAIN_SAMPLES = 320  # Debug
+        # self.VAL_SAMPLES = 192
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples

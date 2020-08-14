@@ -79,20 +79,19 @@ if __name__ == '__main__':
 				print(e)
 
 		embedding_dict, probs_dict = get_embedding_dicts(50)
-		for idx, params in enumerate(ParameterGrid(command_configs)):
-			if idx % tot_exps == exp_id:
-				csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
-					params['batch_size']) + '_lr' + str(params['learning_rate']) + '_b' + str(
-					params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
-				if not os.path.exists('../csvs/' + csv_file):
-					params['epochs'] = 50
-					params['early_stopping'] = 'yes'
-					params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
-						params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
-						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost'])
-					for trial in range(n_trials):
-						params['file_name'] += '_T' + str(trial)
+		for trial in range(n_trials):
+			for idx, params in enumerate(ParameterGrid(command_configs)):
+				if idx % tot_exps == exp_id:
+					csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
+						params['batch_size']) + '_lr' + str(params['learning_rate']) + '_b' + str(
+						params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
+					if not os.path.exists('../csvs/' + csv_file):
 						params['trial'] = trial
+						params['epochs'] = 50
+						params['early_stopping'] = 'yes'
+						params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
+							params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
+							params['cost_per_sample']) + '_SC' + str(params['surprisal_cost']) + '_T' + str(trial)
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
 						gc.collect()
