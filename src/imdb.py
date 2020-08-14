@@ -424,7 +424,8 @@ def main(argv=None):
         'cost_per_sample': FLAGS.cost_per_sample,
         'surprisal_cost': FLAGS.surprisal_influence,
         'file_name': f'LR{FLAGS.learning_rate}_BS{FLAGS.batch_size}_HU{FLAGS.rnn_cells}_CPS{FLAGS.cost_per_sample}_SC{FLAGS.surprisal_influence}',
-        'early_stopping': (FLAGS.early_stopping == 'yes')
+        'early_stopping': (FLAGS.early_stopping == 'yes'),
+        'trial': 0
     }
     net = SkipRNN(command_configs, emb_dict = EMBEDDING_DICT, probs_dict=PROBS_DICT)
     print_setup()
