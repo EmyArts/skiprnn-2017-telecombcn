@@ -61,10 +61,10 @@ class SkipRNN():
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        # self.TRAIN_SAMPLES = 9984 # Colab
-        # self.VAL_SAMPLES = 4992
-        self.TRAIN_SAMPLES = 14976  # Server
-        self.VAL_SAMPLES = 9984
+        self.TRAIN_SAMPLES = 9984  # Colab
+        self.VAL_SAMPLES = 4992
+        # self.TRAIN_SAMPLES = 14976  # Server
+        # self.VAL_SAMPLES = 9984
         # self.TRAIN_SAMPLES = 320  # Debug
         # self.VAL_SAMPLES = 192
         # TRAIN and VAL samples should always sum up to 25k
