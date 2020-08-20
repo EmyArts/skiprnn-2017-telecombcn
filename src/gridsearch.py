@@ -51,6 +51,7 @@ if __name__ == '__main__':
 	parser.add_argument("--trials", type=int, default=3, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
+	parser.add_argument("--reverse")
 
 	args = parser.parse_args()
 	exp_id = args.id

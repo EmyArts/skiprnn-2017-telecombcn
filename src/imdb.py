@@ -61,8 +61,8 @@ class SkipRNN():
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        # self.TRAIN_SAMPLES = 10024 # Colab
-        # self.VAL_SAMPLES = 5056
+        # self.TRAIN_SAMPLES = 9984 # Colab
+        # self.VAL_SAMPLES = 4992
         self.TRAIN_SAMPLES = 14976  # Server
         self.VAL_SAMPLES = 9984
         # self.TRAIN_SAMPLES = 320  # Debug
@@ -175,7 +175,12 @@ class SkipRNN():
         predictions = tf.argmax(logits, 1)
 
         # Compute cross-entropy loss
-        cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+        printer_lab = tf.cond(tf.math.reduce_any(tf.logical_and(tf.less(tf.zeros_like(ground_truth), ground_truth),
+                                                                tf.greater(tf.ones_like(ground_truth), ground_truth))),
+                              lambda: tf.print("Found a label out of range"), lambda: tf.no_op())
+        with tf.control_dependencies([printer_lab]):
+            cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
+                                                                                      labels=ground_truth)
         # cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
         # max_ce = tf.math.maximum(cross_entropy_per_sample)
         # median_ce = tf.math.median(cross_entropy_per_sample)
@@ -185,9 +190,11 @@ class SkipRNN():
                               lambda: tf.print("Found NaN in entropy loss"), lambda: tf.no_op())
         with tf.control_dependencies([printer_Nan]):
             cross_entropy = tf.reduce_mean(
-                tf.where(tf.math.is_nan(cross_entropy_per_sample),
-                         tf.ones(cross_entropy_per_sample.get_shape()),
-                         cross_entropy_per_sample))
+                tf.boolean_mask(cross_entropy_per_sample, tf.is_finite(cross_entropy_per_sample)))
+
+            # tf.where(tf.math.is_nan(cross_entropy_per_sample),
+            #          tf.ones(cross_entropy_per_sample.get_shape()),
+            #          cross_entropy_per_sample))
 
         # Compute accuracy
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
@@ -228,13 +235,13 @@ class SkipRNN():
         # Initialize weights
         sess.run(tf.global_variables_initializer())
 
-        train_loss_plt = np.empty((self.NUM_EPOCHS))
-        val_loss_plt = np.empty((self.NUM_EPOCHS))
-        loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
-        val_acc_df = np.empty((self.NUM_EPOCHS))
-        train_acc_df = np.empty((self.NUM_EPOCHS))
-        train_update_df = np.empty((self.NUM_EPOCHS))
-        val_update_df = np.empty((self.NUM_EPOCHS))
+        train_loss_plt = np.zeros((self.NUM_EPOCHS))
+        val_loss_plt = np.zeros((self.NUM_EPOCHS))
+        loss_plt = np.zeros((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
+        val_acc_df = np.zeros((self.NUM_EPOCHS))
+        train_acc_df = np.zeros((self.NUM_EPOCHS))
+        train_update_df = np.zeros((self.NUM_EPOCHS))
+        val_update_df = np.zeros((self.NUM_EPOCHS))
 
         # FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}_t{self.TRIAL}'
 
