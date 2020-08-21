@@ -29,11 +29,11 @@ class Monitor(Thread):
 
 
 command_configs = {
-	'learning_rate': [0.01, 0.001, 0.0001],
+	'learning_rate': [0.0001],
 	'batch_size': [64],
-	'hidden_units': [32, 64, 96],
-	'cost_per_sample': [0.005, 0.001, 0.0001],
-	'surprisal_cost': [0.1, 0.005]
+	'hidden_units': [32],
+	'cost_per_sample': [0.01, 0.005, 0.001, 0.0005, 0.0001],
+	'surprisal_cost': [0, 0.1, 0.05, 0.01]
 }
 # command_configs = {
 # 	'learning_rate': [0.01],
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 						params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
 					if not os.path.exists('../csvs/' + csv_file):
 						params['trial'] = trial
-						params['epochs'] = 50
+						params['epochs'] = 70
 						params['early_stopping'] = 'yes'
 						params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
 							params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(

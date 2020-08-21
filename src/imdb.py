@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import os
+import sys
 import time
 import datetime
 import pickle
@@ -61,12 +62,12 @@ class SkipRNN():
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        self.TRAIN_SAMPLES = 9984  # Colab
-        self.VAL_SAMPLES = 4992
+        # self.TRAIN_SAMPLES = 9984  # Colab
+        # self.VAL_SAMPLES = 4992
         # self.TRAIN_SAMPLES = 14976  # Server
         # self.VAL_SAMPLES = 9984
-        # self.TRAIN_SAMPLES = 320  # Debug
-        # self.VAL_SAMPLES = 192
+        self.TRAIN_SAMPLES = 320  # Debug
+        self.VAL_SAMPLES = 192
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -187,7 +188,8 @@ class SkipRNN():
 		# printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
 		# printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
 		printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(cross_entropy_per_sample)),
-                              lambda: tf.print("Found NaN in entropy loss"), lambda: tf.no_op())
+                              lambda: tf.print("Found NaN in entropy loss", output_stream=sys.stderr),
+                              lambda: tf.no_op())
         with tf.control_dependencies([printer_Nan]):
             cross_entropy = tf.reduce_mean(
                 tf.boolean_mask(cross_entropy_per_sample, tf.is_finite(cross_entropy_per_sample)))
@@ -196,36 +198,36 @@ class SkipRNN():
             #          tf.ones(cross_entropy_per_sample.get_shape()),
             #          cross_entropy_per_sample))
 
-        # Compute accuracy
-        accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
+    # Compute accuracy
+    accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
 
-        # Compute loss for each updated state
-        budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
-        printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
-                              lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
-        with tf.control_dependencies([printer_Nan]):
-            budget_loss = tf.where(tf.math.is_nan(budget_loss),
-                                   tf.ones(budget_loss.get_shape()),
-                                   budget_loss)
+    # Compute loss for each updated state
+    budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
+    # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
+    #                       lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
+    # with tf.control_dependencies([printer_Nan]):
+    #     budget_loss = tf.where(tf.math.is_nan(budget_loss),
+    #                            tf.ones(budget_loss.get_shape()),
+    #                            budget_loss)
 
-        # Compute loss for the amount of surprisal
-        surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
-        # Avoid encouraging to not skip.
-        printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
-                              lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
-        with tf.control_dependencies([printer_Nan]):
-            surprisal_loss = tf.where(tf.math.logical_or(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)),
-                                                         tf.math.is_nan(surprisal_loss)), tf.ones_like(surprisal_loss),
-                                      surprisal_loss)
+    # Compute loss for the amount of surprisal
+    surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
+    # Avoid encouraging to not skip.
+    # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
+    #                       lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
+    # with tf.control_dependencies([printer_Nan]):
+    #     surprisal_loss = tf.where(tf.math.logical_or(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)),
+    #                                                  tf.math.is_nan(surprisal_loss)), tf.ones_like(surprisal_loss),
+    #                               surprisal_loss)
 
-        loss = cross_entropy + budget_loss + surprisal_loss
-        loss = tf.reshape(loss, [])
+    loss = cross_entropy + budget_loss + surprisal_loss
+    loss = tf.reshape(loss, [])
 
-        loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
+    loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
 
-        # Optimizer
-        opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 1)  # used to be 1 is for gradient clipping
-        train_fn = opt.apply_gradients(grads_and_vars)
+    # Optimizer
+    opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 1)  # used to be 1 is for gradient clipping
+    train_fn = opt.apply_gradients(grads_and_vars)
 
         sess = tf.Session()
 
@@ -359,7 +361,7 @@ class SkipRNN():
                     if epoch == 11:
                         best_accuracy = val_acc_df.max()
                         best_idx = val_acc_df.argmax()
-                    if best_accuracy < val_acc_df[epoch]:
+                    if best_accuracy < val_acc_df[epoch] + 1e-4:
                         best_accuracy = val_acc_df[epoch]
                         best_idx = epoch
                     elif best_idx + 10 < epoch:
