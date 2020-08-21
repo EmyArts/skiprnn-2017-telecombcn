@@ -180,7 +180,8 @@ class SkipRNN():
         printer_lab = tf.cond(
             tf.math.reduce_any(tf.logical_or(tf.equal(tf.zeros_like(ground_truth), ground_truth),
                                              tf.equal(tf.ones_like(ground_truth), ground_truth))),
-            lambda: tf.print("Found a label out of range: ", [ground_truth]), lambda: tf.no_op())
+            lambda: tf.print("Labels: ", [ground_truth]),
+            lambda: tf.print("Found a label out of range: ", [ground_truth]))
         with tf.control_dependencies([printer_lab]):
             cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
                                                                                       labels=ground_truth)
