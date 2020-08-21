@@ -157,7 +157,8 @@ class SkipRNN():
 
     # def train(hyper_params = BASE_CONF):
     def train(self):
-        samples = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH], name='Samples')  # (batch, time, in)
+        samples = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH],
+                                 name='Samples')  # (batch, time, in)
         ground_truth = tf.placeholder(tf.int64, shape=[self.BATCH_SIZE], name='GroundTruth')
         probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
 
@@ -167,27 +168,27 @@ class SkipRNN():
 
         rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
-		# Split the outputs of the RNN into the actual outputs and the state update gate
-		rnn_outputs, updated_states = split_rnn_outputs('skip_lstm', rnn_outputs)
+        # Split the outputs of the RNN into the actual outputs and the state update gate
+        rnn_outputs, updated_states = split_rnn_outputs('skip_lstm', rnn_outputs)
 
-		# print(f"\nUpdated states are {updated_states}.\n")
+        # print(f"\nUpdated states are {updated_states}.\n")
 
-		logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=self.OUTPUT_SIZE)
-		predictions = tf.argmax(logits, 1)
+        logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=self.OUTPUT_SIZE)
+        predictions = tf.argmax(logits, 1)
 
-		# Compute cross-entropy loss
-		printer_lab = tf.cond(tf.math.reduce_any(tf.logical_or(tf.equal(tf.zeros_like(ground_truth), ground_truth),
-															   tf.equal(tf.ones_like(ground_truth), ground_truth))),
-							  lambda: tf.print("Found a label out of range"), lambda: tf.no_op())
-		with tf.control_dependencies([printer_lab]):
-			cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
-																					  labels=ground_truth)
-		# cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
-		# max_ce = tf.math.maximum(cross_entropy_per_sample)
-		# median_ce = tf.math.median(cross_entropy_per_sample)
-		# printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
-		# printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
-		printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(cross_entropy_per_sample)),
+        # Compute cross-entropy loss
+        printer_lab = tf.cond(tf.math.reduce_any(tf.logical_or(tf.equal(tf.zeros_like(ground_truth), ground_truth),
+                                                               tf.equal(tf.ones_like(ground_truth), ground_truth))),
+                              lambda: tf.print("Found a label out of range"), lambda: tf.no_op())
+        with tf.control_dependencies([printer_lab]):
+            cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
+                                                                                      labels=ground_truth)
+        # cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+        # max_ce = tf.math.maximum(cross_entropy_per_sample)
+        # median_ce = tf.math.median(cross_entropy_per_sample)
+        # printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
+        # printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
+        printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(cross_entropy_per_sample)),
                               lambda: tf.print("Found NaN in entropy loss", output_stream=sys.stderr),
                               lambda: tf.no_op())
         with tf.control_dependencies([printer_Nan]):
@@ -198,36 +199,36 @@ class SkipRNN():
             #          tf.ones(cross_entropy_per_sample.get_shape()),
             #          cross_entropy_per_sample))
 
-    # Compute accuracy
-    accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
+        # Compute accuracy
+        accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
 
-    # Compute loss for each updated state
-    budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
-    # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
-    #                       lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
-    # with tf.control_dependencies([printer_Nan]):
-    #     budget_loss = tf.where(tf.math.is_nan(budget_loss),
-    #                            tf.ones(budget_loss.get_shape()),
-    #                            budget_loss)
+        # Compute loss for each updated state
+        budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
+        # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
+        #                       lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
+        # with tf.control_dependencies([printer_Nan]):
+        #     budget_loss = tf.where(tf.math.is_nan(budget_loss),
+        #                            tf.ones(budget_loss.get_shape()),
+        #                            budget_loss)
 
-    # Compute loss for the amount of surprisal
-    surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
-    # Avoid encouraging to not skip.
-    # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
-    #                       lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
-    # with tf.control_dependencies([printer_Nan]):
-    #     surprisal_loss = tf.where(tf.math.logical_or(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)),
-    #                                                  tf.math.is_nan(surprisal_loss)), tf.ones_like(surprisal_loss),
-    #                               surprisal_loss)
+        # Compute loss for the amount of surprisal
+        surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
+        # Avoid encouraging to not skip.
+        # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
+        #                       lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
+        # with tf.control_dependencies([printer_Nan]):
+        #     surprisal_loss = tf.where(tf.math.logical_or(tf.equal(surprisal_loss, tf.zeros_like(surprisal_loss)),
+        #                                                  tf.math.is_nan(surprisal_loss)), tf.ones_like(surprisal_loss),
+        #                               surprisal_loss)
 
-    loss = cross_entropy + budget_loss + surprisal_loss
-    loss = tf.reshape(loss, [])
+        loss = cross_entropy + budget_loss + surprisal_loss
+        loss = tf.reshape(loss, [])
 
-    loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
+        loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
 
-    # Optimizer
-    opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 1)  # used to be 1 is for gradient clipping
-    train_fn = opt.apply_gradients(grads_and_vars)
+        # Optimizer
+        opt, grads_and_vars = compute_gradients(loss, self.LEARNING_RATE, 1)  # used to be 1 is for gradient clipping
+        train_fn = opt.apply_gradients(grads_and_vars)
 
         sess = tf.Session()
 
@@ -294,7 +295,7 @@ class SkipRNN():
                                                                                      ground_truth: val_labels[
                                                                                          iteration],
                                                                                      probs: val_probs[iteration]
-                                                                                     })
+                                                                                 })
                     val_accuracy += val_iter_accuracy
                     val_loss += val_iter_loss
                     if val_used_inputs is not None:
@@ -345,11 +346,11 @@ class SkipRNN():
                                                                  self.NUM_EPOCHS,
                                                                  duration,
                                                                  100. * train_accuracy,
-                                                      train_steps,
-                                                      100. * train_steps / self.SEQUENCE_LENGTH,
-                                                      100. * val_accuracy,
-                                                      val_steps,
-                                                      100. * val_steps / self.SEQUENCE_LENGTH))
+                                                                 train_steps,
+                                                                 100. * train_steps / self.SEQUENCE_LENGTH,
+                                                                 100. * val_accuracy,
+                                                                 val_steps,
+                                                                 100. * val_steps / self.SEQUENCE_LENGTH))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                     loss_abs[0], loss_abs[1], loss_abs[2]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
@@ -377,26 +378,6 @@ class SkipRNN():
         except KeyboardInterrupt:
             self.logger.info("Training was interrupted manually")
             pass
-
-        # Plotting is done in postprocessing
-        # try:
-        #     plt.plot(train_loss_plt, label='Training loss')
-        #     plt.plot(val_loss_plt, label='Validation loss')
-        #     plt.title(f"Max accuracy {val_acc_df.max()}")
-        #     plt.legend()
-        #     plt.savefig(f"{self.FOLDER}/{FILE_NAME}.png")
-        #     plt.clf()
-        #
-        #     plt.plot(loss_plt[:, :, 0].flatten(), label='Entropy loss')
-        #     plt.plot(loss_plt[:, :, 1].flatten(), label='Budget loss')
-        #     plt.plot(loss_plt[:, :, 2].flatten(), label='Surprisal loss')
-        #     plt.title("Training losses over time")
-        #     plt.legend()
-        #     plt.savefig(f"{self.FOLDER}/losses_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}.png")
-        #     plt.clf()
-        # except:
-        #     self.logger.info("Could not create figures")
-        #     pass
 
         try:
             df_dict = self.CONFIG_DICT
