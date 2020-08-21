@@ -178,9 +178,9 @@ class SkipRNN():
 
         # Compute cross-entropy loss
         printer_lab = tf.cond(
-            tf.math.reduce_any(tf.logical_not(tf.logical_or(tf.equal(tf.zeros_like(ground_truth), ground_truth),
-                                                            tf.equal(tf.ones_like(ground_truth), ground_truth)))),
-            lambda: tf.print("Found a label out of range"), lambda: tf.no_op())
+            tf.math.reduce_any(tf.logical_or(tf.equal(tf.zeros_like(ground_truth), ground_truth),
+                                             tf.equal(tf.ones_like(ground_truth), ground_truth))),
+            lambda: tf.print("Found a label out of range: ", [ground_truth]), lambda: tf.no_op())
         with tf.control_dependencies([printer_lab]):
             cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
                                                                                       labels=ground_truth)
