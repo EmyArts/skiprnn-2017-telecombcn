@@ -166,27 +166,27 @@ class SkipRNN():
 
         rnn_outputs, rnn_states = tf.nn.dynamic_rnn(cell, samples, dtype=tf.float32, initial_state=initial_state)
 
-        # Split the outputs of the RNN into the actual outputs and the state update gate
-        rnn_outputs, updated_states = split_rnn_outputs('skip_lstm', rnn_outputs)
+		# Split the outputs of the RNN into the actual outputs and the state update gate
+		rnn_outputs, updated_states = split_rnn_outputs('skip_lstm', rnn_outputs)
 
-        # print(f"\nUpdated states are {updated_states}.\n")
+		# print(f"\nUpdated states are {updated_states}.\n")
 
-        logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=self.OUTPUT_SIZE)
-        predictions = tf.argmax(logits, 1)
+		logits = layers.linear(inputs=rnn_outputs[:, -1, :], num_outputs=self.OUTPUT_SIZE)
+		predictions = tf.argmax(logits, 1)
 
-        # Compute cross-entropy loss
-        printer_lab = tf.cond(tf.math.reduce_any(tf.logical_and(tf.less(tf.zeros_like(ground_truth), ground_truth),
-                                                                tf.greater(tf.ones_like(ground_truth), ground_truth))),
-                              lambda: tf.print("Found a label out of range"), lambda: tf.no_op())
-        with tf.control_dependencies([printer_lab]):
-            cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
-                                                                                      labels=ground_truth)
-        # cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
-        # max_ce = tf.math.maximum(cross_entropy_per_sample)
-        # median_ce = tf.math.median(cross_entropy_per_sample)
-        # printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
-        # printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
-        printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(cross_entropy_per_sample)),
+		# Compute cross-entropy loss
+		printer_lab = tf.cond(tf.math.reduce_any(tf.logical_or(tf.equal(tf.zeros_like(ground_truth), ground_truth),
+															   tf.equal(tf.ones_like(ground_truth), ground_truth))),
+							  lambda: tf.print("Found a label out of range"), lambda: tf.no_op())
+		with tf.control_dependencies([printer_lab]):
+			cross_entropy_per_sample = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,
+																					  labels=ground_truth)
+		# cross_entropy_per_sample = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=ground_truth)
+		# max_ce = tf.math.maximum(cross_entropy_per_sample)
+		# median_ce = tf.math.median(cross_entropy_per_sample)
+		# printer_max = tf.Print(max_ce, [max_ce], "The maximum cross entropy is ")
+		# printer_median = tf.Print(median_ce, [median_ce], "The median cross entropy is ")
+		printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(cross_entropy_per_sample)),
                               lambda: tf.print("Found NaN in entropy loss"), lambda: tf.no_op())
         with tf.control_dependencies([printer_Nan]):
             cross_entropy = tf.reduce_mean(
