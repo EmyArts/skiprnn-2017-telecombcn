@@ -48,7 +48,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
 	parser.add_argument("--tot_exps", type=int, default=20, help="The total amount of parallel experiments")
-	parser.add_argument("--trials", type=int, default=3, help="The amount of times the same network is trained.")
+	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
 	parser.add_argument("--reverse")
@@ -64,6 +64,7 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
+	# with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
 	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
 		if gputil:
 			monitor = Monitor(30)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
 				print(e)
 
 		embedding_dict, probs_dict = get_embedding_dicts(50)
-		for trial in range(n_trials):
+		for trial in range(3, 3 + n_trials):
 			for idx, params in enumerate(ParameterGrid(command_configs)):
 				if idx % tot_exps == exp_id:
 					csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
@@ -88,7 +89,7 @@ if __name__ == '__main__':
 						params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
 					if not os.path.exists('../csvs/' + csv_file):
 						params['trial'] = trial
-						params['epochs'] = 70
+						params['epochs'] = 100
 						params['early_stopping'] = 'yes'
 						params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
 							params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
