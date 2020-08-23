@@ -65,7 +65,7 @@ if __name__ == '__main__':
 		os.makedirs('../terminal_logs')
 
 	# with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
-	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
+	with closing(Tee(f"../terminal_logs/exp{exp_id}_new_epochs.txt", "w", channel="stderr")) as outputstream:
 		if gputil:
 			monitor = Monitor(30)
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
