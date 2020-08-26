@@ -28,26 +28,26 @@ class Monitor(Thread):
 		self.stopped = True
 
 
+# command_configs = {
+# 	'learning_rate': [0.0001],
+# 	'batch_size': [64],
+# 	'hidden_units': [32],
+# 	'cost_per_sample': [0.01, 0.005, 0.001, 0.0005, 0.0001],
+# 	'surprisal_cost': [0, 0.1, 0.05, 0.01]
+# }
 command_configs = {
 	'learning_rate': [0.0001],
 	'batch_size': [64],
 	'hidden_units': [32],
-	'cost_per_sample': [0.01, 0.005, 0.001, 0.0005, 0.0001],
-	'surprisal_cost': [0, 0.1, 0.05, 0.01]
+	'cost_per_sample': [1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6],
+	'surprisal_cost': [0, 1, 0.5, 0.1, 0.05, 0.01, 0.005]
 }
-# command_configs = {
-# 	'learning_rate': [0.01],
-# 	'batch_size': [32],
-# 	'hidden_units': [32],
-# 	'cost_per_sample': [0.005],
-# 	'surprisal_cost': [0.1]
-# }
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=20, help="The total amount of parallel experiments")
+	parser.add_argument("--tot_exps", type=int, default=35, help="The total amount of parallel experiments")
 	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
@@ -64,8 +64,8 @@ if __name__ == '__main__':
 	if not os.path.exists('../terminal_logs'):
 		os.makedirs('../terminal_logs')
 
-	# with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
-	with closing(Tee(f"../terminal_logs/exp{exp_id}_new_epochs.txt", "w", channel="stderr")) as outputstream:
+	with closing(Tee(f"../terminal_logs/exp{exp_id}.txt", "w", channel="stderr")) as outputstream:
+		# with closing(Tee(f"../terminal_logs/exp{exp_id}_new_epochs.txt", "w", channel="stderr")) as outputstream:
 		if gputil:
 			monitor = Monitor(30)
 		# with StdoutTee(f"../terminal_logs/exp{exp_id}.txt"), StderrTee(f"../terminal_logs/exp{exp_id}_err.txt"):
@@ -81,8 +81,11 @@ if __name__ == '__main__':
 				print(e)
 
 		embedding_dict, probs_dict = get_embedding_dicts(50)
-		for trial in range(3, 3 + n_trials):
-			for idx, params in enumerate(ParameterGrid(command_configs)):
+		grid = ParameterGrid(command_configs)
+		n_nets = len(grid)
+		for trial in range(0, n_trials):
+			for idx, params in enumerate(grid):
+				idx += trial * n_nets
 				if idx % tot_exps == exp_id:
 					csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
 						params['batch_size']) + '_lr' + str(params['learning_rate']) + '_b' + str(

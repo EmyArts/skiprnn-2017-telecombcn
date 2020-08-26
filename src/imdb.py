@@ -359,15 +359,14 @@ class SkipRNN():
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
-
-                if self.EARLY_STOPPING and epoch > 10:
-                    if epoch == 11:
+                if self.EARLY_STOPPING and epoch > 15:
+                    if epoch == 16:
                         best_accuracy = val_acc_df.max()
                         best_idx = val_acc_df.argmax()
                     if best_accuracy < val_acc_df[epoch] + 1e-4:
                         best_accuracy = val_acc_df[epoch]
                         best_idx = epoch
-                    elif best_idx + 10 < epoch:
+                    elif best_idx + 15 < epoch:
                         val_update_df = val_update_df[:epoch]
                         val_acc_df = val_acc_df[:epoch]
                         train_acc_df = train_acc_df[:epoch]
