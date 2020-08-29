@@ -87,16 +87,14 @@ if __name__ == '__main__':
 			for idx, params in enumerate(grid):
 				idx += trial * n_nets
 				if idx % tot_exps == exp_id:
-					csv_file = 'hu' + str(params['hidden_units']) + '_bs' + str(
-						params['batch_size']) + '_lr' + str(params['learning_rate']) + '_b' + str(
-						params['cost_per_sample']) + '_s' + str(params['surprisal_cost']) + '.csv'
-					if not os.path.exists('../csvs/' + csv_file):
+					file_name = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
+						params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
+						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost']) + '_T' + str(trial)
+					if not os.path.exists('../csvs/' + file_name + ".csv"):
 						params['trial'] = trial
 						params['epochs'] = 100
 						params['early_stopping'] = 'yes'
-						params['file_name'] = 'EXP' + str(exp_id) + '_LR' + str(params['learning_rate']) + '_BS' + str(
-							params['batch_size']) + '_HU' + str(params['hidden_units']) + '_CPS' + str(
-							params['cost_per_sample']) + '_SC' + str(params['surprisal_cost']) + '_T' + str(trial)
+						params['file_name'] = file_name
 						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
 						gc.collect()
