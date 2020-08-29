@@ -48,7 +48,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
 	parser.add_argument("--tot_exps", type=int, default=35, help="The total amount of parallel experiments")
-	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
+	parser.add_argument("--trials", type=int, default=2, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
 	parser.add_argument("--reverse")
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 		embedding_dict, probs_dict = get_embedding_dicts(50)
 		grid = ParameterGrid(command_configs)
 		n_nets = len(grid)
-		for trial in range(0, n_trials):
+		for trial in range(1, 1 + n_trials):
 			for idx, params in enumerate(grid):
 				idx += trial * n_nets
 				if idx % tot_exps == exp_id:
