@@ -36,19 +36,19 @@ class Monitor(Thread):
 # 	'surprisal_cost': [0, 0.1, 0.05, 0.01]
 # }
 command_configs = {
-	'learning_rate': [0.0001],
+	'learning_rate': [0.0005, 0.00075],
 	'batch_size': [64],
 	'hidden_units': [32],
-	'cost_per_sample': [1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6],
-	'surprisal_cost': [0, 1, 0.5, 0.1, 0.05, 0.01, 0.005]
+	'cost_per_sample': [1e-3, 1e-4, 5e-5, 1e-5],
+	'surprisal_cost': [0, 1, 0.1, 0.01]
 }
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=35, help="The total amount of parallel experiments")
-	parser.add_argument("--trials", type=int, default=2, help="The amount of times the same network is trained.")
+	parser.add_argument("--tot_exps", type=int, default=32, help="The total amount of parallel experiments")
+	parser.add_argument("--trials", type=int, default=3, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
 	parser.add_argument("--reverse")
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 		embedding_dict, probs_dict = get_embedding_dicts(50)
 		grid = ParameterGrid(command_configs)
 		n_nets = len(grid)
-		for trial in range(1, 1 + n_trials):
+		for trial in range(0, n_trials):
 			for idx, params in enumerate(grid):
 				idx += trial * n_nets
 				if idx % tot_exps == exp_id:
