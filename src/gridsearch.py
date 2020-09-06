@@ -36,10 +36,11 @@ class Monitor(Thread):
 # 	'surprisal_cost': [0, 0.1, 0.05, 0.01]
 # }
 command_configs = {
-	'learning_rate': [0.0005, 0.00075],
+	# 'learning_rate': [0.0005, 0.00075]
+	'learning_rate': [0.00025],
 	'batch_size': [64],
 	'hidden_units': [32],
-	'cost_per_sample': [1e-3, 1e-4, 1e-5],
+	'cost_per_sample': [1e-3, 1e-4, 1e-5],  # If there is time try only 5e-5
 	'surprisal_cost': [0, 1, 0.1, 0.01]
 }
 
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=32, help="The total amount of parallel experiments")
+	parser.add_argument("--tot_exps", type=int, default=27, help="The total amount of parallel experiments")
 	parser.add_argument("--trials", type=int, default=3, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
