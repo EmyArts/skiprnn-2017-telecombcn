@@ -442,7 +442,7 @@ class SkipRNN():
             df_dict['val_updates'] = val_update_df
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
-            loss_plt_mean = loss_plt.mean(axis=1)
+            loss_plt_mean = loss_plt.mean(axis=1).transpose()
             df_dict['entropy_loss'] = loss_plt_mean[0]
             df_dict['budget_loss'] = loss_plt_mean[1]
             df_dict['surprisal_loss'] = loss_plt_mean[2]
@@ -474,6 +474,22 @@ def get_embedding_dicts(embedding_length):
     f.close()
     print('Total %s word vectors.' % len(embedding_dict))
     return embedding_dict, probs_dict
+
+def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
+    vocab = {}
+    inv_embedding_dict = {v: k for k, v in embedding_dict.items()}
+    for emb in embeddings:
+        pos = np.where(np.all(embedding_dict == emb,axis=1))
+        assert len(pos) == 1
+        idx = embedding_matrix[pos]
+        word = inv_embedding_dict[idx]
+        if word in vocab.keys():
+            vocab[word] += 1
+        else:
+            vocab[word] = 1
+    vocab = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
+    print({k: vocab[k] for k in vocab.keys()[:10]})
+    return vocab
 
 def main(argv=None):
     create_generic_flags()
