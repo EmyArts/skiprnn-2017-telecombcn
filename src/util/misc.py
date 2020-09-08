@@ -7,6 +7,7 @@ from __future__ import print_function
 
 import types
 from decimal import Decimal
+import numpy as np
 
 import tensorflow as tf
 
@@ -56,6 +57,29 @@ def compute_used_samples(update_state_gate):
         for idt in range(update_state_gate.shape[1]):
             steps += update_state_gate[idx, idt]
     return steps / batch_size
+
+def stats_used_samples(update_state_gate, embeddings, probs):
+    try:
+        assert (update_state_gate.shape == embeddings.shape and update_state_gate == probs.shape)
+    except:
+        print("Dimensions in stats_used_samples do not correspond")
+        raise
+    read_embs = []
+    non_read_embs = []
+    read_surps = []
+    non_read_surps = []
+    batch_size = update_state_gate.shape[0]
+    for idx in range(batch_size):
+        for idt in range(update_state_gate.shape[1]):
+            if update_state_gate[idx, idt] == 0:
+                non_read_embs.append(embeddings[idx, idt])
+                non_read_surps.append(probs[idx, idt])
+            else:
+                read_embs.append(embeddings[idx, idt])
+                read_surps.append(probs[idx, idt])
+    read_surps = np.multiply(-1, np.log(read_surps))
+    non_read_surps = np.multiply(-1, np.log(non_read_surps))
+    return read_embs, non_read_embs, read_surps, non_read_surps
 
 
 def scalar_summary(name, value):
