@@ -392,11 +392,16 @@ class SkipRNN():
                     if test_used_inputs is not None:
                         test_steps += compute_used_samples(test_used_inputs)
                         if val_accuracy + 1e-4 > val_acc_df.max():
+                            read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                            non_read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                            read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
+                            non_read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
+
                             re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration], test_probs[iteration])
                             read_embs[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH : self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(re)] = re
                             non_read_embs[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(nre)] = nre
-                            read_surps[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH : self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(rs)] = rs
-                            non_read_surps[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(nrs)] = nrs
+                            read_surps[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH : self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(rs)] = rs.flatten()
+                            non_read_surps[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(nrs)] = nrs.flatten()
                     else:
                         val_steps += self.SEQUENCE_LENGTH
 
