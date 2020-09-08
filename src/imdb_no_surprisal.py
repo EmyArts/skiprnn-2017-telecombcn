@@ -119,7 +119,7 @@ class SkipRNN():
             tot_len = math.ceil(self.VAL_SAMPLES / self.BATCH_SIZE) # This will be VAL_ITERS
             #print("Total amount of test samples: " + str(len(list(dataset))))
         elif split == 'test':
-            data = self.imdb_builder.as_dataset(as_supervised=True, split=f'test[:{self.TEST_SAMPLES}')
+            data = self.imdb_builder.as_dataset(as_supervised=True, split=f'test[:{self.TEST_SAMPLES}]')
             tot_len = math.ceil(self.TEST_SAMPLES / self.BATCH_SIZE)
         else:
             raise ValueError()
