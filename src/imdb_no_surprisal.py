@@ -391,7 +391,6 @@ class SkipRNN():
                     if test_used_inputs is not None:
                         test_steps += compute_used_samples(test_used_inputs)
                         re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration], test_probs[iteration])
-                        print(re, rs)
                         read_embs.append(re)
                         non_read_embs.append(nre)
                         read_surps.append(rs)
@@ -443,7 +442,10 @@ class SkipRNN():
             df_dict['val_updates'] = val_update_df
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
-            df_dict['entropy_loss'], df_dict['budget_loss'], df_dict['surprisal_loss'] = loss_plt.mean(axis=1).transpose()
+            loss_plt_mean = loss_plt.mean(axis=1)
+            df_dict['entropy_loss'] = loss_plt_mean[0]
+            df_dict['budget_loss'] = loss_plt_mean[1]
+            df_dict['surprisal_loss'] = loss_plt_mean[2]
             df = pd.DataFrame(df_dict)
             df.drop(columns=['epochs', 'file_name'], inplace=True)
             csv_loc = '../csvs'
