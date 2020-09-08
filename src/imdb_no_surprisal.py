@@ -80,7 +80,7 @@ class SkipRNN():
         self.TEST_ITERS = int(self.TEST_SAMPLES / self.BATCH_SIZE)
         # ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
         # TEST_ITERS = int(5000/BATCH_SIZE)
-
+        self.TEST_EMBEDDING_MATRIX = np.zeros((self.TEST_ITERS, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         # Load data
         self.imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
         self.imdb_builder.download_and_prepare()
@@ -151,6 +151,8 @@ class SkipRNN():
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
                 batch_index += 1
+        if split == 'test':
+            self.TEST_EMBEDDING_MATRIX = embedding_matrix
         self.logger.info(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
         print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
@@ -467,8 +469,12 @@ class SkipRNN():
 
         ## Saving analysis statistics
         try:
-            idx = df['val_acc'].argmax()
-
+            analysis_loc = '../analysis'
+            if not os.path.exists(analysis_loc):
+            read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, read_embs)
+            non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
+            pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
+            pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
         except Exception as e:
             print(e)
             self.logger.info("Something went wrong when reporting analysis results")
