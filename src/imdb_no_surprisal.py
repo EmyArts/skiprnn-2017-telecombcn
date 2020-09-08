@@ -256,7 +256,7 @@ class SkipRNN():
         test_update_df = np.zeros((self.NUM_EPOCHS))
         test_time_df = np.zeros((self.NUM_EPOCHS))
 
-        read_embs = []
+        read_embs = np.zeros((self.NUM_EPOCHS, self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
         non_read_embs = []
         read_surps = []
         non_read_surps = []
@@ -427,6 +427,7 @@ class SkipRNN():
                         val_acc_df = val_acc_df[:epoch]
                         train_acc_df = train_acc_df[:epoch]
                         train_update_df = train_update_df[:epoch]
+                        loss_plt = loss_plt[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
