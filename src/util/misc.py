@@ -59,12 +59,12 @@ def compute_used_samples(update_state_gate):
     return steps / batch_size
 
 def stats_used_samples(update_state_gate, embeddings, probs):
-    try:
-        assert (update_state_gate.shape[:1] == embeddings.shape[:1] and update_state_gate == probs.shape)
-    except:
-        print("Dimensions in stats_used_samples do not correspond")
-        print(f"updates: {update_state_gate.shape}, embeddings: {embeddings.shape}, probs: {probs.shape}.")
-        raise
+    # try:
+    #     assert (update_state_gate.shape[:1] == embeddings.shape[:1] and update_state_gate == probs.shape)
+    # except:
+    #     print("Dimensions in stats_used_samples do not correspond")
+    #     print(f"updates: {update_state_gate.shape}, embeddings: {embeddings.shape}, probs: {probs.shape}.")
+    #     raise
     read_embs = []
     non_read_embs = []
     read_surps = []
