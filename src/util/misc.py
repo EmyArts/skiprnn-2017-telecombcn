@@ -60,7 +60,7 @@ def compute_used_samples(update_state_gate):
 
 def stats_used_samples(update_state_gate, embeddings, probs):
     try:
-        assert (update_state_gate.shape == (embeddings.shape[0], embeddings.shape[1]) and update_state_gate == probs.shape)
+        assert (update_state_gate.shape[:1] == embeddings.shape[:1] and update_state_gate == probs.shape)
     except:
         print("Dimensions in stats_used_samples do not correspond")
         print(f"updates: {update_state_gate.shape}, embeddings: {embeddings.shape}, probs: {probs.shape}.")
