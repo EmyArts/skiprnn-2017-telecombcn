@@ -256,10 +256,10 @@ class SkipRNN():
         test_update_df = np.zeros((self.NUM_EPOCHS))
         test_time_df = np.zeros((self.NUM_EPOCHS))
 
-        read_embs = np.zeros((self.NUM_EPOCHS, self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
-        non_read_embs = []
-        read_surps = []
-        non_read_surps = []
+        read_embs = np.zeros((self.NUM_EPOCHS, self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+        non_read_embs = np.zeros((self.NUM_EPOCHS, self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+        read_surps = np.ones((self.NUM_EPOCHS, self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+        non_read_surps = np.ones((self.NUM_EPOCHS, self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
 
 
 
@@ -376,9 +376,14 @@ class SkipRNN():
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
-                t0 = time.time()
-                test_accuracy, test_loss, test_steps = 0, 0, 0
+
+                test_accuracy, test_loss, test_steps, time = 0, 0, 0, 0
                 for iteration in range(self.TEST_ITERS):
+                    temp_read_embs = []
+                    temp_non_read_embs = []
+                    temp_read_surps = []
+                    temp_non_read_surps = []
+                    t0 = time.time()
                     test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
                                                                                  feed_dict={
                                                                                      samples: test_matrix[iteration],
@@ -386,24 +391,24 @@ class SkipRNN():
                                                                                          iteration],
                                                                                      probs: test_probs[iteration]
                                                                                  })
+                    time += time.time() - t0
                     test_accuracy += test_iter_accuracy
                     test_loss += test_iter_loss
                     if test_used_inputs is not None:
                         test_steps += compute_used_samples(test_used_inputs)
                         re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration], test_probs[iteration])
-                        read_embs.append(re)
-                        non_read_embs.append(nre)
-                        read_surps.append(rs)
-                        non_read_surps.append(nrs)
+                        temp_read_embs.append(re)
+                        temp_non_read_embs.append(nre)
+                        temp_read_surps.append(rs)
+                        temp_non_read_surps.append(nrs)
                     else:
                         val_steps += self.SEQUENCE_LENGTH
                         read_embs.append(test_matrix[iteration])
 
-                test_time_df[epoch] = time.time() - t0
-
                 test_accuracy /= self.TEST_ITERS
                 test_loss /= self.TEST_ITERS
                 test_steps /= self.TEST_ITERS
+                test_time_df[epoch] = time
                 test_acc_df[epoch] = test_accuracy
                 test_update_df[epoch] = test_steps
 
@@ -456,6 +461,15 @@ class SkipRNN():
         except Exception as e:
             print(e)
             self.logger.info("Could not create csvs")
+            pass
+
+        ## Saving analysis statistics
+        try:
+            idx = df['val_acc'].argmax()
+
+        except Exception as e:
+            print(e)
+            self.logger.info("Something went wrong when reporting analysis results")
             pass
 
         sess.close()
