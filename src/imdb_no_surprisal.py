@@ -372,7 +372,7 @@ class SkipRNN():
                                                                  100. * val_steps / self.SEQUENCE_LENGTH))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                     loss_abs[0], loss_abs[1], loss_abs[2]))
-                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
+                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
 
@@ -409,7 +409,7 @@ class SkipRNN():
 
                 self.logger.info("Test time: %.2f seconds, "
                                  "test accuracy: %.2f%%, "
-                                 "test samples: %.2f (%.2f%%), "
+                                 "test samples: %.2f (%.2f%%).\n"
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
                                     test_steps,
@@ -452,7 +452,8 @@ class SkipRNN():
             if not os.path.exists(csv_loc):
                 os.makedirs(csv_loc)
             df.to_csv(f"{csv_loc}/{self.FILE_NAME}.csv")
-        except Exception:
+        except Exception as e:
+            print(e)
             self.logger.info("Could not create csvs")
             pass
 
