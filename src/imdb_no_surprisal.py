@@ -505,18 +505,17 @@ def get_embedding_dicts(embedding_length):
     return embedding_dict, probs_dict
 
 def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
-    print("Hey from get words form embeddings!")
+    # print("Hey from get words form embeddings!")
     vocab = {}
-    print(list(embedding_dict.keys())[:10])
-    print(list(embedding_dict.values())[:10])
+    # print(f"embedding dictionary keys: {list(embedding_dict.keys())[:5]}\n")
+    # print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
     inv_embedding_dict = {v[0]: k for k, v in embedding_dict.items()}
-    print(inv_embedding_dict.keys())
     for emb in embeddings:
-        print(emb)
-        pos = np.where(np.all(embedding_matrix == emb, axis=1))
-        print(pos)
-        assert len(pos) == 1
-        word = inv_embedding_dict[pos[0]]
+        # print(emb)
+        # pos = np.where(np.all(embedding_matrix == emb, axis=1))
+        # print(pos)
+        # assert len(pos) == 1
+        word = inv_embedding_dict[emb]
         if word in vocab.keys():
             vocab[word] += 1
         else:
