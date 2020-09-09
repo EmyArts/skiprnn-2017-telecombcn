@@ -57,17 +57,19 @@ class SkipRNN():
         # Constants
         self.OUTPUT_SIZE = 2
         self.SEQUENCE_LENGTH = 2520
-        # VALIDATION_SAMPLES = 5000
         self.EMBEDDING_LENGTH = 50
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
         # self.TRAIN_SAMPLES = 9984  # Colab
         # self.VAL_SAMPLES = 4992
-        self.TRAIN_SAMPLES = 14976  # Server
-        self.VAL_SAMPLES = 9984
-        # self.TRAIN_SAMPLES = 320  # Debug
-        # self.VAL_SAMPLES = 192
+        # self.TEST_SAMPLES = 9984
+        # self.TRAIN_SAMPLES = 14976  # Server
+        # self.VAL_SAMPLES = 9984
+        # self.TEST_SAMPLES = 14976
+        self.TRAIN_SAMPLES = 320  # Debug
+        self.VAL_SAMPLES = 192
+        self.TEST_SAMPLES = 320
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -75,9 +77,11 @@ class SkipRNN():
 
         self.ITERATIONS_PER_EPOCH = int(self.TRAIN_SAMPLES / self.BATCH_SIZE)
         self.VAL_ITERS = int(self.VAL_SAMPLES / self.BATCH_SIZE)
+        self.TEST_ITERS = int(self.TEST_SAMPLES / self.BATCH_SIZE)
         # ITERATIONS_PER_EPOCH = int(5000/BATCH_SIZE)
         # TEST_ITERS = int(5000/BATCH_SIZE)
-
+        self.TEST_EMBEDDING_MATRIX = np.zeros(
+            (self.TEST_ITERS, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         # Load data
         self.imdb_builder = tfds.builder('imdb_reviews/plain_text', data_dir='../data')
         self.imdb_builder.download_and_prepare()
@@ -110,11 +114,14 @@ class SkipRNN():
             data = self.imdb_builder.as_dataset(as_supervised=True, split=f'train[:{self.TRAIN_SAMPLES}]')
             # This will be the ITERATIONS_PER_EPOCH
             # print("Total amount of training samples: " + str(len(list(dataset))))
-            #print("Total amount of validation samples: " + str(len(list(dataset))))
+            # print("Total amount of validation samples: " + str(len(list(dataset))))
         elif split == 'val':
             data = self.imdb_builder.as_dataset(as_supervised=True, split=val_split)
-            tot_len = math.ceil(self.VAL_SAMPLES / self.BATCH_SIZE) # This will be VAL_ITERS
-            #print("Total amount of test samples: " + str(len(list(dataset))))
+            tot_len = math.ceil(self.VAL_SAMPLES / self.BATCH_SIZE)  # This will be VAL_ITERS
+            # print("Total amount of test samples: " + str(len(list(dataset))))
+        elif split == 'test':
+            data = self.imdb_builder.as_dataset(as_supervised=True, split=f'test[:{self.TEST_SAMPLES}]')
+            tot_len = math.ceil(self.TEST_SAMPLES / self.BATCH_SIZE)
         else:
             raise ValueError()
 
@@ -145,11 +152,14 @@ class SkipRNN():
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
                 batch_index += 1
+        if split == 'test':
+            self.TEST_EMBEDDING_MATRIX = embedding_matrix
         self.logger.info(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
         print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
         # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
-        print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
+        print(
+            f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
         # np.expand_dims(probs_matrix, axis=-1)
         return embedding_matrix, labels, probs_matrix
 
@@ -241,18 +251,26 @@ class SkipRNN():
         sess.run(tf.global_variables_initializer())
 
         train_loss_plt = np.zeros((self.NUM_EPOCHS))
-        val_loss_plt = np.zeros((self.NUM_EPOCHS))
         loss_plt = np.zeros((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
         val_acc_df = np.zeros((self.NUM_EPOCHS))
         train_acc_df = np.zeros((self.NUM_EPOCHS))
+        test_acc_df = np.zeros((self.NUM_EPOCHS))
         train_update_df = np.zeros((self.NUM_EPOCHS))
         val_update_df = np.zeros((self.NUM_EPOCHS))
+        test_update_df = np.zeros((self.NUM_EPOCHS))
+        test_time_df = np.zeros((self.NUM_EPOCHS))
+
+        read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+        non_read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+        read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
+        non_read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
 
         # FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}_t{self.TRIAL}'
 
         try:
             train_matrix, train_labels, train_probs = self.input_fn(split='train')
             val_matrix, val_labels, val_probs = self.input_fn(split='val')
+            test_matrix, test_labels, test_probs = self.input_fn(split='test')
 
             # train_loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
 
@@ -280,6 +298,7 @@ class SkipRNN():
                         train_steps += compute_used_samples(out[3])
                     else:
                         train_steps += self.SEQUENCE_LENGTH
+
                 duration = time.time() - start_time
 
                 train_accuracy /= self.ITERATIONS_PER_EPOCH
@@ -288,6 +307,7 @@ class SkipRNN():
                 train_loss_plt[epoch] = train_loss
                 train_acc_df[epoch] = train_accuracy
                 train_update_df[epoch] = train_steps
+
 
                 val_accuracy, val_loss, val_steps = 0, 0, 0
                 for iteration in range(self.VAL_ITERS):
@@ -307,7 +327,6 @@ class SkipRNN():
                 val_accuracy /= self.VAL_ITERS
                 val_loss /= self.VAL_ITERS
                 val_steps /= self.VAL_ITERS
-                val_loss_plt[epoch] = val_loss
                 val_acc_df[epoch] = val_accuracy
                 val_update_df[epoch] = val_steps
 
@@ -355,9 +374,70 @@ class SkipRNN():
                                                                  100. * val_steps / self.SEQUENCE_LENGTH))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                     loss_abs[0], loss_abs[1], loss_abs[2]))
-                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%.\n" % (
+                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
+                analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
+                if analysis_update:
+                    self.logger.info("Updating Analysis")
+                    read_embs = np.zeros(
+                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                    non_read_embs = np.zeros(
+                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                    read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+                    non_read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+
+                test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
+                for iteration in range(self.TEST_ITERS):
+                    t0 = time.time()
+                    test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
+                                                                                    feed_dict={
+                                                                                        samples: test_matrix[iteration],
+                                                                                        ground_truth: test_labels[
+                                                                                            iteration],
+                                                                                        probs: test_probs[iteration]
+                                                                                    })
+                    t += time.time() - t0
+                    test_accuracy += test_iter_accuracy
+                    test_loss += test_iter_loss
+                    if test_used_inputs is not None:
+                        test_steps += compute_used_samples(test_used_inputs)
+                        if analysis_update:
+                            try:
+                                re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration],
+                                                                      test_probs[iteration])
+                                read_embs[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    re)] = re
+                                non_read_embs[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    nre)] = nre
+                                read_surps[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    rs)] = rs.flatten()
+                                non_read_surps[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    nrs)] = nrs.flatten()
+                            except:
+                                self.logger.info("Could not update analysis")
+                                pass
+                    else:
+                        val_steps += self.SEQUENCE_LENGTH
+
+                test_accuracy /= self.TEST_ITERS
+                test_loss /= self.TEST_ITERS
+                test_steps /= self.TEST_ITERS
+                test_time_df[epoch] = t
+                test_acc_df[epoch] = test_accuracy
+                test_update_df[epoch] = test_steps
+
+                self.logger.info("Test time: %.2f seconds, "
+                                 "test accuracy: %.2f%%, "
+                                 "test samples: %.2f (%.2f%%).\n"
+                                 % (test_time_df[epoch],
+                                    100. * test_accuracy,
+                                    test_steps,
+                                    100. * test_steps / self.SEQUENCE_LENGTH))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
@@ -371,6 +451,7 @@ class SkipRNN():
                         val_acc_df = val_acc_df[:epoch]
                         train_acc_df = train_acc_df[:epoch]
                         train_update_df = train_update_df[:epoch]
+                        loss_plt = loss_plt[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
@@ -386,14 +467,41 @@ class SkipRNN():
             df_dict['val_updates'] = val_update_df
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
+            loss_plt_mean = loss_plt.mean(axis=1).transpose()
+            df_dict['entropy_loss'] = loss_plt_mean[0]
+            df_dict['budget_loss'] = loss_plt_mean[1]
+            df_dict['surprisal_loss'] = loss_plt_mean[2]
             df = pd.DataFrame(df_dict)
             df.drop(columns=['epochs', 'file_name'], inplace=True)
             csv_loc = '../csvs'
             if not os.path.exists(csv_loc):
                 os.makedirs(csv_loc)
             df.to_csv(f"{csv_loc}/{self.FILE_NAME}.csv")
-        except Exception:
+        except Exception as e:
+            print(e)
             self.logger.info("Could not create csvs")
+            pass
+
+        ## Saving analysis statistics
+        try:
+            analysis_loc = '../analysis'
+            if not os.path.exists(analysis_loc):
+                os.makedirs(analysis_loc)
+            print("Read words")
+            read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, read_embs)
+            print("Skipped words")
+            non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
+            pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
+            pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
+            read_surps = np.vstack(read_surps).flatten()
+            non_read_surps = np.vstack(non_read_surps).flatten()
+            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps > 0])
+            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
+                    non_read_surps[non_read_surps > 0])
+
+        except Exception as e:
+            print(e)
+            self.logger.info("Something went wrong when reporting analysis results")
             pass
 
         sess.close()
@@ -413,6 +521,31 @@ def get_embedding_dicts(embedding_length):
     f.close()
     print('Total %s word vectors.' % len(embedding_dict))
     return embedding_dict, probs_dict
+
+
+def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
+    # print("Hey from get words form embeddings!")
+    vocab = {}
+    # print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
+    inv_embedding_dict = {tuple(v): k for k, v in embedding_dict.items()}
+    keys = inv_embedding_dict.keys()
+    # print(f"inverse embedding dictionary keys: {list(keys[:5]}\n")
+    for emb in embeddings:
+        # print(f"Embedding: {emb}\n")
+        # pos = np.where(np.all(embedding_matrix == emb, axis=1))
+        # print(pos)
+        # assert len(pos) == 1
+        if tuple(emb) in keys:
+            word = inv_embedding_dict[tuple(emb)]
+            # print(f"Word found {word}")
+            if word in vocab.keys():
+                vocab[word] += 1
+            else:
+                vocab[word] = 1
+    vocab = {k: v for k, v in sorted(vocab.items(), key=lambda item: item[1], reverse=True)}
+    print({k: vocab[k] for k in list(vocab.keys())[:10]})
+    return vocab
+
 
 def main(argv=None):
     create_generic_flags()

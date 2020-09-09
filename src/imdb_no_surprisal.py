@@ -168,7 +168,7 @@ class SkipRNN():
         samples = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH],
                                  name='Samples')  # (batch, time, in)
         ground_truth = tf.placeholder(tf.int64, shape=[self.BATCH_SIZE], name='GroundTruth')
-        probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
+        # probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
 
         cell, initial_state = create_model(model='skip_lstm',
                                            num_cells=[self.HIDDEN_UNITS],
@@ -222,7 +222,7 @@ class SkipRNN():
         #                            budget_loss)
 
         # Compute loss for the amount of surprisal
-        surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
+        # surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
         # Avoid encouraging to not skip.
         # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
         #                       lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
@@ -231,7 +231,7 @@ class SkipRNN():
         #                                                  tf.math.is_nan(surprisal_loss)), tf.ones_like(surprisal_loss),
         #                               surprisal_loss)
 
-        loss = cross_entropy + budget_loss + surprisal_loss
+        loss = cross_entropy + budget_loss  # + surprisal_loss
         loss = tf.reshape(loss, [])
 
         loss = tf.where(tf.is_nan(loss), tf.ones_like(loss), loss)
@@ -289,7 +289,7 @@ class SkipRNN():
                     out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss, surprisal_loss],
                                    feed_dict={samples: train_matrix[iteration],
                                               ground_truth: train_labels[iteration],
-                                              probs: train_probs[iteration]
+                                              # probs: train_probs[iteration]
                                               })
                     train_accuracy += out[2]
                     train_loss += out[1]
@@ -316,7 +316,7 @@ class SkipRNN():
                                                                                      samples: val_matrix[iteration],
                                                                                      ground_truth: val_labels[
                                                                                          iteration],
-                                                                                     probs: val_probs[iteration]
+                                                                                     # probs: val_probs[iteration]
                                                                                  })
                     val_accuracy += val_iter_accuracy
                     val_loss += val_iter_loss
@@ -395,7 +395,7 @@ class SkipRNN():
                                                                                         samples: test_matrix[iteration],
                                                                                         ground_truth: test_labels[
                                                                                             iteration],
-                                                                                        probs: test_probs[iteration]
+                                                                                        # probs: test_probs[iteration]
                                                                                  })
                     t += time.time() - t0
                     test_accuracy += test_iter_accuracy

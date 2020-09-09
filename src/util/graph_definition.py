@@ -22,7 +22,7 @@ def create_generic_flags():
     tf.app.flags.DEFINE_integer("rnn_cells", 64, "Number of RNN cells.")
     tf.app.flags.DEFINE_integer("rnn_layers", 1, "Number of RNN layers.")
     tf.app.flags.DEFINE_integer('batch_size', 32, "Batch size.")
-    tf.app.flags.DEFINE_integer('epochs', 50, "Number of epochs")
+    tf.app.flags.DEFINE_integer('epochs', 100, "Number of epochs")
     tf.app.flags.DEFINE_float('learning_rate', 0.01, "Learning rate.")
     tf.app.flags.DEFINE_float('grad_clip', 1., "Clip gradients at this value. Set to <=0 to disable clipping.")
     tf.app.flags.DEFINE_string('logdir', '../logs', "Directory where TensorBoard logs will be stored.")
