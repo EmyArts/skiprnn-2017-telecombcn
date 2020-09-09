@@ -519,6 +519,7 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
         if word in vocab.keys():
             vocab[word] += 1
         else:
+            print(f"Word found {word}")
             vocab[word] = 1
     vocab = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
     print({k: vocab[k] for k in list(vocab.keys())[:10]})
