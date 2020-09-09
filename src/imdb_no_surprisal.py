@@ -519,7 +519,7 @@ def get_embedding_dicts(embedding_length):
 def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     # print("Hey from get words form embeddings!")
     vocab = {}
-    print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
+    # print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
     inv_embedding_dict = {tuple(v): k for k, v in embedding_dict.items()}
     keys = inv_embedding_dict.keys()
     # print(f"inverse embedding dictionary keys: {list(keys[:5]}\n")
@@ -530,12 +530,12 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
         # assert len(pos) == 1
         if tuple(emb) in keys:
             word = inv_embedding_dict[tuple(emb)]
-            print(f"Word found {word}")
+            # print(f"Word found {word}")
             if word in vocab.keys():
                 vocab[word] += 1
             else:
                 vocab[word] = 1
-    vocab = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
+    vocab = {k: v for k, v in sorted(vocab.items(), key=lambda item: item[1])}
     print({k: vocab[k] for k in list(vocab.keys())[:10]})
     return vocab
 
