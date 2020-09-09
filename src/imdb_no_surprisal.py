@@ -543,7 +543,7 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
                 vocab[word] += 1
             else:
                 vocab[word] = 1
-    vocab = {k: v for k, v in sorted(vocab.items(), key=lambda item: item[1])}
+    vocab = {k: v for k, v in sorted(vocab.items(), key=lambda item: item[1], reverse=True)}
     print({k: vocab[k] for k in list(vocab.keys())[:10]})
     return vocab
 
