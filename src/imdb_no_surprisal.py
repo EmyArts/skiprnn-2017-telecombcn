@@ -511,11 +511,11 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     # print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
     inv_embedding_dict = {v[0]: k for k, v in embedding_dict.items()}
     for emb in embeddings:
-        # print(emb)
+        print(f"Embedding: {emb}\n")
         # pos = np.where(np.all(embedding_matrix == emb, axis=1))
         # print(pos)
         # assert len(pos) == 1
-        word = inv_embedding_dict[emb]
+        word = inv_embedding_dict[emb[0]]
         if word in vocab.keys():
             vocab[word] += 1
         else:
