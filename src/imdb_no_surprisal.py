@@ -507,10 +507,10 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     vocab = {}
     inv_embedding_dict = {v: k for k, v in embedding_dict.items()}
     for emb in embeddings:
-        pos = np.where(np.all(embedding_dict == emb,axis=1))
+        pos = np.where(np.all(embedding_matrix == emb, axis=1))
+        print(pos)
         assert len(pos) == 1
-        idx = embedding_matrix[pos[0]]
-        word = inv_embedding_dict[idx]
+        word = inv_embedding_dict[pos[0]]
         if word in vocab.keys():
             vocab[word] += 1
         else:
