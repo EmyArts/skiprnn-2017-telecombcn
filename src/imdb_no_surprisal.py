@@ -36,7 +36,7 @@ from gensim.utils import tokenize
 
 # Task-independent flags
 
-class SkipRNN():
+class no_surp_SkipRNN():
 
     def __init__(self, config_dict, emb_dict, probs_dict):
 
@@ -98,6 +98,7 @@ class SkipRNN():
         self.logger.addHandler(fh)
 
         self.logger.info(
+            f"\n\n{self.FILE_NAME}\n\n"
             f"\n\nLearning rate: {self.LEARNING_RATE}\nBatch size: {self.BATCH_SIZE}\nHidden units: {self.HIDDEN_UNITS}"
             f"\nCost per sample: {self.COST_PER_SAMPLE}\nSurprisal cost {self.SURPRISAL_COST}\n\n")
         # self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
