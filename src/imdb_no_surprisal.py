@@ -372,10 +372,10 @@ class SkipRNN():
                                                                  100. * val_accuracy,
                                                                  val_steps,
                                                                  100. * val_steps / self.SEQUENCE_LENGTH))
-                self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
-                    loss_abs[0], loss_abs[1], loss_abs[2]))
-                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
-                    loss_perc[0], loss_perc[1], loss_perc[2]))
+                self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f" % (
+                    loss_abs[0], loss_abs[1]))
+                self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%" % (
+                    loss_perc[0], loss_perc[1]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
                 analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
                 if analysis_update:
