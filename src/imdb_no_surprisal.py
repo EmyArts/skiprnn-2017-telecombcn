@@ -508,7 +508,7 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     # print("Hey from get words form embeddings!")
     vocab = {}
     # print(f"embedding dictionary keys: {list(embedding_dict.keys())[:5]}\n")
-    inv_embedding_dict = {v[0]: k for k, v in embedding_dict.items()}
+    inv_embedding_dict = {v: k for k, v in embedding_dict.items()}
     print(f"inverse embedding dictionary values: {list(inv_embedding_dict.keys())[:5]}\n")
     for emb in embeddings:
         print(f"Embedding: {emb}\n")
