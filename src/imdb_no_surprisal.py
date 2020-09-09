@@ -507,8 +507,8 @@ def get_embedding_dicts(embedding_length):
 def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     print("Hey from get words form embeddings!")
     vocab = {}
-    print(embedding_dict.keys()[:10])
-    print(embedding_dict.values()[:10])
+    print(list(embedding_dict.keys())[:10])
+    print(list(embedding_dict.values())[:10])
     inv_embedding_dict = {v[0]: k for k, v in embedding_dict.items()}
     print(inv_embedding_dict.keys())
     for emb in embeddings:
@@ -522,7 +522,7 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
         else:
             vocab[word] = 1
     vocab = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
-    print({k: vocab[k] for k in vocab.keys()[:10]})
+    print({k: vocab[k] for k in list(vocab.keys())[:10]})
     return vocab
 
 def main(argv=None):
