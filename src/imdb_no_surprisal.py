@@ -509,7 +509,7 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     vocab = {}
     # print(f"embedding dictionary keys: {list(embedding_dict.keys())[:5]}\n")
     inv_embedding_dict = {v[0]: k for k, v in embedding_dict.items()}
-    print(f"inverse embedding dictionary values: {list(embedding_dict.keys())[:5]}\n")
+    print(f"inverse embedding dictionary values: {list(inv_embedding_dict.keys())[:5]}\n")
     for emb in embeddings:
         print(f"Embedding: {emb}\n")
         # pos = np.where(np.all(embedding_matrix == emb, axis=1))
