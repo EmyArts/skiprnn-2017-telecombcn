@@ -394,6 +394,7 @@ class SkipRNN():
                     if test_used_inputs is not None:
                         test_steps += compute_used_samples(test_used_inputs)
                         if val_accuracy + 1e-4 > val_acc_df.max():
+                            self.logger.info("Updating Analysis")
                             read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
                             non_read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
                             read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
@@ -512,7 +513,7 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     keys = inv_embedding_dict.keys()
     # print(f"inverse embedding dictionary keys: {list(keys[:5]}\n")
     for emb in embeddings:
-        print(f"Embedding: {emb}\n")
+        # print(f"Embedding: {emb}\n")
         # pos = np.where(np.all(embedding_matrix == emb, axis=1))
         # print(pos)
         # assert len(pos) == 1
