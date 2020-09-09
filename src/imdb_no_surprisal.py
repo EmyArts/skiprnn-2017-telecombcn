@@ -403,19 +403,24 @@ class SkipRNN():
                     if test_used_inputs is not None:
                         test_steps += compute_used_samples(test_used_inputs)
                         if analysis_update:
-                            re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration], test_probs[iteration])
-                            read_embs[
-                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                re)] = re
-                            non_read_embs[
-                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                nre)] = nre
-                            read_surps[
-                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                rs)] = rs.flatten()
-                            non_read_surps[
-                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                nrs)] = nrs.flatten()
+                            try:
+                                re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration],
+                                                                      test_probs[iteration])
+                                read_embs[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    re)] = re
+                                non_read_embs[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    nre)] = nre
+                                read_surps[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    rs)] = rs.flatten()
+                                non_read_surps[
+                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                    nrs)] = nrs.flatten()
+                            except:
+                                self.logger.info("Could not update analysis")
+                                pass
                     else:
                         val_steps += self.SEQUENCE_LENGTH
 
@@ -484,8 +489,9 @@ class SkipRNN():
             analysis_loc = '../analysis'
             if not os.path.exists(analysis_loc):
                 os.makedirs(analysis_loc)
-            print("Getting read words")
+            print("Read words")
             read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, read_embs)
+            print("Skipped words")
             non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
             pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
             pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
