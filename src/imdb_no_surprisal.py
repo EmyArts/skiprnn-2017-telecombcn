@@ -377,34 +377,45 @@ class SkipRNN():
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
+                analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
+                if analysis_update:
+                    self.logger.info("Updating Analysis")
+                    read_embs = np.zeros(
+                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                    non_read_embs = np.zeros(
+                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                    read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
+                    non_read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
 
                 test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
                 for iteration in range(self.TEST_ITERS):
                     t0 = time.time()
                     test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
-                                                                                 feed_dict={
-                                                                                     samples: test_matrix[iteration],
-                                                                                     ground_truth: test_labels[
-                                                                                         iteration],
-                                                                                     probs: test_probs[iteration]
+                                                                                    feed_dict={
+                                                                                        samples: test_matrix[iteration],
+                                                                                        ground_truth: test_labels[
+                                                                                            iteration],
+                                                                                        probs: test_probs[iteration]
                                                                                  })
                     t += time.time() - t0
                     test_accuracy += test_iter_accuracy
                     test_loss += test_iter_loss
                     if test_used_inputs is not None:
                         test_steps += compute_used_samples(test_used_inputs)
-                        if val_accuracy + 1e-4 > val_acc_df.max():
-                            self.logger.info("Updating Analysis")
-                            read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                            non_read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                            read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
-                            non_read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
-
+                        if analysis_update:
                             re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration], test_probs[iteration])
-                            read_embs[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH : self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(re)] = re
-                            non_read_embs[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(nre)] = nre
-                            read_surps[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH : self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(rs)] = rs.flatten()
-                            non_read_surps[self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(nrs)] = nrs.flatten()
+                            read_embs[
+                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                re)] = re
+                            non_read_embs[
+                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                nre)] = nre
+                            read_surps[
+                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                rs)] = rs.flatten()
+                            non_read_surps[
+                            self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                nrs)] = nrs.flatten()
                     else:
                         val_steps += self.SEQUENCE_LENGTH
 
