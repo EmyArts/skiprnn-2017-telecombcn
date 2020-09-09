@@ -384,8 +384,8 @@ class SkipRNN():
                         (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
                     non_read_embs = np.zeros(
                         (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                    read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
-                    non_read_surps = np.ones((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH))
+                    read_surps = np.fill((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+                    non_read_surps = np.fill((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
 
                 test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
                 for iteration in range(self.TEST_ITERS):
