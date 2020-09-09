@@ -249,7 +249,7 @@ class SkipRNN():
         sess.run(tf.global_variables_initializer())
 
         train_loss_plt = np.zeros((self.NUM_EPOCHS))
-        loss_plt = np.zeros((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
+        loss_plt = np.zeros((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 2))
         val_acc_df = np.zeros((self.NUM_EPOCHS))
         train_acc_df = np.zeros((self.NUM_EPOCHS))
         test_acc_df = np.zeros((self.NUM_EPOCHS))
@@ -286,14 +286,14 @@ class SkipRNN():
                 for iteration in range(self.ITERATIONS_PER_EPOCH):
                     # Perform SGD update
                     # print(iteration, train_probs[iteration].shape)
-                    out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss, surprisal_loss],
+                    out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss],
                                    feed_dict={samples: train_matrix[iteration],
                                               ground_truth: train_labels[iteration],
                                               # probs: train_probs[iteration]
                                               })
                     train_accuracy += out[2]
                     train_loss += out[1]
-                    loss_plt[epoch][iteration] = out[4:]  # entropy, budget, surprisal
+                    loss_plt[epoch][iteration] = out[4:]  # entropy, budget
                     if out[3] is not None:
                         train_steps += compute_used_samples(out[3])
                     else:
@@ -472,7 +472,7 @@ class SkipRNN():
             loss_plt_mean = loss_plt.mean(axis=1).transpose()
             df_dict['entropy_loss'] = loss_plt_mean[0]
             df_dict['budget_loss'] = loss_plt_mean[1]
-            df_dict['surprisal_loss'] = loss_plt_mean[2]
+            # df_dict['surprisal_loss'] = loss_plt_mean[2]
             df = pd.DataFrame(df_dict)
             df.drop(columns=['epochs', 'file_name'], inplace=True)
             csv_loc = '../csvs'
