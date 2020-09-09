@@ -509,18 +509,20 @@ def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
     vocab = {}
     print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
     inv_embedding_dict = {tuple(v): k for k, v in embedding_dict.items()}
-    print(f"inverse embedding dictionary values: {list(inv_embedding_dict.keys())[:5]}\n")
+    keys = inv_embedding_dict.keys()
+    # print(f"inverse embedding dictionary keys: {list(keys[:5]}\n")
     for emb in embeddings:
         print(f"Embedding: {emb}\n")
         # pos = np.where(np.all(embedding_matrix == emb, axis=1))
         # print(pos)
         # assert len(pos) == 1
-        word = inv_embedding_dict[tuple(emb)]
-        print(f"Word found {word}")
-        if word in vocab.keys():
-            vocab[word] += 1
-        else:
-            vocab[word] = 1
+        if tuple(emb) in keys:
+            word = inv_embedding_dict[tuple(emb)]
+            print(f"Word found {word}")
+            if word in vocab.keys():
+                vocab[word] += 1
+            else:
+                vocab[word] = 1
     vocab = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
     print({k: vocab[k] for k in list(vocab.keys())[:10]})
     return vocab
