@@ -94,7 +94,7 @@ if __name__ == '__main__':
 						params['cost_per_sample']) + '_SC' + str(params['surprisal_cost']) + '_T' + str(trial)
 					if not os.path.exists('../csvs/' + file_name + ".csv"):
 						params['trial'] = trial
-						params['epochs'] = 100
+						params['epochs'] = 125
 						params['early_stopping'] = 'yes'
 						params['file_name'] = file_name
 						if params['surprisal_cost'] == 0:
