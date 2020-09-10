@@ -61,15 +61,15 @@ class SkipRNN():
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
         # Keras used 15k for training, 10k for validation out of the training set and 25k for testing later
-        # self.TRAIN_SAMPLES = 9984  # Colab
-        # self.VAL_SAMPLES = 4992
-        # self.TEST_SAMPLES = 9984
+        self.TRAIN_SAMPLES = 9984  # Colab
+        self.VAL_SAMPLES = 4992
+        self.TEST_SAMPLES = 9984
         # self.TRAIN_SAMPLES = 14976  # Server
         # self.VAL_SAMPLES = 9984
         # self.TEST_SAMPLES = 14976
-        self.TRAIN_SAMPLES = 320  # Debug
-        self.VAL_SAMPLES = 192
-        self.TEST_SAMPLES = 320
+        # self.TRAIN_SAMPLES = 320  # Debug
+        # self.VAL_SAMPLES = 192
+        # self.TEST_SAMPLES = 320
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -99,7 +99,7 @@ class SkipRNN():
         self.logger.addHandler(fh)
 
         self.logger.info(
-            f"\n\n{self.FILE_NAME}\n\n"
+            f"\n\n{self.FILE_NAME}\n"
             f"\nLearning rate: {self.LEARNING_RATE}\nBatch size: {self.BATCH_SIZE}\nHidden units: {self.HIDDEN_UNITS}"
             f"\nCost per sample: {self.COST_PER_SAMPLE}\nSurprisal cost {self.SURPRISAL_COST}\n\n")
         # self.logger.basicConfig(filename=f"{self.FOLDER}/log.log", filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)

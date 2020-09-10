@@ -41,7 +41,7 @@ command_configs = {
 	'learning_rate': [0.00025],
 	'batch_size': [64],
 	'hidden_units': [32],
-	'cost_per_sample': [5e-5],
+	'cost_per_sample': [1e-5],
 	'surprisal_cost': [0, 0.1]  # 0 or whatever is best
 }
 
