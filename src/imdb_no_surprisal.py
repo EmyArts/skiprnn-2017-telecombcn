@@ -470,6 +470,8 @@ class no_surp_SkipRNN():
             df_dict['val_updates'] = val_update_df
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
+            df_dict['test_acc'] = test_acc_df
+            df_dict['test_updates'] = test_update_df
             loss_plt_mean = loss_plt.mean(axis=1).transpose()
             df_dict['entropy_loss'] = loss_plt_mean[0]
             df_dict['budget_loss'] = loss_plt_mean[1]
