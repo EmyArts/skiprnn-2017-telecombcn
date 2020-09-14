@@ -455,6 +455,9 @@ class no_surp_SkipRNN():
                         train_acc_df = train_acc_df[:epoch]
                         train_update_df = train_update_df[:epoch]
                         loss_plt = loss_plt[:epoch]
+                        test_acc_df = test_acc_df[:epoch]
+                        test_update_df = test_update_df[:epoch]
+                        test_time_df = test_time_df[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 

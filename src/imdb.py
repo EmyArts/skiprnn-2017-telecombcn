@@ -453,6 +453,9 @@ class SkipRNN():
                         train_acc_df = train_acc_df[:epoch]
                         train_update_df = train_update_df[:epoch]
                         loss_plt = loss_plt[:epoch]
+                        test_acc_df = test_acc_df[:epoch]
+                        test_update_df = test_update_df[:epoch]
+                        test_time_df = test_time_df[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
@@ -470,6 +473,7 @@ class SkipRNN():
             df_dict['train_updates'] = train_update_df
             df_dict['test_acc'] = test_acc_df
             df_dict['test_updates'] = test_update_df
+            df_dict['test_time'] = test_time_df
             loss_plt_mean = loss_plt.mean(axis=1).transpose()
             df_dict['entropy_loss'] = loss_plt_mean[0]
             df_dict['budget_loss'] = loss_plt_mean[1]
