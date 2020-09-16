@@ -64,12 +64,12 @@ class SkipRNN():
         # self.TRAIN_SAMPLES = 9984  # Colab
         # self.VAL_SAMPLES = 4992
         # self.TEST_SAMPLES = 9984
-        # self.TRAIN_SAMPLES = 14976  # Server
-        # self.VAL_SAMPLES = 9984
-        # self.TEST_SAMPLES = 14976
-        self.TRAIN_SAMPLES = 320  # Debug
-        self.VAL_SAMPLES = 192
-        self.TEST_SAMPLES = 320
+        self.TRAIN_SAMPLES = 14976  # Server
+        self.VAL_SAMPLES = 9984
+        self.TEST_SAMPLES = 14976
+        # self.TRAIN_SAMPLES = 320  # Debug
+        # self.VAL_SAMPLES = 192
+        # self.TEST_SAMPLES = 320
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
