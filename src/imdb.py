@@ -405,7 +405,7 @@ class SkipRNN():
                         test_steps += compute_used_samples(test_used_inputs)
                         if analysis_update:
                             try:
-                                re, nre, rs, nrs = stats_used_samples(out[3], test_matrix[iteration],
+                                re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
                                                                       test_probs[iteration])
                                 read_embs[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
