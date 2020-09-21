@@ -42,15 +42,15 @@ command_configs = {
 	'batch_size': [64],
 	'hidden_units': [32],
 	'cost_per_sample': [1e-5],
-	'surprisal_cost': [0, 0.1]  # 0 or whatever is best
+	'surprisal_cost': [10]  # 0 or whatever is best
 }
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=8, help="The total amount of parallel experiments")
-	parser.add_argument("--trials", type=int, default=10, help="The amount of times the same network is trained.")
+	parser.add_argument("--tot_exps", type=int, default=1, help="The total amount of parallel experiments")
+	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
 	parser.add_argument("--reverse")
