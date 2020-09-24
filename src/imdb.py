@@ -56,7 +56,7 @@ class SkipRNN():
 
         # Constants
         self.OUTPUT_SIZE = 2
-        self.SEQUENCE_LENGTH = 625
+        self.SEQUENCE_LENGTH = 625  # Found emperically 95th percentile
         self.EMBEDDING_LENGTH = 50
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
@@ -129,7 +129,7 @@ class SkipRNN():
         # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
         embedding_matrix = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         probs_matrix = np.ones((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.float32)
-        mask = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.bool_)
+        mask = np.full((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), False)
         labels = np.zeros((tot_len, self.BATCH_SIZE), dtype=np.int64)
         line_index = 0
         batch_index = 0
@@ -166,7 +166,7 @@ class SkipRNN():
         print(
             f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
         # np.expand_dims(probs_matrix, axis=-1)
-        return embedding_matrix, labels, probs_matrix
+        return embedding_matrix, labels, probs_matrix, mask
 
     # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
@@ -176,6 +176,7 @@ class SkipRNN():
                                  name='Samples')  # (batch, time, in)
         ground_truth = tf.placeholder(tf.int64, shape=[self.BATCH_SIZE], name='GroundTruth')
         probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
+        mask = tf.placeholder(tf.bool, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='padding_mask')
 
         cell, initial_state = create_model(model='skip_lstm',
                                            num_cells=[self.HIDDEN_UNITS],
@@ -218,6 +219,8 @@ class SkipRNN():
 
         # Compute accuracy
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
+
+        updated_states = tf.boolean_mask(updated_states, mask)
 
         # Compute loss for each updated state
         budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
@@ -273,9 +276,9 @@ class SkipRNN():
         # FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}_t{self.TRIAL}'
 
         try:
-            train_matrix, train_labels, train_probs = self.input_fn(split='train')
-            val_matrix, val_labels, val_probs = self.input_fn(split='val')
-            test_matrix, test_labels, test_probs = self.input_fn(split='test')
+            train_matrix, train_labels, train_probs, train_mask = self.input_fn(split='train')
+            val_matrix, val_labels, val_probs, val_mask = self.input_fn(split='val')
+            test_matrix, test_labels, test_probs, test_mask = self.input_fn(split='test')
 
             # train_loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
 
@@ -294,7 +297,8 @@ class SkipRNN():
                     out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss, surprisal_loss],
                                    feed_dict={samples: train_matrix[iteration],
                                               ground_truth: train_labels[iteration],
-                                              probs: train_probs[iteration]
+                                              probs: train_probs[iteration],
+                                              mask: train_mask[iteration]
                                               })
                     train_accuracy += out[2]
                     train_loss += out[1]
@@ -321,7 +325,8 @@ class SkipRNN():
                                                                                      samples: val_matrix[iteration],
                                                                                      ground_truth: val_labels[
                                                                                          iteration],
-                                                                                     probs: val_probs[iteration]
+                                                                                     probs: val_probs[iteration],
+                                                                                     mask: val_mask[iteration]
                                                                                  })
                     val_accuracy += val_iter_accuracy
                     val_loss += val_iter_loss
@@ -400,7 +405,8 @@ class SkipRNN():
                                                                                         samples: test_matrix[iteration],
                                                                                         ground_truth: test_labels[
                                                                                             iteration],
-                                                                                        probs: test_probs[iteration]
+                                                                                        probs: test_probs[iteration],
+                                                                                        mask: test_mask[iteration]
                                                                                     })
                     t += time.time() - t0
                     test_accuracy += test_iter_accuracy
