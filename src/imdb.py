@@ -56,7 +56,7 @@ class SkipRNN():
 
         # Constants
         self.OUTPUT_SIZE = 2
-        self.SEQUENCE_LENGTH = 2520
+        self.SEQUENCE_LENGTH = 625
         self.EMBEDDING_LENGTH = 50
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
@@ -64,12 +64,12 @@ class SkipRNN():
         # self.TRAIN_SAMPLES = 9984  # Colab
         # self.VAL_SAMPLES = 4992
         # self.TEST_SAMPLES = 9984
-        self.TRAIN_SAMPLES = 14976  # Server
-        self.VAL_SAMPLES = 9984
-        self.TEST_SAMPLES = 14976
-        # self.TRAIN_SAMPLES = 320  # Debug
-        # self.VAL_SAMPLES = 192
-        # self.TEST_SAMPLES = 320
+        # self.TRAIN_SAMPLES = 14976  # Server
+        # self.VAL_SAMPLES = 9984
+        # self.TEST_SAMPLES = 14976
+        self.TRAIN_SAMPLES = 320  # Debug
+        self.VAL_SAMPLES = 192
+        self.TEST_SAMPLES = 320
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -129,6 +129,7 @@ class SkipRNN():
         # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
         embedding_matrix = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         probs_matrix = np.ones((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.float32)
+        mask = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.bool_)
         labels = np.zeros((tot_len, self.BATCH_SIZE), dtype=np.int64)
         line_index = 0
         batch_index = 0
@@ -139,6 +140,8 @@ class SkipRNN():
             labels[batch_index][entry] = label
             # print(label)
             tokens = list(tokenize(str(text), lowercase=True))[3:]
+            if len(tokens) >= self.SEQUENCE_LENGTH:
+                tokens = tokens[:self.SEQUENCE_LENGTH]
             for i, t in enumerate(tokens):
                 embedding_vector = self.EMBEDDING_DICT.get(t)
                 prob = self.PROBS_DICT.get(t)
@@ -149,6 +152,7 @@ class SkipRNN():
                 else:
                     c_unk += 1
                 word_count += 1
+                mask[batch_index][entry][i] = True
             line_index += 1
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
@@ -415,10 +419,10 @@ class SkipRNN():
                                     nre)] = nre
                                 read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    rs)] = rs.flatten()
+                                    rs)] = rs  # take out flatten but should not be the problem
                                 non_read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nrs)] = nrs.flatten()
+                                    nrs)] = nrs
                             except:
                                 self.logger.info("Could not update analysis")
                                 pass
@@ -502,9 +506,9 @@ class SkipRNN():
             pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
             read_surps = np.vstack(read_surps).flatten()
             non_read_surps = np.vstack(non_read_surps).flatten()
-            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps > 0])
+            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps >= 0])
             np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
-                    non_read_surps[non_read_surps > 0])
+                    non_read_surps[non_read_surps >= 0])
 
         except Exception as e:
             print(e)
