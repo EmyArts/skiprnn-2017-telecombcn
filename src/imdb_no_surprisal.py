@@ -56,7 +56,7 @@ class no_surp_SkipRNN():
 
         # Constants
         self.OUTPUT_SIZE = 2
-        self.SEQUENCE_LENGTH = 2520
+        self.SEQUENCE_LENGTH = 625  # Found emperically 95th percentile
         self.EMBEDDING_LENGTH = 50
 
         # Originalli 25k for training and 25k for testing -> 15k for validation and 10k for testing
@@ -114,11 +114,11 @@ class no_surp_SkipRNN():
             data = self.imdb_builder.as_dataset(as_supervised=True, split=f'train[:{self.TRAIN_SAMPLES}]')
             # This will be the ITERATIONS_PER_EPOCH
             # print("Total amount of training samples: " + str(len(list(dataset))))
-            #print("Total amount of validation samples: " + str(len(list(dataset))))
+            # print("Total amount of validation samples: " + str(len(list(dataset))))
         elif split == 'val':
             data = self.imdb_builder.as_dataset(as_supervised=True, split=val_split)
-            tot_len = math.ceil(self.VAL_SAMPLES / self.BATCH_SIZE) # This will be VAL_ITERS
-            #print("Total amount of test samples: " + str(len(list(dataset))))
+            tot_len = math.ceil(self.VAL_SAMPLES / self.BATCH_SIZE)  # This will be VAL_ITERS
+            # print("Total amount of test samples: " + str(len(list(dataset))))
         elif split == 'test':
             data = self.imdb_builder.as_dataset(as_supervised=True, split=f'test[:{self.TEST_SAMPLES}]')
             tot_len = math.ceil(self.TEST_SAMPLES / self.BATCH_SIZE)
@@ -128,6 +128,7 @@ class no_surp_SkipRNN():
         # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
         embedding_matrix = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         probs_matrix = np.ones((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.float32)
+        mask = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.float32)
         labels = np.zeros((tot_len, self.BATCH_SIZE), dtype=np.int64)
         line_index = 0
         batch_index = 0
@@ -138,6 +139,8 @@ class no_surp_SkipRNN():
             labels[batch_index][entry] = label
             # print(label)
             tokens = list(tokenize(str(text), lowercase=True))[3:]
+            if len(tokens) >= self.SEQUENCE_LENGTH:
+                tokens = tokens[:self.SEQUENCE_LENGTH]
             for i, t in enumerate(tokens):
                 embedding_vector = self.EMBEDDING_DICT.get(t)
                 prob = self.PROBS_DICT.get(t)
@@ -148,6 +151,7 @@ class no_surp_SkipRNN():
                 else:
                     c_unk += 1
                 word_count += 1
+                mask[batch_index][entry][i] = 1
             line_index += 1
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
@@ -160,7 +164,7 @@ class no_surp_SkipRNN():
         # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
         print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
         # np.expand_dims(probs_matrix, axis=-1)
-        return embedding_matrix, labels, probs_matrix
+        return embedding_matrix, labels, probs_matrix, mask
 
     # print_samples = tf.Print(samples, [samples], "\nSamples are: \n")
 
@@ -170,6 +174,7 @@ class no_surp_SkipRNN():
                                  name='Samples')  # (batch, time, in)
         ground_truth = tf.placeholder(tf.int64, shape=[self.BATCH_SIZE], name='GroundTruth')
         # probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
+        mask = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='padding_mask')
 
         cell, initial_state = create_model(model='skip_lstm',
                                            num_cells=[self.HIDDEN_UNITS],
@@ -214,7 +219,7 @@ class no_surp_SkipRNN():
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
 
         # Compute loss for each updated state
-        budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
+        budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE, mask)
         # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
         #                       lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
         # with tf.control_dependencies([printer_Nan]):
@@ -249,6 +254,7 @@ class no_surp_SkipRNN():
         # Initialize weights
         sess.run(tf.global_variables_initializer())
 
+        # Results
         train_loss_plt = np.zeros((self.NUM_EPOCHS))
         loss_plt = np.zeros((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 2))
         val_acc_df = np.zeros((self.NUM_EPOCHS))
@@ -269,9 +275,9 @@ class no_surp_SkipRNN():
         # FILE_NAME = f'hu{self.HIDDEN_UNITS}_bs{self.BATCH_SIZE}_lr{self.LEARNING_RATE}_b{self.COST_PER_SAMPLE}_s{self.SURPRISAL_COST}_t{self.TRIAL}'
 
         try:
-            train_matrix, train_labels, train_probs = self.input_fn(split='train')
-            val_matrix, val_labels, val_probs = self.input_fn(split='val')
-            test_matrix, test_labels, test_probs = self.input_fn(split='test')
+            train_matrix, train_labels, train_probs, train_mask = self.input_fn(split='train')
+            val_matrix, val_labels, val_probs, val_mask = self.input_fn(split='val')
+            test_matrix, test_labels, test_probs, test_mask = self.input_fn(split='test')
 
             # train_loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
 
@@ -290,13 +296,14 @@ class no_surp_SkipRNN():
                     out = sess.run([train_fn, loss, accuracy, updated_states, cross_entropy, budget_loss],
                                    feed_dict={samples: train_matrix[iteration],
                                               ground_truth: train_labels[iteration],
-                                              # probs: train_probs[iteration]
+                                              # probs: train_probs[iteration],
+                                              mask: train_mask[iteration]
                                               })
                     train_accuracy += out[2]
                     train_loss += out[1]
                     loss_plt[epoch][iteration] = out[4:]  # entropy, budget
                     if out[3] is not None:
-                        train_steps += compute_used_samples(out[3])
+                        train_steps += compute_used_samples(out[3] * train_mask[iteration])
                     else:
                         train_steps += self.SEQUENCE_LENGTH
 
@@ -317,12 +324,13 @@ class no_surp_SkipRNN():
                                                                                      samples: val_matrix[iteration],
                                                                                      ground_truth: val_labels[
                                                                                          iteration],
-                                                                                     # probs: val_probs[iteration]
+                                                                                     # probs: val_probs[iteration],
+                                                                                     mask: val_mask[iteration]
                                                                                  })
                     val_accuracy += val_iter_accuracy
                     val_loss += val_iter_loss
                     if val_used_inputs is not None:
-                        val_steps += compute_used_samples(val_used_inputs)
+                        val_steps += compute_used_samples(val_used_inputs * val_mask[iteration])
                     else:
                         val_steps += self.SEQUENCE_LENGTH
                 val_accuracy /= self.VAL_ITERS
@@ -369,10 +377,12 @@ class no_surp_SkipRNN():
                                                                  duration,
                                                                  100. * train_accuracy,
                                                                  train_steps,
-                                                                 100. * train_steps / self.SEQUENCE_LENGTH,
+                                                                 100. * train_steps / (np.count_nonzero(train_mask) / (
+                                                                             self.train_ITERS * self.BATCH_SIZE)),
                                                                  100. * val_accuracy,
                                                                  val_steps,
-                                                                 100. * val_steps / self.SEQUENCE_LENGTH))
+                                                                 100. * val_steps / (np.count_nonzero(val_mask) / (
+                                                                             self.VAL_ITERS * self.BATCH_SIZE))))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f" % (
                     loss_abs[0], loss_abs[1]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%" % (
@@ -396,17 +406,18 @@ class no_surp_SkipRNN():
                                                                                         samples: test_matrix[iteration],
                                                                                         ground_truth: test_labels[
                                                                                             iteration],
-                                                                                        # probs: test_probs[iteration]
-                                                                                 })
+                                                                                        # probs: test_probs[iteration],
+                                                                                        mask: test_mask[iteration]
+                                                                                    })
                     t += time.time() - t0
                     test_accuracy += test_iter_accuracy
                     test_loss += test_iter_loss
                     if test_used_inputs is not None:
-                        test_steps += compute_used_samples(test_used_inputs)
+                        test_steps += compute_used_samples(test_used_inputs * test_mask[iteration])
                         if analysis_update:
                             try:
                                 re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
-                                                                      test_probs[iteration])
+                                                                      test_probs[iteration], test_mask[iteration])
                                 read_embs[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
                                     re)] = re
@@ -415,10 +426,10 @@ class no_surp_SkipRNN():
                                     nre)] = nre
                                 read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    rs)] = rs.flatten()
+                                    rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
                                 non_read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nrs)] = nrs.flatten()
+                                    nrs.flatten())] = nrs.flatten()
                             except:
                                 self.logger.info("Could not update analysis")
                                 pass
@@ -440,7 +451,8 @@ class no_surp_SkipRNN():
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
                                     test_steps,
-                                    100. * test_steps / self.SEQUENCE_LENGTH))
+                                    100. * test_steps / (
+                                            np.count_nonzero(test_mask) / (self.TEST_ITERS * self.BATCH_SIZE))))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
@@ -503,9 +515,9 @@ class no_surp_SkipRNN():
             pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
             read_surps = np.vstack(read_surps).flatten()
             non_read_surps = np.vstack(non_read_surps).flatten()
-            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps > 0])
+            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps >= 0])
             np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
-                    non_read_surps[non_read_surps > 0])
+                    non_read_surps[non_read_surps >= 0])
 
         except Exception as e:
             print(e)

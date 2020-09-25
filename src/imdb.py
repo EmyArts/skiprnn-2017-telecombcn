@@ -306,7 +306,7 @@ class SkipRNN():
                     train_loss += out[1]
                     loss_plt[epoch][iteration] = out[4:]  # entropy, budget, surprisal
                     if out[3] is not None:
-                        train_steps += compute_used_samples(out[3])
+                        train_steps += compute_used_samples(out[3] * train_mask[iteration])
                     else:
                         train_steps += self.SEQUENCE_LENGTH
 
@@ -333,7 +333,7 @@ class SkipRNN():
                     val_accuracy += val_iter_accuracy
                     val_loss += val_iter_loss
                     if val_used_inputs is not None:
-                        val_steps += compute_used_samples(val_used_inputs)
+                        val_steps += compute_used_samples(val_used_inputs * val_mask[iteration])
                     else:
                         val_steps += self.SEQUENCE_LENGTH
                 val_accuracy /= self.VAL_ITERS
@@ -380,10 +380,12 @@ class SkipRNN():
                                                                  duration,
                                                                  100. * train_accuracy,
                                                                  train_steps,
-                                                                 100. * train_steps / self.SEQUENCE_LENGTH,
+                                                                 100. * train_steps / (np.count_nonzero(train_mask) / (
+                                                                             self.train_ITERS * self.BATCH_SIZE)),
                                                                  100. * val_accuracy,
                                                                  val_steps,
-                                                                 100. * val_steps / self.SEQUENCE_LENGTH))
+                                                                 100. * val_steps / (np.count_nonzero(val_mask) / (
+                                                                             self.VAL_ITERS * self.BATCH_SIZE))))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                     loss_abs[0], loss_abs[1], loss_abs[2]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
@@ -427,10 +429,10 @@ class SkipRNN():
                                     nre)] = nre
                                 read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    rs)] = rs  # take out flatten but should not be the problem
+                                    rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
                                 non_read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nrs)] = nrs
+                                    nrs.flatten())] = nrs.flatten()
                             except:
                                 self.logger.info("Could not update analysis")
                                 pass
