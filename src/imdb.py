@@ -31,10 +31,11 @@ from util.misc import *
 from util.graph_definition import *
 from gensim.utils import tokenize
 
-
-
-
 # Task-independent flags
+from src.util.graph_definition import create_model, split_rnn_outputs, compute_budget_loss, compute_surprisal_loss, \
+    compute_gradients, create_generic_flags
+from src.util.misc import compute_used_samples, print_setup
+
 
 class SkipRNN():
 
@@ -264,11 +265,11 @@ class SkipRNN():
         loss_plt = np.zeros((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH, 3))
         val_acc_df = np.zeros((self.NUM_EPOCHS))
         train_acc_df = np.zeros((self.NUM_EPOCHS))
-        test_acc_df = np.zeros((self.NUM_EPOCHS))
+        # test_acc_df = np.zeros((self.NUM_EPOCHS))
         train_update_df = np.zeros((self.NUM_EPOCHS))
         val_update_df = np.zeros((self.NUM_EPOCHS))
-        test_update_df = np.zeros((self.NUM_EPOCHS))
-        test_time_df = np.zeros((self.NUM_EPOCHS))
+        # test_update_df = np.zeros((self.NUM_EPOCHS))
+        # test_time_df = np.zeros((self.NUM_EPOCHS))
 
         read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
         non_read_embs = np.zeros((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
@@ -408,47 +409,47 @@ class SkipRNN():
                                                                                         probs: test_probs[iteration],
                                                                                         mask: test_mask[iteration]
                                                                                     })
-                    t += time.time() - t0
-                    test_accuracy += test_iter_accuracy
-                    test_loss += test_iter_loss
-                    if test_used_inputs is not None:
-                        test_steps += compute_used_samples(test_used_inputs * test_mask[iteration])
-                        if analysis_update:
-                            try:
-                                re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
-                                                                      test_probs[iteration], test_mask[iteration])
-                                read_embs[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    re)] = re
-                                non_read_embs[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nre)] = nre
-                                read_surps[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
-                                non_read_surps[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nrs.flatten())] = nrs.flatten()
-                            except Exception as e:
-                                self.logger.info("Could not update analysis")
-                                self.logger.error(e)
-                                pass
-                    else:
-                        test_steps += np.count_nonzero(test_mask[iteration])
-
-                test_accuracy /= self.TEST_ITERS
-                test_loss /= self.TEST_ITERS
-                test_steps /= (np.count_nonzero(test_mask) / self.BATCH_SIZE)
-                test_time_df[epoch] = t
-                test_acc_df[epoch] = test_accuracy
-                test_update_df[epoch] = test_steps
-
-                self.logger.info("Test time: %.2f seconds, "
-                                 "test accuracy: %.2f%%, "
-                                 "test samples: %.2f%%.\n"
-                                 % (test_time_df[epoch],
-                                    100. * test_accuracy,
-                                    100. * test_steps))
+                #     t += time.time() - t0
+                #     test_accuracy += test_iter_accuracy
+                #     test_loss += test_iter_loss
+                #     if test_used_inputs is not None:
+                #         test_steps += compute_used_samples(test_used_inputs * test_mask[iteration])
+                #         if analysis_update:
+                #             try:
+                #                 re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
+                #                                                       test_probs[iteration], test_mask[iteration])
+                #                 read_embs[
+                #                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                #                     re)] = re
+                #                 non_read_embs[
+                #                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                #                     nre)] = nre
+                #                 read_surps[
+                #                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                #                     rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
+                #                 non_read_surps[
+                #                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                #                     nrs.flatten())] = nrs.flatten()
+                #             except Exception as e:
+                #                 self.logger.info("Could not update analysis")
+                #                 self.logger.error(e)
+                #                 pass
+                #     else:
+                #         test_steps += np.count_nonzero(test_mask[iteration])
+                #
+                # test_accuracy /= self.TEST_ITERS
+                # test_loss /= self.TEST_ITERS
+                # test_steps /= (np.count_nonzero(test_mask) / self.BATCH_SIZE)
+                # test_time_df[epoch] = t
+                # test_acc_df[epoch] = test_accuracy
+                # test_update_df[epoch] = test_steps
+                #
+                # self.logger.info("Test time: %.2f seconds, "
+                #                  "test accuracy: %.2f%%, "
+                #                  "test samples: %.2f%%.\n"
+                #                  % (test_time_df[epoch],
+                #                     100. * test_accuracy,
+                #                     100. * test_steps))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
@@ -463,9 +464,9 @@ class SkipRNN():
                         train_acc_df = train_acc_df[:epoch]
                         train_update_df = train_update_df[:epoch]
                         loss_plt = loss_plt[:epoch]
-                        test_acc_df = test_acc_df[:epoch]
-                        test_update_df = test_update_df[:epoch]
-                        test_time_df = test_time_df[:epoch]
+                        # test_acc_df = test_acc_df[:epoch]
+                        # test_update_df = test_update_df[:epoch]
+                        # test_time_df = test_time_df[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
@@ -481,9 +482,9 @@ class SkipRNN():
             df_dict['val_updates'] = val_update_df
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
-            df_dict['test_acc'] = test_acc_df
-            df_dict['test_updates'] = test_update_df
-            df_dict['test_time'] = test_time_df
+            # df_dict['test_acc'] = test_acc_df
+            # df_dict['test_updates'] = test_update_df
+            # df_dict['test_time'] = test_time_df
             loss_plt_mean = loss_plt.mean(axis=1).transpose()
             df_dict['entropy_loss'] = loss_plt_mean[0]
             df_dict['budget_loss'] = loss_plt_mean[1]

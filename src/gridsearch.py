@@ -29,27 +29,27 @@ class Monitor(Thread):
 		self.stopped = True
 
 
-# command_configs = {
-# 	'learning_rate': [0.0001],
-# 	'batch_size': [64],
-# 	'hidden_units': [32],
-# 	'cost_per_sample': [0.01, 0.001, 0.0001],
-# 	'surprisal_cost': [0, 0.1, 0.01, 0.001]
-# }
 command_configs = {
-	# 'learning_rate': [0.0005, 0.00075]
 	'learning_rate': [0.00025],
 	'batch_size': [64],
 	'hidden_units': [32],
-	'cost_per_sample': [1e-5],
-	'surprisal_cost': [0, 0.01]  # 0 or whatever is best
+	'cost_per_sample': [1e-3, 1e-4, 1e-5, 1e-6],
+	'surprisal_cost': [0, 0.1, 0.01, 0.001, 0.0001]
 }
+# command_configs = {
+# 	# 'learning_rate': [0.0005, 0.00075]
+# 	'learning_rate': [0.00025],
+# 	'batch_size': [64],
+# 	'hidden_units': [32],
+# 	'cost_per_sample': [1e-5],
+# 	'surprisal_cost': [0, 0.01]  # 0 or whatever is best
+# }
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--id", type=int, help="id of the specific run")
-	parser.add_argument("--tot_exps", type=int, default=2, help="The total amount of parallel experiments")
+	parser.add_argument("--tot_exps", type=int, default=20, help="The total amount of parallel experiments")
 	parser.add_argument("--trials", type=int, default=1, help="The amount of times the same network is trained.")
 	parser.add_argument("--print_gputil", type=bool, default=False,
 						help="Whether to show the GPU utilization on terminal")
@@ -97,10 +97,11 @@ if __name__ == '__main__':
 						params['epochs'] = 125
 						params['early_stopping'] = 'yes'
 						params['file_name'] = file_name
-						if params['surprisal_cost'] == 0:
-							model = no_surp_SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
-						else:
-							model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+						# if params['surprisal_cost'] == 0:
+						# 	model = no_surp_SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+						# else:
+						# 	model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
 						gc.collect()
 		if gputil:
