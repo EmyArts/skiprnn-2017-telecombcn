@@ -414,7 +414,7 @@ class SkipRNN():
                     test_accuracy += test_iter_accuracy
                     test_loss += test_iter_loss
                     if test_used_inputs is not None:
-                        test_steps += compute_used_samples(test_used_inputs) * test_mask[iteration]
+                        test_steps += compute_used_samples(test_used_inputs * test_mask[iteration])
                         if analysis_update:
                             try:
                                 re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
