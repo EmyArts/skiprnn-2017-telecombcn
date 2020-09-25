@@ -65,12 +65,12 @@ class SkipRNN():
         # self.TRAIN_SAMPLES = 9984  # Colab
         # self.VAL_SAMPLES = 4992
         # self.TEST_SAMPLES = 9984
-        self.TRAIN_SAMPLES = 14976  # Server
-        self.VAL_SAMPLES = 9984
-        self.TEST_SAMPLES = 14976
-        # self.TRAIN_SAMPLES = 320  # Debug
-        # self.VAL_SAMPLES = 192
-        # self.TEST_SAMPLES = 320
+        # self.TRAIN_SAMPLES = 14976  # Server
+        # self.VAL_SAMPLES = 9984
+        # self.TEST_SAMPLES = 14976
+        self.TRAIN_SAMPLES = 320  # Debug
+        self.VAL_SAMPLES = 192
+        self.TEST_SAMPLES = 320
         # TRAIN and VAL samples should always sum up to 25k
 
         # TRAIN_SAMPLES = info.splits[tfds.Split.TRAIN].num_examples
@@ -144,15 +144,17 @@ class SkipRNN():
             if len(tokens) >= self.SEQUENCE_LENGTH:
                 tokens = tokens[:self.SEQUENCE_LENGTH]
             for i, t in enumerate(tokens):
+                mask[batch_index][entry][i] = 1
                 embedding_vector = self.EMBEDDING_DICT.get(t)
                 prob = self.PROBS_DICT.get(t)
                 if embedding_vector is not None:
                     # words not found in embedding index will be all-zeros.
                     embedding_matrix[batch_index][entry][i] = embedding_vector
                     probs_matrix[batch_index][entry][i] = prob
-                    mask[batch_index][entry][i] = 1
                 else:
                     c_unk += 1
+                    embedding_matrix[batch_index][entry][i] = self.EMBEDDING_DICT.get("unk_word")
+                    probs_matrix[batch_index][entry][i] = self.PROBS_DICT.get("unk_word")
                 word_count += 1
             line_index += 1
             entry = line_index % self.BATCH_SIZE
@@ -528,6 +530,7 @@ class SkipRNN():
 def get_embedding_dicts(embedding_length):
     PROBS_FILE = 'util/probs.pkl'
     probs_dict = pickle.load(open(PROBS_FILE, 'rb'))
+    probs_dict["unk_word"] = 1
 
     embedding_dict = {}
     f = open(f'glove.6B.{str(embedding_length)}d.txt')
@@ -537,11 +540,20 @@ def get_embedding_dicts(embedding_length):
         coefs = np.asarray(values[1:], dtype='float32')
         embedding_dict[word] = coefs
     f.close()
+    embedding_dict["unk_word"] = [-0.12920076, -0.28866628, -0.01224866, -0.05676644, -0.20210965, -0.08389011,
+                                  0.33359843, 0.16045167, 0.03867431, 0.17833012, 0.04696583, -0.00285802,
+                                  0.29099807, 0.04613704, -0.20923874, -0.06613114, -0.06822549, 0.07665912,
+                                  0.3134014, 0.17848536, -0.1225775, -0.09916984, -0.07495987, 0.06413227,
+                                  0.14441176, 0.60894334, 0.17463093, 0.05335403, -0.01273871, 0.03474107,
+                                  -0.8123879, -0.04688699, 0.20193407, 0.2031118, -0.03935686, 0.06967544,
+                                  -0.01553638, -0.03405238, -0.06528071, 0.12250231, 0.13991883, -0.17446303,
+                                  -0.08011883, 0.0849521, -0.01041659, -0.13705009, 0.20127155, 0.10069408,
+                                  0.00653003, 0.01685157]
     print('Total %s word vectors.' % len(embedding_dict))
     return embedding_dict, probs_dict
 
 
-def get_words_from_embedding(embedding_dict, embedding_matrix, embeddings):
+def get_words_from_embedding(embedding_dict, embeddings):
     # print("Hey from get words form embeddings!")
     vocab = {}
     # print(f"embedding dictionary values: {list(embedding_dict.values())[:5]}\n")
