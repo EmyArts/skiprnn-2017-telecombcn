@@ -42,7 +42,7 @@ command_configs = {
 	'batch_size': [64],
 	'hidden_units': [32],
 	'cost_per_sample': [1e-5],
-	'surprisal_cost': [0, 0.1]  # 0 or whatever is best
+	'surprisal_cost': [0, 0.01]  # 0 or whatever is best
 }
 
 if __name__ == '__main__':
