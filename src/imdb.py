@@ -449,10 +449,10 @@ class SkipRNN():
 
                 self.logger.info("Test time: %.2f seconds, "
                                  "test accuracy: %.2f%%, "
-                                 "test samples: (%.2f%%).\n"
+                                 "test samples: %.2f%%.\n"
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
-                                    test_steps,))
+                                    test_steps))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
