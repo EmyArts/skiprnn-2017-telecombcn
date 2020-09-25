@@ -31,10 +31,11 @@ from util.misc import *
 from util.graph_definition import *
 from gensim.utils import tokenize
 
-# Task-independent flags
-from src.util.graph_definition import create_model, split_rnn_outputs, compute_budget_loss, compute_surprisal_loss, \
-    compute_gradients, create_generic_flags
-from src.util.misc import compute_used_samples, print_setup
+
+# # Task-independent flags
+# from src.util.graph_definition import create_model, split_rnn_outputs, compute_budget_loss, compute_surprisal_loss, \
+#     compute_gradients, create_generic_flags
+# from src.util.misc import compute_used_samples, print_setup
 
 
 class SkipRNN():
