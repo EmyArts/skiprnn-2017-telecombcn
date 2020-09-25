@@ -116,12 +116,12 @@ def split_rnn_outputs(model, rnn_outputs):
         return rnn_outputs, tf.no_op()
 
 
-def compute_budget_loss(model, loss, updated_states, cost_per_sample):
+def compute_budget_loss(model, loss, updated_states, cost_per_sample, mask):
     """
     Compute penalization term on the number of updated states (i.e. used samples)
     """
     if using_skip_rnn(model):
-        sample_loss = tf.reduce_mean(tf.reduce_sum(cost_per_sample * updated_states, 1), 0)
+        sample_loss = tf.reduce_mean(tf.reduce_sum(cost_per_sample * tf.boolean_mask(updated_states, mask), 1), 0)
         # if not any(tf.is_nan(sample_loss)):
         #     return sample_loss
         # else:
@@ -134,13 +134,15 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample):
     else:
         return tf.zeros(loss.get_shape())
 
-def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, surprisal_influence):
+
+def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, surprisal_influence, mask):
     """
     Compute penalization term on the average surprisal of the unread samples.
     """
     if using_skip_rnn(model):
-        neg_updated_states = tf.subtract(tf.ones(updated_states.get_shape(), dtype=tf.dtypes.float32), updated_states)
-        surprisal_values = tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities)))
+        neg_updated_states = tf.boolean_mask(
+            tf.subtract(tf.ones(updated_states.get_shape(), dtype=tf.dtypes.float32), updated_states), mask)
+        surprisal_values = tf.boolean_mask(tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities))), mask)
         # printer_0 = tf.Print(neg_updated_states, [neg_updated_states], "Inverse of the updated states is ")
         surprisals = tf.multiply(neg_updated_states,
                                  tf.where(tf.is_nan(surprisal_values), tf.zeros_like(surprisal_values),

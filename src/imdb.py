@@ -129,7 +129,7 @@ class SkipRNN():
         # print(f"Vector for unknonw words is {embeddings_index.get('unk')}")
         embedding_matrix = np.zeros((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH), dtype=np.float32)
         probs_matrix = np.ones((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), dtype=np.float32)
-        mask = np.full((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH), False)
+        mask = np.full((tot_len, self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1), False)
         labels = np.zeros((tot_len, self.BATCH_SIZE), dtype=np.int64)
         line_index = 0
         batch_index = 0
@@ -176,7 +176,7 @@ class SkipRNN():
                                  name='Samples')  # (batch, time, in)
         ground_truth = tf.placeholder(tf.int64, shape=[self.BATCH_SIZE], name='GroundTruth')
         probs = tf.placeholder(tf.float32, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='Probs')
-        mask = tf.placeholder(tf.bool, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH], name='padding_mask')
+        mask = tf.placeholder(tf.bool, shape=[self.BATCH_SIZE, self.SEQUENCE_LENGTH, 1], name='padding_mask')
 
         cell, initial_state = create_model(model='skip_lstm',
                                            num_cells=[self.HIDDEN_UNITS],
@@ -220,10 +220,10 @@ class SkipRNN():
         # Compute accuracy
         accuracy = tf.reduce_mean(tf.cast(tf.equal(predictions, ground_truth), tf.float32))
 
-        updated_states = tf.boolean_mask(updated_states, mask)
+        # updated_states = tf.boolean_mask(updated_states, mask)
 
         # Compute loss for each updated state
-        budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE)
+        budget_loss = compute_budget_loss('skip_lstm', cross_entropy, updated_states, self.COST_PER_SAMPLE, mask)
         # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(budget_loss)),
         #                       lambda: tf.print("Found NaN in budget loss"), lambda: tf.no_op())
         # with tf.control_dependencies([printer_Nan]):
@@ -232,7 +232,8 @@ class SkipRNN():
         #                            budget_loss)
 
         # Compute loss for the amount of surprisal
-        surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST)
+        surprisal_loss = compute_surprisal_loss('skip_lstm', cross_entropy, updated_states, probs, self.SURPRISAL_COST,
+                                                mask)
         # Avoid encouraging to not skip.
         # printer_Nan = tf.cond(tf.math.reduce_any(tf.math.is_nan(surprisal_loss)),
         #                       lambda: tf.print("Found NaN in surprisal loss"), lambda: tf.no_op())
