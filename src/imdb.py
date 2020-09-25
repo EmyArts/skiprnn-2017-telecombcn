@@ -391,15 +391,15 @@ class SkipRNN():
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 # print(f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
-                analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
-                if analysis_update:
-                    self.logger.info("Updating Analysis")
-                    read_embs = np.zeros(
-                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                    non_read_embs = np.zeros(
-                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                    read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
-                    non_read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+                # analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
+                # if analysis_update:
+                #     self.logger.info("Updating Analysis")
+                #     read_embs = np.zeros(
+                #         (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                #     non_read_embs = np.zeros(
+                #         (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                #     read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+                #     non_read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
 
                 # test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
                 # for iteration in range(self.TEST_ITERS):
