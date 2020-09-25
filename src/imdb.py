@@ -451,7 +451,7 @@ class SkipRNN():
                                     100. * test_accuracy,
                                     test_steps,
                                     100. * test_steps / (
-                                                np.count_nonzero(test_mask) / (self.TEST_ITERS * self.BATCH_SIZE)))
+                                            np.count_nonzero(test_mask) / (self.TEST_ITERS * self.BATCH_SIZE))))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
