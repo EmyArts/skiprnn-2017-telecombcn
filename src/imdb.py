@@ -308,7 +308,7 @@ class SkipRNN():
                     if out[3] is not None:
                         train_steps += compute_used_samples(out[3] * train_mask[iteration])
                     else:
-                        train_steps += self.SEQUENCE_LENGTH
+                        train_steps += np.count_nonzero(train_mask[iteration])
 
                 duration = time.time() - start_time
 
@@ -335,7 +335,7 @@ class SkipRNN():
                     if val_used_inputs is not None:
                         val_steps += compute_used_samples(val_used_inputs * val_mask[iteration])
                     else:
-                        val_steps += self.SEQUENCE_LENGTH
+                        val_steps += np.count_nonzero(val_mask[iteration])
                 val_accuracy /= self.VAL_ITERS
                 val_loss /= self.VAL_ITERS
                 val_steps /= self.VAL_ITERS
@@ -433,27 +433,26 @@ class SkipRNN():
                                 non_read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
                                     nrs.flatten())] = nrs.flatten()
-                            except:
+                            except Exception as e:
                                 self.logger.info("Could not update analysis")
+                                self.logger.error(e)
                                 pass
                     else:
-                        val_steps += self.SEQUENCE_LENGTH
+                        test_steps += np.count_nonzero(test_mask[iteration])
 
                 test_accuracy /= self.TEST_ITERS
                 test_loss /= self.TEST_ITERS
-                test_steps /= self.TEST_ITERS
+                test_steps /= (np.count_nonzero(test_mask) / self.BATCH_SIZE)
                 test_time_df[epoch] = t
                 test_acc_df[epoch] = test_accuracy
                 test_update_df[epoch] = test_steps
 
                 self.logger.info("Test time: %.2f seconds, "
                                  "test accuracy: %.2f%%, "
-                                 "test samples: %.2f (%.2f%%).\n"
+                                 "test samples: (%.2f%%).\n"
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
-                                    test_steps,
-                                    100. * test_steps / (
-                                            np.count_nonzero(test_mask) / (self.TEST_ITERS * self.BATCH_SIZE))))
+                                    test_steps,))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
