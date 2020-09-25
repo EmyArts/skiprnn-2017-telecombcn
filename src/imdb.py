@@ -414,11 +414,11 @@ class SkipRNN():
                     test_accuracy += test_iter_accuracy
                     test_loss += test_iter_loss
                     if test_used_inputs is not None:
-                        test_steps += compute_used_samples(test_used_inputs)
+                        test_steps += compute_used_samples(test_used_inputs) * test_mask[iteration]
                         if analysis_update:
                             try:
                                 re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
-                                                                      test_probs[iteration])
+                                                                      test_probs[iteration], test_mask[iteration])
                                 read_embs[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
                                     re)] = re
@@ -450,7 +450,8 @@ class SkipRNN():
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
                                     test_steps,
-                                    100. * test_steps / self.SEQUENCE_LENGTH))
+                                    100. * test_steps / (
+                                                np.count_nonzero(test_mask) / (self.TEST_ITERS * self.BATCH_SIZE)))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:

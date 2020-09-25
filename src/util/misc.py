@@ -58,7 +58,7 @@ def compute_used_samples(update_state_gate):
             steps += update_state_gate[idx, idt]
     return steps / batch_size
 
-def stats_used_samples(update_state_gate, embeddings, probs):
+def stats_used_samples(update_state_gate, embeddings, probs, mask):
     # try:
     #     assert (update_state_gate.shape[:1] == embeddings.shape[:1] and update_state_gate == probs.shape)
     # except:
@@ -72,12 +72,13 @@ def stats_used_samples(update_state_gate, embeddings, probs):
     batch_size = update_state_gate.shape[0]
     for idx in range(batch_size):
         for idt in range(update_state_gate.shape[1]):
-            if update_state_gate[idx, idt] == 0:
-                non_read_embs.append(embeddings[idx, idt])
-                non_read_surps.append(probs[idx, idt])
-            else:
-                read_embs.append(embeddings[idx, idt])
-                read_surps.append(probs[idx, idt])
+            if mask[idx, idt] == 1:
+                if update_state_gate[idx, idt] == 0:
+                    non_read_embs.append(embeddings[idx, idt])
+                    non_read_surps.append(probs[idx, idt])
+                else:
+                    read_embs.append(embeddings[idx, idt])
+                    read_surps.append(probs[idx, idt])
     read_surps = np.multiply(-1, np.log(read_surps))
     non_read_surps = np.multiply(-1, np.log(non_read_surps))
     return read_embs, non_read_embs, read_surps, non_read_surps
