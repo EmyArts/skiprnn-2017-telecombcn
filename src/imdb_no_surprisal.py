@@ -148,10 +148,10 @@ class no_surp_SkipRNN():
                     # words not found in embedding index will be all-zeros.
                     embedding_matrix[batch_index][entry][i] = embedding_vector
                     probs_matrix[batch_index][entry][i] = prob
+                    mask[batch_index][entry][i] = 1
                 else:
                     c_unk += 1
                 word_count += 1
-                mask[batch_index][entry][i] = 1
             line_index += 1
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
@@ -162,7 +162,8 @@ class no_surp_SkipRNN():
         print(f"{c_unk} words out of {word_count} total words unknown for {split} set.")
 
         # inputs = {'text': text, 'labels': labels, 'iterator_init_op': iterator_init_op}
-        print(f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
+        print(
+            f"\n\n Input shape is {embedding_matrix.shape},  labels shape is {labels.shape}, probs shape is {probs_matrix.shape}")
         # np.expand_dims(probs_matrix, axis=-1)
         return embedding_matrix, labels, probs_matrix, mask
 
@@ -305,13 +306,13 @@ class no_surp_SkipRNN():
                     if out[3] is not None:
                         train_steps += compute_used_samples(out[3] * train_mask[iteration])
                     else:
-                        train_steps += self.SEQUENCE_LENGTH
+                        train_steps += np.count_nonzero(train_mask[iteration])
 
                 duration = time.time() - start_time
 
                 train_accuracy /= self.ITERATIONS_PER_EPOCH
                 train_loss /= self.ITERATIONS_PER_EPOCH
-                train_steps /= self.ITERATIONS_PER_EPOCH
+                train_steps /= (np.count_nonzero(train_mask) / self.BATCH_SIZE)
                 train_loss_plt[epoch] = train_loss
                 train_acc_df[epoch] = train_accuracy
                 train_update_df[epoch] = train_steps
@@ -332,10 +333,10 @@ class no_surp_SkipRNN():
                     if val_used_inputs is not None:
                         val_steps += compute_used_samples(val_used_inputs * val_mask[iteration])
                     else:
-                        val_steps += self.SEQUENCE_LENGTH
+                        val_steps += np.count_nonzero(val_mask[iteration])
                 val_accuracy /= self.VAL_ITERS
                 val_loss /= self.VAL_ITERS
-                val_steps /= self.VAL_ITERS
+                val_steps /= (np.count_nonzero(val_mask) / self.BATCH_SIZE)
                 val_acc_df[epoch] = val_accuracy
                 val_update_df[epoch] = val_steps
 
@@ -370,19 +371,15 @@ class no_surp_SkipRNN():
                 self.logger.info("Epoch %d/%d, "
                                  "duration: %.2f seconds, "
                                  "train accuracy: %.2f%%, "
-                                 "train samples: %.2f (%.2f%%), "
+                                 "train samples: %.2f%%, "
                                  "val accuracy: %.2f%%, "
-                                 "val samples: %.2f (%.2f%%)" % (epoch + 1,
-                                                                 self.NUM_EPOCHS,
-                                                                 duration,
-                                                                 100. * train_accuracy,
-                                                                 train_steps,
-                                                                 100. * train_steps / (np.count_nonzero(train_mask) / (
-                                                                         self.ITERATIONS_PER_EPOCH * self.BATCH_SIZE)),
-                                                                 100. * val_accuracy,
-                                                                 val_steps,
-                                                                 100. * val_steps / (np.count_nonzero(val_mask) / (
-                                                                         self.VAL_ITERS * self.BATCH_SIZE))))
+                                 "val samples: %.2f%%" % (epoch + 1,
+                                                          self.NUM_EPOCHS,
+                                                          duration,
+                                                          100. * train_accuracy,
+                                                          100. * train_steps,
+                                                          100. * val_accuracy,
+                                                          100. * val_steps))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f" % (
                     loss_abs[0], loss_abs[1]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%" % (
@@ -430,15 +427,15 @@ class no_surp_SkipRNN():
                                 non_read_surps[
                                 self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
                                     nrs.flatten())] = nrs.flatten()
-                            except:
+                            except Exception as e:
                                 self.logger.info("Could not update analysis")
                                 pass
                     else:
-                        val_steps += self.SEQUENCE_LENGTH
+                        test_steps += np.count_nonzero(test_mask[iteration])
 
                 test_accuracy /= self.TEST_ITERS
                 test_loss /= self.TEST_ITERS
-                test_steps /= self.TEST_ITERS
+                test_steps /= (np.count_nonzero(test_mask) / self.BATCH_SIZE)
                 test_time_df[epoch] = t
                 test_acc_df[epoch] = test_accuracy
                 test_update_df[epoch] = test_steps
@@ -447,12 +444,10 @@ class no_surp_SkipRNN():
 
                 self.logger.info("Test time: %.2f seconds, "
                                  "test accuracy: %.2f%%, "
-                                 "test samples: %.2f (%.2f%%).\n"
+                                 "test samples: %.2f%%.\n"
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
-                                    test_steps,
-                                    100. * test_steps / (
-                                            np.count_nonzero(test_mask) / (self.TEST_ITERS * self.BATCH_SIZE))))
+                                    100. * test_steps))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
