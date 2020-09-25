@@ -378,11 +378,11 @@ class no_surp_SkipRNN():
                                                                  100. * train_accuracy,
                                                                  train_steps,
                                                                  100. * train_steps / (np.count_nonzero(train_mask) / (
-                                                                             self.train_ITERS * self.BATCH_SIZE)),
+                                                                         self.ITERATIONS_PER_EPOCH * self.BATCH_SIZE)),
                                                                  100. * val_accuracy,
                                                                  val_steps,
                                                                  100. * val_steps / (np.count_nonzero(val_mask) / (
-                                                                             self.VAL_ITERS * self.BATCH_SIZE))))
+                                                                         self.VAL_ITERS * self.BATCH_SIZE))))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f" % (
                     loss_abs[0], loss_abs[1]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%" % (
