@@ -374,7 +374,7 @@ class SkipRNN():
                 loss_abs = loss_plt[epoch].mean(axis=0)
                 loss_perc = np.divide(loss_abs, (loss_abs.sum())) * 100
 
-                self.logger.info("Epoch %d/%d, "
+                self.logger.info("\nEpoch %d/%d, "
                                  "duration: %.2f seconds, "
                                  "train accuracy: %.2f%%, "
                                  "train samples: %.2f%%, "
@@ -401,17 +401,17 @@ class SkipRNN():
                     read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
                     non_read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
 
-                test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
-                for iteration in range(self.TEST_ITERS):
-                    t0 = time.time()
-                    test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
-                                                                                    feed_dict={
-                                                                                        samples: test_matrix[iteration],
-                                                                                        ground_truth: test_labels[
-                                                                                            iteration],
-                                                                                        probs: test_probs[iteration],
-                                                                                        mask: test_mask[iteration]
-                                                                                    })
+                # test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
+                # for iteration in range(self.TEST_ITERS):
+                #     t0 = time.time()
+                #     test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
+                #                                                                     feed_dict={
+                #                                                                         samples: test_matrix[iteration],
+                #                                                                         ground_truth: test_labels[
+                #                                                                             iteration],
+                #                                                                         probs: test_probs[iteration],
+                #                                                                         mask: test_mask[iteration]
+                #                                                                     })
                 #     t += time.time() - t0
                 #     test_accuracy += test_iter_accuracy
                 #     test_loss += test_iter_loss
@@ -504,26 +504,26 @@ class SkipRNN():
             pass
 
         ## Saving analysis statistics
-        try:
-            analysis_loc = '../analysis'
-            if not os.path.exists(analysis_loc):
-                os.makedirs(analysis_loc)
-            print("Read words")
-            read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, read_embs)
-            print("Skipped words")
-            non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
-            pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
-            pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
-            read_surps = np.vstack(read_surps).flatten()
-            non_read_surps = np.vstack(non_read_surps).flatten()
-            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps >= 0])
-            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
-                    non_read_surps[non_read_surps >= 0])
-
-        except Exception as e:
-            print(e)
-            self.logger.info("Something went wrong when reporting analysis results")
-            pass
+        # try:
+        #     analysis_loc = '../analysis'
+        #     if not os.path.exists(analysis_loc):
+        #         os.makedirs(analysis_loc)
+        #     print("Read words")
+        #     read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, read_embs)
+        #     print("Skipped words")
+        #     non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
+        #     pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
+        #     pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
+        #     read_surps = np.vstack(read_surps).flatten()
+        #     non_read_surps = np.vstack(non_read_surps).flatten()
+        #     np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps >= 0])
+        #     np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
+        #             non_read_surps[non_read_surps >= 0])
+        #
+        # except Exception as e:
+        #     print(e)
+        #     self.logger.info("Something went wrong when reporting analysis results")
+        #     pass
 
         sess.close()
         tf.reset_default_graph()
