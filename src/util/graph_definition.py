@@ -121,7 +121,7 @@ def compute_budget_loss(model, loss, updated_states, cost_per_sample, mask):
     Compute penalization term on the number of updated states (i.e. used samples)
     """
     if using_skip_rnn(model):
-        sample_loss = tf.reduce_mean(tf.reduce_sum(cost_per_sample * tf.boolean_mask(updated_states, mask), 1), 0)
+        sample_loss = tf.reduce_mean(tf.reduce_sum(cost_per_sample * tf.multiply(updated_states, mask), 1), 0)
         # if not any(tf.is_nan(sample_loss)):
         #     return sample_loss
         # else:
@@ -140,16 +140,15 @@ def compute_surprisal_loss(model, loss, updated_states, sample_probabilities, su
     Compute penalization term on the average surprisal of the unread samples.
     """
     if using_skip_rnn(model):
-        neg_updated_states = tf.boolean_mask(
-            tf.subtract(tf.ones(updated_states.get_shape(), dtype=tf.dtypes.float32), updated_states), mask)
-        surprisal_values = tf.boolean_mask(tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities))), mask)
+        neg_updated_states = tf.subtract(tf.ones(updated_states.get_shape(), dtype=tf.dtypes.float32), updated_states)
+        surprisal_values = tf.multiply(tf.multiply(tf.constant(-1.0), (tf.log(sample_probabilities))), mask)
         # printer_0 = tf.Print(neg_updated_states, [neg_updated_states], "Inverse of the updated states is ")
         surprisals = tf.multiply(neg_updated_states,
                                  tf.where(tf.is_nan(surprisal_values), tf.zeros_like(surprisal_values),
                                           surprisal_values))
         tot_surprisal = tf.reduce_sum(surprisals)
         # printer_1 = tf.Print(tot_surprisal, [tot_surprisal], "Total surprisal is ")
-        non_read_samples = tf.reduce_sum(neg_updated_states)
+        non_read_samples = tf.reduce_sum(tf.multiply(neg_updated_states, mask))
         # printer_2 = tf.Print(non_read_samples, [non_read_samples], "Non read samples is ")
         # with tf.control_dependencies([printer_0, printer_1, printer_2]):
         average_surprisal = tf.div_no_nan(tot_surprisal, non_read_samples)
