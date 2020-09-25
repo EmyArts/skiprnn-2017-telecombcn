@@ -379,10 +379,8 @@ class SkipRNN():
                                                           self.NUM_EPOCHS,
                                                           duration,
                                                           100. * train_accuracy,
-                                                          train_steps,
                                                           100. * train_steps,
                                                           100. * val_accuracy,
-                                                          val_steps,
                                                           100. * val_steps))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                     loss_abs[0], loss_abs[1], loss_abs[2]))
