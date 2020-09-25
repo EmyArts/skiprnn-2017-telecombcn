@@ -149,10 +149,10 @@ class SkipRNN():
                     # words not found in embedding index will be all-zeros.
                     embedding_matrix[batch_index][entry][i] = embedding_vector
                     probs_matrix[batch_index][entry][i] = prob
+                    mask[batch_index][entry][i] = 1
                 else:
                     c_unk += 1
                 word_count += 1
-                mask[batch_index][entry][i] = 1
             line_index += 1
             entry = line_index % self.BATCH_SIZE
             if entry == 0:
