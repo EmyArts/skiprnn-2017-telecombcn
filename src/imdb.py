@@ -314,7 +314,7 @@ class SkipRNN():
 
                 train_accuracy /= self.ITERATIONS_PER_EPOCH
                 train_loss /= self.ITERATIONS_PER_EPOCH
-                train_steps /= self.ITERATIONS_PER_EPOCH
+                train_steps /= (np.count_nonzero(train_mask) / self.BATCH_SIZE)
                 train_loss_plt[epoch] = train_loss
                 train_acc_df[epoch] = train_accuracy
                 train_update_df[epoch] = train_steps
@@ -338,7 +338,7 @@ class SkipRNN():
                         val_steps += np.count_nonzero(val_mask[iteration])
                 val_accuracy /= self.VAL_ITERS
                 val_loss /= self.VAL_ITERS
-                val_steps /= self.VAL_ITERS
+                val_steps /= (np.count_nonzero(val_mask) / self.BATCH_SIZE)
                 val_acc_df[epoch] = val_accuracy
                 val_update_df[epoch] = val_steps
 
@@ -373,19 +373,17 @@ class SkipRNN():
                 self.logger.info("Epoch %d/%d, "
                                  "duration: %.2f seconds, "
                                  "train accuracy: %.2f%%, "
-                                 "train samples: %.2f (%.2f%%), "
+                                 "train samples: %.2f%%, "
                                  "val accuracy: %.2f%%, "
-                                 "val samples: %.2f (%.2f%%)" % (epoch + 1,
-                                                                 self.NUM_EPOCHS,
-                                                                 duration,
-                                                                 100. * train_accuracy,
-                                                                 train_steps,
-                                                                 100. * train_steps / (np.count_nonzero(train_mask) / (
-                                                                         self.ITERATIONS_PER_EPOCH * self.BATCH_SIZE)),
-                                                                 100. * val_accuracy,
-                                                                 val_steps,
-                                                                 100. * val_steps / (np.count_nonzero(val_mask) / (
-                                                                         self.VAL_ITERS * self.BATCH_SIZE))))
+                                 "val samples: %.2f%%" % (epoch + 1,
+                                                          self.NUM_EPOCHS,
+                                                          duration,
+                                                          100. * train_accuracy,
+                                                          train_steps,
+                                                          100. * train_steps,
+                                                          100. * val_accuracy,
+                                                          val_steps,
+                                                          100. * val_steps))
                 self.logger.info("Absolute losses: entropy: %.3f, budget: %.3f, surprisal: %.3f." % (
                     loss_abs[0], loss_abs[1], loss_abs[2]))
                 self.logger.info("Percentage losses: entropy: %.2f%%, budget: %.2f%%, surprisal: %.2f%%." % (
@@ -452,7 +450,7 @@ class SkipRNN():
                                  "test samples: %.2f%%.\n"
                                  % (test_time_df[epoch],
                                     100. * test_accuracy,
-                                    test_steps))
+                                    100. * test_steps))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
