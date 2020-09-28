@@ -513,7 +513,7 @@ class no_surp_SkipRNN():
             print("Read words")
             read_words = get_words_from_embedding(self.EMBEDDING_DICT, read_embs)
             print("Skipped words")
-            non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
+            non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, non_read_embs)
             pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
             pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
             read_surps = np.vstack(read_surps).flatten()
