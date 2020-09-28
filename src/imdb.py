@@ -510,7 +510,7 @@ class SkipRNN():
             if not os.path.exists(analysis_loc):
                 os.makedirs(analysis_loc)
             print("Read words")
-            read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, read_embs)
+            read_words = get_words_from_embedding(self.EMBEDDING_DICT, read_embs)
             print("Skipped words")
             non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, self.TEST_EMBEDDING_MATRIX, non_read_embs)
             pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
