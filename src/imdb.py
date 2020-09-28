@@ -422,18 +422,22 @@ class SkipRNN():
                             try:
                                 re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
                                                                       test_probs[iteration], test_mask[iteration])
-                                read_embs[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    re)] = re
-                                non_read_embs[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nre)] = nre
-                                read_surps[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
-                                non_read_surps[
-                                self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                                    nrs.flatten())] = nrs.flatten()
+                                if len(re) > 0:
+                                    read_embs[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        re)] = re
+                                if len(nre) > 0:
+                                    non_read_embs[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        nre)] = nre
+                                if len(rs) > 0:
+                                    read_surps[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
+                                if len(nrs) > 0:
+                                    non_read_surps[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        nrs.flatten())] = nrs.flatten()
                             except Exception as e:
                                 self.logger.info("Could not update analysis")
                                 self.logger.error(e)

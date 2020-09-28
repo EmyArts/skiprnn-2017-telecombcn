@@ -96,11 +96,11 @@ if __name__ == '__main__':
 						params['epochs'] = 125
 						params['early_stopping'] = 'yes'
 						params['file_name'] = file_name
-						# if params['surprisal_cost'] == 0:
-						# 	model = no_surp_SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
-						# else:
-						# 	model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
-						model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+						if params['surprisal_cost'] == 0:
+							model = no_surp_SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+						else:
+							model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
+						# model = SkipRNN(config_dict=params, emb_dict=embedding_dict, probs_dict=probs_dict)
 						model.train()
 						gc.collect()
 		if gputil:
