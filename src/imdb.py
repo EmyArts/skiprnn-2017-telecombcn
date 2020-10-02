@@ -284,7 +284,7 @@ class SkipRNN():
         try:
             train_matrix, train_labels, train_probs, train_mask = self.input_fn(split='train')
             val_matrix, val_labels, val_probs, val_mask = self.input_fn(split='val')
-            # test_matrix, test_labels, test_probs, test_mask = self.input_fn(split='test')
+            test_matrix, test_labels, test_probs, test_mask = self.input_fn(split='test')
 
             # train_loss_plt = np.empty((self.NUM_EPOCHS, self.ITERATIONS_PER_EPOCH)
 
@@ -392,72 +392,72 @@ class SkipRNN():
                     loss_perc[0], loss_perc[1], loss_perc[2]))
                 print(
                     f"entropy: {loss_plt[epoch, :, 0].mean()}, budget: {loss_plt[epoch, :, 1].mean()}, surprisal: {loss_plt[epoch, :, 2].mean()}.")
-                # analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
-                # if analysis_update:
-                #     self.logger.info("Updating Analysis")
-                #     read_embs = np.zeros(
-                #         (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                #     non_read_embs = np.zeros(
-                #         (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
-                #     read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
-                #     non_read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+                analysis_update = val_accuracy + 1e-4 > val_acc_df.max()
+                if analysis_update:
+                    self.logger.info("Updating Analysis")
+                    read_embs = np.zeros(
+                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                    non_read_embs = np.zeros(
+                        (self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH, self.EMBEDDING_LENGTH))
+                    read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
+                    non_read_surps = np.full((self.TEST_ITERS * self.BATCH_SIZE * self.SEQUENCE_LENGTH), -1)
 
-                # test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
-                # for iteration in range(self.TEST_ITERS):
-                #     t0 = time.time()
-                #     test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
-                #                                                                     feed_dict={
-                #                                                                         samples: test_matrix[iteration],
-                #                                                                         ground_truth: test_labels[
-                #                                                                             iteration],
-                #                                                                         probs: test_probs[iteration],
-                #                                                                         mask: test_mask[iteration]
-                #                                                                     })
-                #     t += time.time() - t0
-                #     test_accuracy += test_iter_accuracy
-                #     test_loss += test_iter_loss
-                #     if test_used_inputs is not None:
-                #         test_steps += compute_used_samples(test_used_inputs * test_mask[iteration])
-                #         if analysis_update:
-                #             try:
-                #                 re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
-                #                                                       test_probs[iteration], test_mask[iteration])
-                #                 if len(re) > 0:
-                #                     read_embs[
-                #                     self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                #                         re)] = re
-                #                 if len(nre) > 0:
-                #                     non_read_embs[
-                #                     self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                #                         nre)] = nre
-                #                 if len(rs) > 0:
-                #                     read_surps[
-                #                     self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                #                         rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
-                #                 if len(nrs) > 0:
-                #                     non_read_surps[
-                #                     self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
-                #                         nrs.flatten())] = nrs.flatten()
-                #             except Exception as e:
-                #                 self.logger.info("Could not update analysis")
-                #                 self.logger.error(e)
-                #                 pass
-                #     else:
-                #         test_steps += np.count_nonzero(test_mask[iteration])
-                #
-                # test_accuracy /= self.TEST_ITERS
-                # test_loss /= self.TEST_ITERS
-                # test_steps /= (np.count_nonzero(test_mask) / self.BATCH_SIZE)
-                # test_time_df[epoch] = t
-                # test_acc_df[epoch] = test_accuracy
-                # test_update_df[epoch] = test_steps
-                #
-                # self.logger.info("Test time: %.2f seconds, "
-                #                  "test accuracy: %.2f%%, "
-                #                  "test samples: %.2f%%.\n"
-                #                  % (test_time_df[epoch],
-                #                     100. * test_accuracy,
-                #                     100. * test_steps))
+                test_accuracy, test_loss, test_steps, t = 0, 0, 0, 0
+                for iteration in range(self.TEST_ITERS):
+                    t0 = time.time()
+                    test_iter_accuracy, test_iter_loss, test_used_inputs = sess.run([accuracy, loss, updated_states],
+                                                                                    feed_dict={
+                                                                                        samples: test_matrix[iteration],
+                                                                                        ground_truth: test_labels[
+                                                                                            iteration],
+                                                                                        probs: test_probs[iteration],
+                                                                                        mask: test_mask[iteration]
+                                                                                    })
+                    t += time.time() - t0
+                    test_accuracy += test_iter_accuracy
+                    test_loss += test_iter_loss
+                    if test_used_inputs is not None:
+                        test_steps += compute_used_samples(test_used_inputs * test_mask[iteration])
+                        if analysis_update:
+                            try:
+                                re, nre, rs, nrs = stats_used_samples(test_used_inputs, test_matrix[iteration],
+                                                                      test_probs[iteration], test_mask[iteration])
+                                if len(re) > 0:
+                                    read_embs[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        re)] = re
+                                if len(nre) > 0:
+                                    non_read_embs[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        nre)] = nre
+                                if len(rs) > 0:
+                                    read_surps[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        rs.flatten())] = rs.flatten()  # take out flatten but should not be the problem
+                                if len(nrs) > 0:
+                                    non_read_surps[
+                                    self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH: self.BATCH_SIZE * iteration * self.SEQUENCE_LENGTH + len(
+                                        nrs.flatten())] = nrs.flatten()
+                            except Exception as e:
+                                self.logger.info("Could not update analysis")
+                                self.logger.error(e)
+                                pass
+                    else:
+                        test_steps += np.count_nonzero(test_mask[iteration])
+
+                test_accuracy /= self.TEST_ITERS
+                test_loss /= self.TEST_ITERS
+                test_steps /= (np.count_nonzero(test_mask) / self.BATCH_SIZE)
+                test_time_df[epoch] = t
+                test_acc_df[epoch] = test_accuracy
+                test_update_df[epoch] = test_steps
+
+                self.logger.info("Test time: %.2f seconds, "
+                                 "test accuracy: %.2f%%, "
+                                 "test samples: %.2f%%.\n"
+                                 % (test_time_df[epoch],
+                                    100. * test_accuracy,
+                                    100. * test_steps))
 
                 if self.EARLY_STOPPING and epoch > 15:
                     if epoch == 16:
@@ -472,9 +472,9 @@ class SkipRNN():
                         train_acc_df = train_acc_df[:epoch]
                         train_update_df = train_update_df[:epoch]
                         loss_plt = loss_plt[:epoch]
-                        # test_acc_df = test_acc_df[:epoch]
-                        # test_update_df = test_update_df[:epoch]
-                        # test_time_df = test_time_df[:epoch]
+                        test_acc_df = test_acc_df[:epoch]
+                        test_update_df = test_update_df[:epoch]
+                        test_time_df = test_time_df[:epoch]
                         self.logger.info("Training was interrupted with early stopping")
                         break
 
@@ -490,9 +490,9 @@ class SkipRNN():
             df_dict['val_updates'] = val_update_df
             df_dict['train_acc'] = train_acc_df
             df_dict['train_updates'] = train_update_df
-            # df_dict['test_acc'] = test_acc_df
-            # df_dict['test_updates'] = test_update_df
-            # df_dict['test_time'] = test_time_df
+            df_dict['test_acc'] = test_acc_df
+            df_dict['test_updates'] = test_update_df
+            df_dict['test_time'] = test_time_df
             loss_plt_mean = loss_plt.mean(axis=1).transpose()
             df_dict['entropy_loss'] = loss_plt_mean[0]
             df_dict['budget_loss'] = loss_plt_mean[1]
@@ -508,27 +508,27 @@ class SkipRNN():
             self.logger.info("Could not create csvs")
             pass
 
-        # Saving analysis statistics
-        # try:
-        #     analysis_loc = '../analysis'
-        #     if not os.path.exists(analysis_loc):
-        #         os.makedirs(analysis_loc)
-        #     print("Read words")
-        #     read_words = get_words_from_embedding(self.EMBEDDING_DICT, read_embs)
-        #     print("Skipped words")
-        #     non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, non_read_embs)
-        #     pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
-        #     pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
-        #     read_surps = np.vstack(read_surps).flatten()
-        #     non_read_surps = np.vstack(non_read_surps).flatten()
-        #     np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps >= 0])
-        #     np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
-        #             non_read_surps[non_read_surps >= 0])
-        #
-        # except Exception as e:
-        #     print(e)
-        #     self.logger.info("Something went wrong when reporting analysis results")
-        #     pass
+        ## Saving analysis statistics
+        try:
+            analysis_loc = '../analysis'
+            if not os.path.exists(analysis_loc):
+                os.makedirs(analysis_loc)
+            print("Read words")
+            read_words = get_words_from_embedding(self.EMBEDDING_DICT, read_embs)
+            print("Skipped words")
+            non_read_words = get_words_from_embedding(self.EMBEDDING_DICT, non_read_embs)
+            pickle.dump(read_words, open(f"{analysis_loc}/{self.FILE_NAME}_read_vocab.pkl", 'wb'), protocol=0)
+            pickle.dump(non_read_words, open(f"{analysis_loc}/{self.FILE_NAME}_non_read_vocab.pkl", 'wb'), protocol=0)
+            read_surps = np.vstack(read_surps).flatten()
+            non_read_surps = np.vstack(non_read_surps).flatten()
+            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_read_surprisals.npy", 'wb'), read_surps[read_surps >= 0])
+            np.save(open(f"{analysis_loc}/{self.FILE_NAME}_non_read_surprisals.npy", 'wb'),
+                    non_read_surps[non_read_surps >= 0])
+
+        except Exception as e:
+            print(e)
+            self.logger.info("Something went wrong when reporting analysis results")
+            pass
 
         sess.close()
         tf.reset_default_graph()
